@@ -1,0 +1,20 @@
+Usually, the older the individual, the more extensive the examination. 
+
+Demographic data file variables are grouped into three broad categories: 
+
+1.- Status Variables: Provide core information on the survey participant. 
+Examples of the core variables include interview status, examination status, and sequence number.
+(Sequence number [SEQN] is a unique ID number assigned to each sample person and is required to 
+match the information on this demographic file to the rest of the NHANES 2007-2008 data.)
+
+2.- Recoded Demographic Variables: 
+
+The variables include age: 
+
+*Age in months for persons under age 80, age in years for 1 to 80-year-olds, 
+and a top-coded age group of 80 years and older.
+
+*Gender, a race/ethnicity variable, 
+
+Current or highest grade of education completed, less than high school, 
+high school, and more than high school education), country of birth (United States, Mexico, or other foreign born), ratio of family income to poverty threshold, income, and a pregnancy status variable (adjudicated from various pregnancy-related variables). Some of the groupings were made due to limited sample sizes for the two-year dataset. (3) Interview and Examination Sample Weight Variables: Sample weights are available for analyzing NHANES 2007-2008 data. Most data analyses require either the interviewed sample weight (variable name: WTINT2YR) or examined sample weight (variable name: WTMEC2YR). The two-year sample weights (WTINT2YR, WTMEC2YR) should be used for NHANES 2007-2j08 i
