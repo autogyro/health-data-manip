@@ -1,39 +1,23 @@
 #Testing loading ASCII/TSV Files
 #@Juan E. Rolon
 
-
 import pandas as pd
 
-data_dir_2 = '/Users/juanerolon/Downloads/ICPSR_25505_Demographics/DS0001/'
-data_dir_3 = '/Users/juanerolon/Downloads/ICPSR_25505_Diabetes/DS0209/'
-data_dir_4 = '/Users/juanerolon/Downloads/ICPSR_25505_Alcohol_Use/DS0202/'
+demographics_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/demographics/'
+smoking_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/smoking/'
 
 
-data2 = pd.read_csv(data_dir_2 + '25505-0001-Data.tsv', sep='\t')
-data3 = pd.read_csv(data_dir_3 + '25505-0209-Data.tsv', sep='\t')
-data4 = pd.read_csv(data_dir_4 + '25505-0202-Data.tsv', sep='\t')
+#datafiles are in SAS format
+demographics_data = pd.read_sas(demographics_path + 'DEMO_H.XPT')
+smoking_data = pd.read_sas(smoking_path + 'SMQ_H.XPT')
 
-demographics_keys = list(data2.head().keys())
-diabetes_keys = list(data3.head().keys())
-alcohol_keys = list(data4.head().keys())
+#datasets keys or column fields
+demographics_vars = list(demographics_data.keys())
+smoking_vars = list(smoking_data.keys())
 
-print('Different keys: diabetes-demographics\n')
-print(list(set(diabetes_keys)-set(demographics_keys)))
-print('Common keys: diabetes-demographics\n')
-print(list(set(diabetes_keys) & set(demographics_keys)))
-print("\n\n")
-print('Different keys: alcohol-demographics\n')
-print(list(set(alcohol_keys)-set(demographics_keys)))
-print('Common keys: alcohol-demographics\n')
-print(list(set(alcohol_keys) & set(demographics_keys)))
+#dataset quick preview of a subset of the column fields (variables of interest)
+print("\nDemographics data exploration:\n")
+print(demographics_data[['SEQN', 'RIDAGEYR', 'RIAGENDR', 'INDHHIN2']].head())
 
-nkeys_demographics = len(demographics_keys)
-nkeys_diabetes = len(diabetes_keys)
-nkeys_diabetes = len(alcohol_keys )
-
-
-# RIAGENDR_VALS2 = data2['RIAGENDR'].head()
-# print(RIAGENDR_VALS2)
-# print("---")
-# RIAGENDR_VALS3 = data3['RIAGENDR'].head()
-# print(RIAGENDR_VALS3)
+print("\nSmoking cigarettes use data exploration:\n")
+print(smoking_data[['SMQ040', 'SMQ020']].head())
