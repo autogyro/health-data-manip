@@ -18,6 +18,8 @@ consumer_data = pd.read_sas(datasets_path + 'consumer_behavior/CBQ_H.xpt')
 insurance_data = pd.read_sas(datasets_path + 'health_insurance/HIQ_H.xpt')
 healthcare_data = pd.read_sas(datasets_path + 'access_to_care/HUQ_H.xpt')
 cardiovascular_data = pd.read_sas(datasets_path + 'cardiovascular/CDQ_H.XPT')
+diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT')
+
 
 
 
@@ -33,7 +35,7 @@ consumer_vars = list(consumer_data.keys())
 insurance_vars = list(insurance_data.keys())
 healthcare_vars = list(healthcare_data.keys())
 cardiovascular_vars = list(cardiovascular_data.keys())
-
+diabetes_vars = list(diabetes_data.keys())
 
 
 #datasets' quick preview of a subset of the column fields (variables of interest)
@@ -69,4 +71,7 @@ print(healthcare_data[['SEQN','HUQ010', 'HUQ020', 'HUQ051']].head())
 
 print("\nCardiovascular health data exploration:\n")
 print(cardiovascular_data[['SEQN','CDQ008', 'CDQ010', 'CDQ001']].head())
+
+print("\nDiabetes data exploration:\n")
+print(diabetes_data[['SEQN','DIQ010', 'DIQ160', 'DIQ170']].head())
 
