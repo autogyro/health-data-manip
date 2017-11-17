@@ -2,6 +2,7 @@
 #@Juan E. Rolon
 
 import pandas as pd
+import numpy as np
 
 #path to datasets folders
 datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/'
@@ -39,39 +40,81 @@ diabetes_vars = list(diabetes_data.keys())
 
 
 #datasets' quick preview of a subset of the column fields (variables of interest)
+
+##### DEMOGRAPHICS ######
+
 print("\nDemographics data exploration:\n")
-print(demographics_data[['SEQN', 'RIDAGEYR', 'RIAGENDR', 'INDHHIN2']].head())
 
-print("\nSmoking cigarettes use data exploration:\n")
-print(smoking_data[['SEQN','SMQ040', 'SMQ020']].head())
+#Print head of data on selected variables of interest
+if False:
+    print("Data head selected\n")
+    print(demographics_data[['SEQN', 'RIDAGEYR', 'RIAGENDR', 'INDHHIN2']].head())
+    print("")
 
-print("\nAlcohol use data exploration:\n")
-print(alcohol_data[['SEQN','ALQ120Q', 'ALQ130']].head())
+seqn_num_records = demographics_data.SEQN.count()
+age_num_records = demographics_data.RIDAGEYR.count()
 
-print("\nWeight  history data exploration:\n")
-print(weight_data[['SEQN','WHD010', 'WHD020']].head())
+max_age = np.max(demographics_data.RIDAGEYR)
+min_age = np.min(demographics_data.RIDAGEYR)
+min_age = np.min(demographics_data.RIDAGEYR)
 
-print("\nPhysical activity data exploration:\n")
-print(physical_data[['SEQN','PAQ650', 'PAQ655']].head())
 
-print("\nBlood pressure & cholesterol data exploration:\n")
-print(pressurechol_data[['SEQN','BPQ020','BPQ040A', 'BPQ050A','BPQ080', 'BPQ090D']].head())
+print("SEQN num. records = {}, Age num records = {}".format(seqn_num_records, age_num_records))
+print("Max age = {}".format(max_age))
+print("Min age = {}".format(min_age))
 
-print("\nDiet and nutrition data exploration:\n")
-print(nutrition_data[['SEQN','DBD895','DBD900', 'DBD905','DBD910']].head())
+print("\nDescriptive statistics of demographics data on selected variables:")
+print(demographics_data[['SEQN', 'RIDAGEYR', 'RIAGENDR', 'INDHHIN2']].describe())
 
-print("\nConsumer behavior data exploration:\n")
-print(consumer_data[['SEQN','CBD070','CBD120', 'CBD130','CBD090']].head())
+#Age restricted data
 
-print("\nHealth insurance data exploration:\n")
-print(insurance_data[['SEQN','HIQ011']].head())
+print("\nAge restricted data:\n")
+age_gt18_data = demographics_data[(18.0 <= demographics_data.RIDAGEYR)]
+age_lt45_data = demographics_data[(demographics_data.RIDAGEYR >= 45.0)]
+age_gt18_lt45_data = age_gt18_data[(age_gt18_data.RIDAGEYR <=45.0)]
 
-print("\nAccess to healthcare data exploration:\n")
-print(healthcare_data[['SEQN','HUQ010', 'HUQ020', 'HUQ051']].head())
+#print age-restricted data heads
+if False:
+    print(age_gt18_data.head())
+    print(age_lt45_data.head())
+    print(age_gt18_lt45_data.head())
 
-print("\nCardiovascular health data exploration:\n")
-print(cardiovascular_data[['SEQN','CDQ008', 'CDQ010', 'CDQ001']].head())
+#------------------------
 
-print("\nDiabetes data exploration:\n")
-print(diabetes_data[['SEQN','DIQ010', 'DIQ160', 'DIQ170']].head())
+if False:
+
+    print("\nSmoking cigarettes use data exploration:\n")
+    print(smoking_data[['SEQN','SMQ040', 'SMQ020']].head())
+
+    print("\nAlcohol use data exploration:\n")
+    print(alcohol_data[['SEQN','ALQ120Q', 'ALQ130']].head())
+
+    print("\nWeight  history data exploration:\n")
+    print(weight_data[['SEQN','WHD010', 'WHD020']].head())
+
+    print("\nPhysical activity data exploration:\n")
+    print(physical_data[['SEQN','PAQ650', 'PAQ655']].head())
+
+    print("\nBlood pressure & cholesterol data exploration:\n")
+    print(pressurechol_data[['SEQN','BPQ020','BPQ040A', 'BPQ050A','BPQ080', 'BPQ090D']].head())
+
+    print("\nDiet and nutrition data exploration:\n")
+    print(nutrition_data[['SEQN','DBD895','DBD900', 'DBD905','DBD910']].head())
+
+    print("\nConsumer behavior data exploration:\n")
+    print(consumer_data[['SEQN','CBD070','CBD120', 'CBD130','CBD090']].head())
+
+    print("\nHealth insurance data exploration:\n")
+    print(insurance_data[['SEQN','HIQ011']].head())
+
+    print("\nAccess to healthcare data exploration:\n")
+    print(healthcare_data[['SEQN','HUQ010', 'HUQ020', 'HUQ051']].head())
+
+    print("\nCardiovascular health data exploration:\n")
+    print(cardiovascular_data[['SEQN','CDQ008', 'CDQ010', 'CDQ001']].head())
+
+    print("\nDiabetes data exploration:\n")
+    print(diabetes_data[['SEQN','DIQ010', 'DIQ160', 'DIQ170']].head())
+
+
 
