@@ -64,14 +64,22 @@ print("Max age = {}".format(max_age))
 print("Min age = {}".format(min_age))
 
 print("\nDescriptive statistics of demographics data on selected variables:")
-print(demographics_data[['SEQN', 'RIDAGEYR', 'RIAGENDR', 'INDHHIN2']].describe())
+print(demographics_data[['SEQN', 'RIDAGEYR', 'INDHHIN2']].describe())
 
 #Age restricted data
 
 print("\nAge restricted data:\n")
 age_gt18_data = demographics_data[(18.0 <= demographics_data.RIDAGEYR)]
 age_lt45_data = demographics_data[(demographics_data.RIDAGEYR >= 45.0)]
+
+#group of interest
 age_gt18_lt45_data = age_gt18_data[(age_gt18_data.RIDAGEYR <=45.0)]
+
+#Save age-restricted data ot CSV files
+if False:
+    age_gt18_lt45_data.to_csv('age_gt18_lt45.csv', sep=',')
+    age_lt45_data.to_csv('age_lt45.csv', sep=',')
+    age_gt18_data.to_csv('age_gt18.csv', sep=',')
 
 #print age-restricted data heads
 if False:
@@ -79,7 +87,17 @@ if False:
     print(age_lt45_data.head())
     print(age_gt18_lt45_data.head())
 
-#------------------------
+
+nag1845 = age_gt18_lt45_data.RIDAGEYR.count()
+
+
+print("Num records of restricted age data (18 <= age <= 45: {}".format(nag1845))
+print("\nDescriptive statistics of age-restricted data on selected variables:")
+print(age_gt18_lt45_data[['SEQN', 'RIDAGEYR', 'INDHHIN2']].describe())
+
+
+
+
 
 if False:
 
