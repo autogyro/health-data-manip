@@ -108,18 +108,32 @@ for record_num in list(age_gt18_lt45_data.SEQN):
         ct +=1
 print("Number of non-empty datframes in Alcohol use data - for listed records: {}".format(ct))
 
+
+
 #----------------------------------------------------------------------------------------
 print("Age and alcohol data transformations:\n")
 
-alcohol_age_dict = {'SEQN':[], 'RIDAGEYR':[], 'ALQ130':[]}
-
 ageSeries = pd.Series(list(age_gt18_lt45_data.RIDAGEYR), index=list(age_gt18_lt45_data.SEQN))
-alcoholSeries = pd.Series(list(alcohol_data.ALQ130), index=list(alcohol_data.SEQN))
+tmp_alcoholSeries = pd.Series(list(alcohol_data.ALQ130), index=list(alcohol_data.SEQN))
 
 print("\nAge series description:\n")
 print(ageSeries.describe())
-print("\nAlcohol series description:\n")
-print(alcoholSeries.describe())
+print("\nFull alcohol series description:\n")
+print(tmp_alcoholSeries.describe())
+
+print("\nReindexing of alcohol data series:\n")
+print("Series head:\n")
+alcohol_Series = tmp_alcoholSeries.reindex(list(age_gt18_lt45_data.SEQN))
+
+print(tmp_alcoholSeries.describe())
+print("\nAlcohol series restricted to age group stat description:\n")
+print(alcohol_Series.describe())
+
+alcohol_Series.to_csv("alcohol_series.csv", sep=',', header=True)
+ageSeries.to_csv("age_series.csv", sep=',', header=True)
+
+
+
 
 
 
