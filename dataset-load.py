@@ -108,6 +108,34 @@ for record_num in list(age_gt18_lt45_data.SEQN):
         ct +=1
 print("Number of non-empty datframes in Alcohol use data - for listed records: {}".format(ct))
 
+#----------------------------------------------------------------------------------------
+print("Age and alcohol data transformations:\n")
+
+alcohol_age_dict = {'SEQN':[], 'RIDAGEYR':[], 'ALQ130':[]}
+
+ageSeries = pd.Series(list(age_gt18_lt45_data.RIDAGEYR), index=list(age_gt18_lt45_data.SEQN))
+alcoholSeries = pd.Series(list(alcohol_data.ALQ130), index=list(alcohol_data.SEQN))
+
+print("\nAge series description:\n")
+print(ageSeries.describe())
+print("\nAlcohol series description:\n")
+print(alcoholSeries.describe())
+
+
+
+
+#Check dataframe head and compare with extracted series head
+if False:
+    print("Original age data frame head:\n")
+    print(age_gt18_lt45_data[['SEQN', 'RIDAGEYR']].head())
+    print("Extracted series age data head witn SEQN as index:\n")
+    print(ageSeries.head())
+
+    print("Original alcohol data frame head:\n")
+    print(alcohol_data[['SEQN', 'ALQ130']].head())
+    print("Extracted Series alcohol data head witn SEQN as index:\n")
+    print(alcoholSeries.head())
+
 
 
 #Extract a sample of individual seqn indexes from age-restricted data
