@@ -91,6 +91,24 @@ print("Random sample (5 individuals) of age-restricted data:\n")
 sample = age_gt18_lt45_data[['SEQN', 'RIDAGEYR', 'INDHHIN2']].sample(n=5, random_state=2131497)
 print(sample)
 
+#List containing all sequence numbers in age-restricted data
+seqn_list = list(age_gt18_lt45_data.SEQN)
+
+#---------------------------------- Alcohol use data -----------------------------------
+print("\nAlcohol use data for given sample of sequence numbers:\n")
+
+for record_num in list(sample.SEQN):
+    print("SEQN = {}:".format(record_num))
+    subrecord = alcohol_data[alcohol_data.SEQN == record_num][['SEQN','ALQ120Q', 'ALQ130']]
+    print(subrecord, "\n")
+
+ct=0
+for record_num in list(age_gt18_lt45_data.SEQN):
+    if not alcohol_data[alcohol_data.SEQN == record_num].empty:
+        ct +=1
+print("Number of non-empty datframes in Alcohol use data - for listed records: {}".format(ct))
+
+
 
 #Extract a sample of individual seqn indexes from age-restricted data
 #These indexes will help extract individual records from the remaining datasets
@@ -101,11 +119,6 @@ if False:
         ct +=1
         if(ct >5):
             break
-
-#List containing all sequence numbers in age-restricted data
-seqn_list = list(age_gt18_lt45_data.SEQN)
-
-
 
 
 #Save age-restricted data ot CSV files
