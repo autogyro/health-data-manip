@@ -66,7 +66,7 @@ print("Min age = {}".format(min_age))
 print("\nDescriptive statistics of demographics data on selected variables:")
 print(demographics_data[['SEQN', 'RIDAGEYR', 'INDHHIN2']].describe())
 
-#Age restricted data
+#---------------------------------- Age restricted data -----------------------------------
 
 print("\nAge restricted data:\n")
 age_gt18_data = demographics_data[(18.0 <= demographics_data.RIDAGEYR)]
@@ -74,6 +74,39 @@ age_lt45_data = demographics_data[(demographics_data.RIDAGEYR >= 45.0)]
 
 #group of interest
 age_gt18_lt45_data = age_gt18_data[(age_gt18_data.RIDAGEYR <=45.0)]
+nag1845 = age_gt18_lt45_data.RIDAGEYR.count()
+
+print("Num records of restricted age data (18 <= age <= 45: {}".format(nag1845))
+print("\nDescriptive statistics of age-restricted data on selected variables:")
+print(age_gt18_lt45_data[['SEQN', 'RIDAGEYR', 'INDHHIN2']].describe())
+
+n_males = age_gt18_lt45_data[age_gt18_lt45_data.RIAGENDR == 1.0].RIAGENDR.count()
+n_females = age_gt18_lt45_data[age_gt18_lt45_data.RIAGENDR == 2.0].RIAGENDR.count()
+print("")
+print("Num males = {}, Num females = {} on restricted age data".format(n_males, n_females))
+
+
+#Random sample
+print("Random sample (5 individuals) of age-restricted data:\n")
+sample = age_gt18_lt45_data[['SEQN', 'RIDAGEYR', 'INDHHIN2']].sample(n=5, random_state=2131497)
+print(sample)
+
+
+#Extract a sample of individual seqn indexes from age-restricted data
+#These indexes will help extract individual records from the remaining datasets
+if False:
+    ct = 0
+    for seqn in age_gt18_lt45_data.SEQN:
+        print(seqn)
+        ct +=1
+        if(ct >5):
+            break
+
+#List containing all sequence numbers in age-restricted data
+seqn_list = list(age_gt18_lt45_data.SEQN)
+
+
+
 
 #Save age-restricted data ot CSV files
 if False:
@@ -86,16 +119,6 @@ if False:
     print(age_gt18_data.head())
     print(age_lt45_data.head())
     print(age_gt18_lt45_data.head())
-
-
-nag1845 = age_gt18_lt45_data.RIDAGEYR.count()
-
-
-print("Num records of restricted age data (18 <= age <= 45: {}".format(nag1845))
-print("\nDescriptive statistics of age-restricted data on selected variables:")
-print(age_gt18_lt45_data[['SEQN', 'RIDAGEYR', 'INDHHIN2']].describe())
-
-
 
 
 
