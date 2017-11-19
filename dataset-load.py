@@ -23,8 +23,6 @@ cardiovascular_data = pd.read_sas(datasets_path + 'cardiovascular/CDQ_H.XPT')
 diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT')
 
 
-
-
 #datasets keys or column fields
 demographics_vars = list(demographics_data.keys())
 smoking_vars =  list(smoking_data.keys())
@@ -114,6 +112,9 @@ print("Number of non-empty datframes in Alcohol use data - for listed records: {
 #----------------------------------------------------------------------------------------
 print("Age and alcohol data transformations:\n")
 
+#Define a series based on the restricted age values of the original dataframe. Also define
+#a temporary series storing all values of the ALQ130 column of the original dataframe regardless of age
+#Note that we have rename the headers RIDAGEYR and ALQ130 as Age and Alcohol, respectively.
 age_Series = pd.Series(list(age_gt18_lt45_data.RIDAGEYR), index=list(age_gt18_lt45_data.SEQN),name='Age')
 tmp_alcoholSeries = pd.Series(list(alcohol_data.ALQ130), index=list(alcohol_data.SEQN), name = 'Alcohol')
 
@@ -125,22 +126,32 @@ print(tmp_alcoholSeries.describe())
 print("\nReindexing of alcohol data series:\n")
 print("Series head:\n")
 
+#We define an alcohol series by re-indexing the tmp_alcoholSeries using the SEQN values of the age-restricted dataframe.
+#In this case alcohol consumption values for ages outside the specified ages/or seqn numbers are automatically
+#assigned NaN values.
 alcohol_Series = tmp_alcoholSeries.reindex(list(age_gt18_lt45_data.SEQN))
 
 print(tmp_alcoholSeries.describe())
 print("\nAlcohol series restricted to age group stat description:\n")
 print(alcohol_Series.describe())
-
 alcohol_Series.to_csv("alcohol_series.csv", sep=',', header=True)
 age_Series.to_csv("age_series.csv", sep=',', header=True)
 
-
+#Define a dataframe containing the restricted age series and the alcohol consumption series only;
+#Note that we have rename the headers RIDAGEYR and ALQ130 as Age and Alcohol, respectively.
 age_alcohol_df = pd.concat([age_Series, alcohol_Series], axis=1)
-
 print(age_alcohol_df.head())
 
-age_alcohol_df.hist(bins=9,facecolor='green', alpha=0.75,linewidth=1,edgecolor='black')
+age_alcohol_df['Alcohol'].hist(by=age_alcohol_df['Age'],bins=9,facecolor='green', alpha=0.75,linewidth=1,edgecolor='black')
 plt.show()
+
+#Two histograms showing separately the Age and Alcohol consumption separately
+if False:
+    age_alcohol_df.hist(bins=9,facecolor='green', alpha=0.75,linewidth=1,edgecolor='black')
+    plt.show()
+
+
+
 
 #age_alcohol_df.plot.scatter(x='Age', y='Alcohol')
 #alcohol_Series.plot()
