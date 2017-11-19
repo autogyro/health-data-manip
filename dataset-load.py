@@ -3,6 +3,7 @@
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 #path to datasets folders
 datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/'
@@ -113,16 +114,17 @@ print("Number of non-empty datframes in Alcohol use data - for listed records: {
 #----------------------------------------------------------------------------------------
 print("Age and alcohol data transformations:\n")
 
-ageSeries = pd.Series(list(age_gt18_lt45_data.RIDAGEYR), index=list(age_gt18_lt45_data.SEQN))
-tmp_alcoholSeries = pd.Series(list(alcohol_data.ALQ130), index=list(alcohol_data.SEQN))
+age_Series = pd.Series(list(age_gt18_lt45_data.RIDAGEYR), index=list(age_gt18_lt45_data.SEQN),name='Age')
+tmp_alcoholSeries = pd.Series(list(alcohol_data.ALQ130), index=list(alcohol_data.SEQN), name = 'Alcohol')
 
 print("\nAge series description:\n")
-print(ageSeries.describe())
+print(age_Series.describe())
 print("\nFull alcohol series description:\n")
 print(tmp_alcoholSeries.describe())
 
 print("\nReindexing of alcohol data series:\n")
 print("Series head:\n")
+
 alcohol_Series = tmp_alcoholSeries.reindex(list(age_gt18_lt45_data.SEQN))
 
 print(tmp_alcoholSeries.describe())
@@ -130,10 +132,28 @@ print("\nAlcohol series restricted to age group stat description:\n")
 print(alcohol_Series.describe())
 
 alcohol_Series.to_csv("alcohol_series.csv", sep=',', header=True)
-ageSeries.to_csv("age_series.csv", sep=',', header=True)
+age_Series.to_csv("age_series.csv", sep=',', header=True)
 
 
+age_alcohol_df = pd.concat([age_Series, alcohol_Series], axis=1)
 
+print(age_alcohol_df.head())
+
+age_alcohol_df.hist(bins=9,facecolor='green', alpha=0.75,linewidth=1,edgecolor='black')
+plt.show()
+
+#age_alcohol_df.plot.scatter(x='Age', y='Alcohol')
+#alcohol_Series.plot()
+#plt.show()
+
+if False:
+    print("\nSingle location at index = 73565.0:\n")
+    print(age_alcohol_df.loc[73565.0])
+
+    print("Age value at index = 73565.0")
+    print(age_alcohol_df.loc[73565.0].Age)
+    print("Alcohol value at index = 73565.0")
+    print(age_alcohol_df.loc[73565.0].Alcohol)
 
 
 
@@ -143,7 +163,7 @@ if False:
     print("Original age data frame head:\n")
     print(age_gt18_lt45_data[['SEQN', 'RIDAGEYR']].head())
     print("Extracted series age data head witn SEQN as index:\n")
-    print(ageSeries.head())
+    print(age_Series.head())
 
     print("Original alcohol data frame head:\n")
     print(alcohol_data[['SEQN', 'ALQ130']].head())
