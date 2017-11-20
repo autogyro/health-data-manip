@@ -144,13 +144,6 @@ age_alcohol_df = pd.concat([age_Series, alcohol_Series], axis=1)
 print(age_alcohol_df.head())
 
 
-
-age_groups = [[20, 30], [40, 45]]
-
-age_alcohol_df['Alcohol'].hist(by=age_groups,bins=9,facecolor='green', alpha=0.75,linewidth=1,edgecolor='black')
-plt.show()
-
-
 #Attempt to create a set of histograms of alcohol consumption for age groups; as is it yields a histogram per
 #each value of the age variable 18, 19 .... 45
 if False:
