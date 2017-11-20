@@ -1,5 +1,6 @@
 #Testing loading datasets
 #@Juan E. Rolon
+#https://github.com/juanerolon
 
 import pandas as pd
 import numpy as np
@@ -142,8 +143,19 @@ age_Series.to_csv("age_series.csv", sep=',', header=True)
 age_alcohol_df = pd.concat([age_Series, alcohol_Series], axis=1)
 print(age_alcohol_df.head())
 
-age_alcohol_df['Alcohol'].hist(by=age_alcohol_df['Age'],bins=9,facecolor='green', alpha=0.75,linewidth=1,edgecolor='black')
+
+
+age_groups = [[20, 30], [40, 45]]
+
+age_alcohol_df['Alcohol'].hist(by=age_groups,bins=9,facecolor='green', alpha=0.75,linewidth=1,edgecolor='black')
 plt.show()
+
+
+#Attempt to create a set of histograms of alcohol consumption for age groups; as is it yields a histogram per
+#each value of the age variable 18, 19 .... 45
+if False:
+    age_alcohol_df['Alcohol'].hist(by=age_alcohol_df['Age'],bins=9,facecolor='green', alpha=0.75,linewidth=1,edgecolor='black')
+    plt.show()
 
 #Two histograms showing separately the Age and Alcohol consumption separately
 if False:
@@ -165,9 +177,6 @@ if False:
     print(age_alcohol_df.loc[73565.0].Age)
     print("Alcohol value at index = 73565.0")
     print(age_alcohol_df.loc[73565.0].Alcohol)
-
-
-
 
 #Check dataframe head and compare with extracted series head
 if False:
