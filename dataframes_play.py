@@ -11,14 +11,26 @@ import numpy as np
 import pandas as pd
 
 # Clear rows containing nans; IN-PLACE; method modifies supplied dataframe, returns None
-d = {'A': [1.1, 2.5, np.nan, 4.8, 5.1, 6.3, np.nan], 'B': [np.nan, 3.2, 3.3, np.nan, 4.0, 5.0, 6.0]}
+d = {'A': [1.1, 2.5, np.nan, 4.8, 5.1, 6.3, np.nan], 'B': [np.nan, 4.0, 3.3, np.nan, 4.0, 5.0, 6.0]}
 df = pd.DataFrame(d)
 print(df)
 
 # Remove rows containing NaNs in any column field
-df.dropna(axis=0, how='any', inplace=True)
 print("\nDrop rows with NaNs:\n")
+df.dropna(axis=0, how='any', inplace=True)
 print(df)
+
+
+#Clear rows based on specific value found for a particular column field
+
+print("\nDrop rows such that the B column contains a 4.0:\n")
+nfs = df[df.B == 4.0].B.count()
+
+df = df[df.B != 4.0]
+
+print(df)
+
+print("Number of rows deleted: {}".format(nfs))
 
 if False:
     #Clear rows containing nans; not inplace; method returns new dataframe object
