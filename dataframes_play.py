@@ -10,6 +10,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+d = {'A':[1.1, 2.5, np.nan, 4.8, 5.1, 6.3, np.nan], 'B':[np.nan, 3.2, 3.3, np.nan, 4.0, 5.0,6.0]}
+df = pd.DataFrame(d)
+print(df)
+
+#Remove rows containing NaNs in any column field
+df1 = df.dropna(axis=0, how='any')
+print("\nDrop rows with NaNs:\n")
+print(df1)
 
 if False:
     #This example helps mapping a single number value to a single label
