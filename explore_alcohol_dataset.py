@@ -26,14 +26,24 @@ diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT')
 
 #clean_numdata(alcohol_data, 'ALQ130', lower_bound=0, upper_bound=25.0, headers_only=True)
 
-if True:
+
+alq101_data = alcohol_data.ALQ101
+alq130_data = alcohol_data.ALQ130
+
+print(alq101_data.head())
 
 
+
+
+if False:
 
     print("\n********** --------- Acohol Dataset---------- *********\n")
 
     print("Alcohol consumption data description and stats:\n")
     print(alcohol_data.keys())
+
+
+    #-----------------------------------------------------------------
 
     print("\n----ALQ101 variable-----:\n")
     print(alcohol_data.ALQ101.head(5))
@@ -55,6 +65,8 @@ if True:
             cnan +=1
 
     print("Total number of NaN values in ALQ101 data: {}".format(cnan))
+
+    # -----------------------------------------------------------------
 
     print("\n-----ALQ130 variable-----:\n")
     print(alcohol_data.ALQ130.head(5))
