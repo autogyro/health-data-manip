@@ -63,14 +63,34 @@ print("Num of NaNs   in ALQ101 column: {}\n".format(nansv101))
 print("Num of values in ALQ130 column: {}".format(nvals130))
 print("Num of NaNs   in ALQ130 column: {}\n".format(nansv130))
 
+
 #-----------------------------------------------------------------------
 #Revisiting income data
 print("\nRevisiting income data:\n")
+
+print("Data head and stats:\n")
 print(ager_data.INDHHIN2.head(10))
 print(ager_data.INDHHIN2.describe())
 
+#Map income code values to income range categories
 income_d = {1: '$0.0 - 4.9K', 2: '$5.0 - 9.9K', 3:'$10.0 - 14.9K', 4:'$15.0 - 19.9K',
             5: '$20.0 - 24.9K', 6:'$25.0 - 34.9K', 7:'$35.0 - 44.9K', 8:'$45.0 - 54.9K',
             9: '$55.0 - 64.9K', 10:'$65.0 - 74.9K', 12:'> $20K', 13:'< $20K',
             14:'$75.0 - 99.9K', 15:'> $100K', 77:'Refused', 99:'Unknown'}
+
+income_cats = []
+for k in income_d:
+    income_cats.append(income_d[k])
+
+
+#------------------------------------------------------------------------
+#Clean demographics data rows where there are missing income values (NaNs),
+#'Refused' or 'Unknown'
+
+n_refused = ager_data[ager_data.INDHHIN2 == 77.0].INDHHIN2.count()
+n_unknown = ager_data[ager_data.INDHHIN2 == 99.0].INDHHIN2.count()
+
+print("Number of records containing NaN answer: {}".format(nansv_income))
+print("Number of records containing refused answer: {}".format(n_refused))
+print("Number of records containing unknown answer: {}".format(n_unknown))
 
