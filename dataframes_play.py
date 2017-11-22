@@ -10,27 +10,28 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# Clear rows containing nans; IN-PLACE; method modifies supplied dataframe, returns None
-d = {'A': [1.1, 2.5, np.nan, 4.8, 5.1, 6.3, np.nan], 'B': [np.nan, 4.0, 3.3, np.nan, 4.0, 5.0, 6.0]}
-df = pd.DataFrame(d)
-print(df)
+if False:
+    # Clear rows containing nans; IN-PLACE; method modifies supplied dataframe, returns None
+    d = {'A': [1.1, 2.5, np.nan, 4.8, 5.1, 6.3, np.nan], 'B': [np.nan, 4.0, 3.3, np.nan, 4.0, 5.0, 6.0]}
+    df = pd.DataFrame(d)
+    print(df)
 
-# Remove rows containing NaNs in any column field
-print("\nDrop rows with NaNs:\n")
-df.dropna(axis=0, how='any', inplace=True)
-print(df)
+    # Remove rows containing NaNs in any column field
+    print("\nDrop rows with NaNs:\n")
+    df.dropna(axis=0, how='any', inplace=True)
+    print(df)
 
 
-#Clear rows based on specific value found for a particular column field
+    #Clear rows based on specific value found for a particular column field
 
-print("\nDrop rows such that the B column contains a 4.0:\n")
-nfs = df[df.B == 4.0].B.count()
+    print("\nDrop rows such that the B column contains a 4.0:\n")
+    nfs = df[df.B == 4.0].B.count()
 
-df = df[df.B != 4.0]
+    df = df[df.B != 4.0]
 
-print(df)
+    print(df)
 
-print("Number of rows deleted: {}".format(nfs))
+    print("Number of rows deleted: {}".format(nfs))
 
 if False:
     #Clear rows containing nans; not inplace; method returns new dataframe object
@@ -114,6 +115,10 @@ if False:
 if False:
     #Accessing and exctracting different parts of a dataframe
 
+    # ager_data_feats = pd.concat([ager_data['RIDAGEYR'],ager_data['RIAGENDR'],ager_data['INDHHIN2']], axis=1)
+    # print(ager_data_feats.head())
+    # print(ager_data_feats.describe())
+
     d = {'A':[1.0,2.5,3.0], 'B':[1.1, 2.2, 3.3], 'C':[3.5, 4.0, 1.0], 'D':[1,2,3]}
     df = pd.DataFrame(d)
     print(df)
@@ -143,6 +148,22 @@ if False:
 
     print(" ")
     print(df4)
+
+
+if True:
+    d1 = {'A':[1.0, 3.1, 2.0, 5.5], 'B':[0.1, 1.1, 2.4, 10.5]}
+    d2 = {'A2': [1.0, 3.1, 2.0], 'B2': [0.1, 2.4, 10.5]}
+    print("df1:\n")
+    df1 = pd.DataFrame(d1)
+    df2 = pd.DataFrame(d2, index=[2,3,4])
+
+    print(df1)
+    print("")
+    print(df2)
+
+    print("\ndf1 reindexed with df2 indexes:\n")
+    df1 = df1.reindex(list(df2.index))
+    print(df1)
 
 if False:
     x = ['A']*300 + ['B']*400 + ['C']*300
