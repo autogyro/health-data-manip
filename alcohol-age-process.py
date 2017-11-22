@@ -63,3 +63,8 @@ print("Num of NaNs   in ALQ101 column: {}\n".format(nansv101))
 print("Num of values in ALQ130 column: {}".format(nvals130))
 print("Num of NaNs   in ALQ130 column: {}\n".format(nansv130))
 
+#-----------------------------------------------------------------------
+#Revisiting income data
+print("\nRevisiting income data:\n")
+print(ager_data.INDHHIN2.head(10))
+print(ager_data.INDHHIN2.describe())
