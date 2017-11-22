@@ -10,14 +10,29 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-d = {'A':[1.1, 2.5, np.nan, 4.8, 5.1, 6.3, np.nan], 'B':[np.nan, 3.2, 3.3, np.nan, 4.0, 5.0,6.0]}
+# Clear rows containing nans; IN-PLACE; method modifies supplied dataframe, returns None
+d = {'A': [1.1, 2.5, np.nan, 4.8, 5.1, 6.3, np.nan], 'B': [np.nan, 3.2, 3.3, np.nan, 4.0, 5.0, 6.0]}
 df = pd.DataFrame(d)
 print(df)
 
-#Remove rows containing NaNs in any column field
-df1 = df.dropna(axis=0, how='any')
+# Remove rows containing NaNs in any column field
+df.dropna(axis=0, how='any', inplace=True)
 print("\nDrop rows with NaNs:\n")
-print(df1)
+print(df)
+
+if False:
+    #Clear rows containing nans; not inplace; method returns new dataframe object
+    d = {'A':[1.1, 2.5, np.nan, 4.8, 5.1, 6.3, np.nan], 'B':[np.nan, 3.2, 3.3, np.nan, 4.0, 5.0,6.0]}
+    df = pd.DataFrame(d)
+    print(df)
+
+    #Remove rows containing NaNs in any column field of df; returns to df1
+    df1 = df.dropna(axis=0, how='any')
+    print("\nDrop rows with NaNs:\n")
+    print(df1)
+
+
+
 
 if False:
     #This example helps mapping a single number value to a single label
