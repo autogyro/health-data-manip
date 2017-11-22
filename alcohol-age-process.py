@@ -94,3 +94,22 @@ print("Number of records containing NaN answer: {}".format(nansv_income))
 print("Number of records containing refused answer: {}".format(n_refused))
 print("Number of records containing unknown answer: {}".format(n_unknown))
 
+#Drop all non-important Columns
+ager_data = ager_data[['RIDAGEYR', 'RIAGENDR','INDHHIN2']]
+
+#Remove records (rows) with NaNs, and those containing 77.0 ('Refused') or 99 ('Unknown')
+ager_data.dropna(axis=0, how='any', inplace=True)
+ager_data = ager_data[ager_data.INDHHIN2 != 77.0]
+ager_data = ager_data[ager_data.INDHHIN2 != 99.0]
+
+print("\nCleaned demographic data description:\n")
+
+print(ager_data.describe())
+
+nansv_income = ager_data.INDHHIN2.isnull().sum()
+n_refused = ager_data[ager_data.INDHHIN2 == 77.0].INDHHIN2.count()
+n_unknown = ager_data[ager_data.INDHHIN2 == 99.0].INDHHIN2.count()
+
+print("Number of records containing NaN answer: {}".format(nansv_income))
+print("Number of records containing refused answer: {}".format(n_refused))
+print("Number of records containing unknown answer: {}".format(n_unknown))
