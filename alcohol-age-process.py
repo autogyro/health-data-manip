@@ -215,7 +215,7 @@ print("ALQ130 - Avg # alcoholic drinks/day - past 12 mos. Range of Values : 1 to
 print("ALQ101 - Had at least 12 alcohol drinks/1 yr? YES=1.0 NO=2.0")
 
 
-#Test exportin data to Apache Arrow feather format
+#Export cleaned dataset to Apache Arrow feather format
 #Compatible with R; uses fast I/O throughput in solid state drives
 import feather
 path = 'ager_alcohol_data.feather'
