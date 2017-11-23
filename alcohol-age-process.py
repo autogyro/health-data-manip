@@ -211,5 +211,17 @@ print("\nLabel description:\n")
 print("RIDAGEYR - Age in years at screening")
 print("RIAGENDR - Gender MALE=1.0, FEMALE=2.0")
 print("INDHHIN2 - Annual household income.. see codes")
-print("ALQ130 - Avg # alcoholic drinks/day - past 12 mos")
+print("ALQ130 - Avg # alcoholic drinks/day - past 12 mos. Range of Values : 1 to 25	")
 print("ALQ101 - Had at least 12 alcohol drinks/1 yr? YES=1.0 NO=2.0")
+
+
+#Test exportin data to Apache Arrow feather format
+#Compatible with R; uses fast I/O throughput in solid state drives
+import feather
+path = 'ager_alcohol_data.feather'
+feather.write_dataframe(ager_alcohol_data, path)
+
+df_test = feather.read_dataframe(path)
+
+print(df_test.head())
+print(df_test.describe())
