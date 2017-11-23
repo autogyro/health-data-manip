@@ -77,17 +77,6 @@ print("Num of values in ALQ130 column: {}".format(nvals130))
 print("Num of NaNs   in ALQ130 column: {}\n".format(nansv130))
 
 
-#Map income code values to income range categories
-income_d = {1: '$0.0 - 4.9K', 2: '$5.0 - 9.9K', 3:'$10.0 - 14.9K', 4:'$15.0 - 19.9K',
-            5: '$20.0 - 24.9K', 6:'$25.0 - 34.9K', 7:'$35.0 - 44.9K', 8:'$45.0 - 54.9K',
-            9: '$55.0 - 64.9K', 10:'$65.0 - 74.9K', 12:'> $20K', 13:'< $20K',
-            14:'$75.0 - 99.9K', 15:'> $100K', 77:'Refused', 99:'Unknown'}
-
-income_cats = []
-for k in income_d:
-    income_cats.append(income_d[k])
-
-
 #------------------------------------------------------------------------
 #Clean demographics data rows where there are missing income values (NaNs),
 #'Refused' or 'Unknown'
@@ -198,6 +187,22 @@ ager_alcohol_data = pd.concat([ager_data['RIDAGEYR'],ager_data['RIAGENDR'],ager_
                                alcohol_data['ALQ101'], alcohol_data['ALQ130']], axis=1)
 
 ager_alcohol_data.dropna(axis=0, how='any', inplace=True)
+
+#Map income code values INDHHIN2 to income range categories
+income_d = {1: '$0.0 - 4.9K', 2: '$5.0 - 9.9K', 3:'$10.0 - 14.9K', 4:'$15.0 - 19.9K',
+            5: '$20.0 - 24.9K', 6:'$25.0 - 34.9K', 7:'$35.0 - 44.9K', 8:'$45.0 - 54.9K',
+            9: '$55.0 - 64.9K', 10:'$65.0 - 74.9K', 12:'> $20K', 13:'< $20K',
+            14:'$75.0 - 99.9K', 15:'> $100K', 77:'Refused', 99:'Unknown'}
+
+income_codes = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 13.0, 14.0, 15.0, 77.0, 99.0]
+
+income_cats = []
+for i, k in enumerate(income_d):
+    income_cats.append(income_d[k])
+
+income_column = pd.cut(ager_alcohol_data['INDHHIN2'], income_codes, labels=income_cats)
+
+ager_alcohol_data['Income'] = income_column
 
 print(ager_alcohol_data.head())
 print(ager_alcohol_data.describe())
