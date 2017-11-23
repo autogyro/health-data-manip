@@ -45,6 +45,19 @@ print("\nNum of values in INDHHIN2 column: {}".format(nvals_income))
 print("Num of NaNs   in INDHHIN2 column: {}\n".format(nansv_income))
 #--------------------------------------------------------------------
 
+
+
+#Revisiting income data
+print("\nRevisiting income data:\n")
+
+print("Data head and stats:\n")
+print(ager_data.INDHHIN2.head(2))
+print(ager_data.INDHHIN2.describe())
+
+#-----------------------------------------------------------------------
+
+print("Processing alcohol data; data will be reindexed using demographics data SEQNs:\n")
+
 alcohol_data = pd.read_sas(datasets_path + 'alcohol_use/ALQ_H.XPT')
 alcohol_data = alcohol_data.set_index('SEQN')
 alcohol_data = alcohol_data.reindex(ager_data.index)
@@ -63,14 +76,6 @@ print("Num of NaNs   in ALQ101 column: {}\n".format(nansv101))
 print("Num of values in ALQ130 column: {}".format(nvals130))
 print("Num of NaNs   in ALQ130 column: {}\n".format(nansv130))
 
-
-#-----------------------------------------------------------------------
-#Revisiting income data
-print("\nRevisiting income data:\n")
-
-print("Data head and stats:\n")
-print(ager_data.INDHHIN2.head(2))
-print(ager_data.INDHHIN2.describe())
 
 #Map income code values to income range categories
 income_d = {1: '$0.0 - 4.9K', 2: '$5.0 - 9.9K', 3:'$10.0 - 14.9K', 4:'$15.0 - 19.9K',
@@ -180,3 +185,19 @@ print("\nNumber of records ALQ130 containing NaN answer: {}".format(nansv130))
 print("Number of records ALQ130 containing accepted values: {}".format(nal130_values))
 print("Number of records ALQ130  containing refused answer: {}".format(nal130_refused))
 print("Number of records ALQ130  containing unknown answer: {}".format(nal130_unknown))
+
+print(".\n"*2)
+print("*"*60)
+
+print("Merging demographic and alcohol consumption data:\n")
+
+ager_data = ager_data.reindex(alcohol_data.index)
+alcohol_data = alcohol_data.reindex(ager_data.index)
+
+ager_alcohol_data = pd.concat([ager_data['RIDAGEYR'],ager_data['RIAGENDR'],ager_data['INDHHIN2'],
+                               alcohol_data['ALQ101'], alcohol_data['ALQ130']], axis=1)
+
+ager_alcohol_data.dropna(axis=0, how='any', inplace=True)
+
+print(ager_alcohol_data.head())
+print(ager_alcohol_data.describe())
