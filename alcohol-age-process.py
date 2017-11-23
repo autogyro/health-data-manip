@@ -69,7 +69,7 @@ print("Num of NaNs   in ALQ130 column: {}\n".format(nansv130))
 print("\nRevisiting income data:\n")
 
 print("Data head and stats:\n")
-print(ager_data.INDHHIN2.head(10))
+print(ager_data.INDHHIN2.head(2))
 print(ager_data.INDHHIN2.describe())
 
 #Map income code values to income range categories
@@ -102,8 +102,9 @@ ager_data.dropna(axis=0, how='any', inplace=True)
 ager_data = ager_data[ager_data.INDHHIN2 != 77.0]
 ager_data = ager_data[ager_data.INDHHIN2 != 99.0]
 
-print("\nCleaned demographic data description:\n")
-
+print("\n ********** Cleaned demographic data description ********** :\n")
+print(ager_data.head(2))
+print("")
 print(ager_data.describe())
 
 nansv_income = ager_data.INDHHIN2.isnull().sum()
@@ -113,3 +114,69 @@ n_unknown = ager_data[ager_data.INDHHIN2 == 99.0].INDHHIN2.count()
 print("Number of records containing NaN answer: {}".format(nansv_income))
 print("Number of records containing refused answer: {}".format(n_refused))
 print("Number of records containing unknown answer: {}".format(n_unknown))
+
+print("\nRevisiting alcohol consumption data:\n")
+print("Data head:\n")
+alcohol_data = alcohol_data[['ALQ101', 'ALQ130']]
+print(alcohol_data.head(2))
+
+nansv101 = alcohol_data.ALQ101.isnull().sum()
+nal101_yes = alcohol_data[alcohol_data.ALQ101 == 1.0].ALQ101.count()
+nal101_no = alcohol_data[alcohol_data.ALQ101 == 2.0].ALQ101.count()
+nal101_unknown = alcohol_data[alcohol_data.ALQ101 == 9.0].ALQ101.count()
+nal101_refused = alcohol_data[alcohol_data.ALQ101 == 7.0].ALQ101.count()
+
+
+print("\nNumber of records ALQ101 containing NaN answer: {}".format(nansv101))
+print("Number of records ALQ101 containing YES answer: {}".format(nal101_yes))
+print("Number of records ALQ101 containing NO answer: {}".format(nal101_no))
+print("Number of records ALQ101  containing refused answer: {}".format(nal101_refused))
+print("Number of records ALQ101  containing unknown answer: {}".format(nal101_unknown))
+
+
+nansv130 = alcohol_data.ALQ130.isnull().sum()
+tmpdf = alcohol_data[alcohol_data.ALQ130 >=1.0]
+tmpdf = tmpdf[tmpdf.ALQ130 <=25.0]
+nal130_values = tmpdf.ALQ130.count()
+nal130_unknown = alcohol_data[alcohol_data.ALQ130 == 999.0].ALQ130.count()
+nal130_refused = alcohol_data[alcohol_data.ALQ130 == 777.0].ALQ130.count()
+
+print("\nNumber of records ALQ130 containing NaN answer: {}".format(nansv130))
+print("Number of records ALQ130 containing accepted values: {}".format(nal130_values))
+print("Number of records ALQ130  containing refused answer: {}".format(nal130_refused))
+print("Number of records ALQ130  containing unknown answer: {}".format(nal130_unknown))
+
+#Remove records (rows) with NaNs, and those containing 7.0 ('Refused') or 9.0 ('Unknown')
+alcohol_data.dropna(axis=0, how='any', inplace=True)
+alcohol_data = alcohol_data[alcohol_data.ALQ101 != 7.0]
+alcohol_data = alcohol_data[alcohol_data.ALQ101 != 9.0]
+alcohol_data = alcohol_data[alcohol_data.ALQ130 != 777.0]
+alcohol_data = alcohol_data[alcohol_data.ALQ130 != 999.0]
+
+print("\n ********** Cleaned alcohol consumption data description ********** :\n")
+print(alcohol_data.head(2))
+print("")
+print(alcohol_data.describe())
+
+nansv101 = alcohol_data.ALQ101.isnull().sum()
+nal101_yes = alcohol_data[alcohol_data.ALQ101 == 1.0].ALQ101.count()
+nal101_no = alcohol_data[alcohol_data.ALQ101 == 2.0].ALQ101.count()
+nal101_unknown = alcohol_data[alcohol_data.ALQ101 == 9.0].ALQ101.count()
+nal101_refused = alcohol_data[alcohol_data.ALQ101 == 7.0].ALQ101.count()
+nansv130 = alcohol_data.ALQ130.isnull().sum()
+tmpdf = alcohol_data[alcohol_data.ALQ130 >=1.0]
+tmpdf = tmpdf[tmpdf.ALQ130 <=25.0]
+nal130_values = tmpdf.ALQ130.count()
+nal130_unknown = alcohol_data[alcohol_data.ALQ130 == 999.0].ALQ130.count()
+nal130_refused = alcohol_data[alcohol_data.ALQ130 == 777.0].ALQ130.count()
+
+
+print("\nNumber of records ALQ101 containing NaN answer: {}".format(nansv101))
+print("Number of records ALQ101 containing YES answer: {}".format(nal101_yes))
+print("Number of records ALQ101 containing NO answer: {}".format(nal101_no))
+print("Number of records ALQ101  containing refused answer: {}".format(nal101_refused))
+print("Number of records ALQ101  containing unknown answer: {}".format(nal101_unknown))
+print("\nNumber of records ALQ130 containing NaN answer: {}".format(nansv130))
+print("Number of records ALQ130 containing accepted values: {}".format(nal130_values))
+print("Number of records ALQ130  containing refused answer: {}".format(nal130_refused))
+print("Number of records ALQ130  containing unknown answer: {}".format(nal130_unknown))
