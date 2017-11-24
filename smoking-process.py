@@ -47,8 +47,8 @@ print("\nMerged dataframe\n")
 
 merged_data = ager_alcohol_data.copy()
 
-print(merged_data.head())
-print(merged_data.describe())
+#print(merged_data.head())
+#print(merged_data.describe())
 
 
 print("\nSMQ040 Code values: \n 1:Every day, 2:Some days, 3:Not at all, 7:Refused, 9:Don't know")
@@ -69,8 +69,21 @@ print("Number of records SMQ040  containing unknown answer: {}".format(nSMQ040_u
 #It will be a good idea to set indexex to integers in all previous scripts
 
 
+def binarize_smq040(x):
+    if (x== 1.0) or (x== 2.0):
+        return 1
+    elif (x== 3.0):
+        return 0
+    else:
+        return np.nan
 
 
+merged_data['Alcohol'] = merged_data['SMQ040'].apply(lambda x: binarize_smq040(x))
+#Purge rows in case we got NaNs after applying the function above to the selected column
+smoking_data.dropna(axis=0, how='any', inplace=True)
 
+
+print(merged_data.head(3))
+print(merged_data.describe())
 
 
