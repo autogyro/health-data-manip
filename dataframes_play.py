@@ -2,13 +2,32 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Sep 19 10:02:43 2017
-
 @author: juanerolon
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+
+#In this example we use the pandas apply method and a pair of functions
+#to re-encode the values of a dataframe column according to a given
+#criterion
+def foo(x):
+    if (x==1) or (x==2):
+        return 'Yes'
+    else:
+        return np.nan
+
+d = {'a':[1,2,1,1,1,2,3,2,1,2,2,3], 'b':[1.0,5.0,1.0,1.0,2.0,4.0,3.0,8.0,1.0,3.0,2.0,3.0]}
+df = pd.DataFrame(d)
+df['c'] = df['a'].apply(lambda x: foo(x))
+
+#This statement will be useful to convert an il-defined float index to int;
+#Implement policy of assuring integer valued indexes in all dataframes
+df['d'] = pd.to_numeric(df['b'], downcast='integer')
+
+print(df)
 
 if False:
     # Clear rows containing nans; IN-PLACE; method modifies supplied dataframe, returns None
@@ -113,11 +132,6 @@ if False:
     plt.show()
 
 if False:
-    #Accessing and exctracting different parts of a dataframe
-
-    # ager_data_feats = pd.concat([ager_data['RIDAGEYR'],ager_data['RIAGENDR'],ager_data['INDHHIN2']], axis=1)
-    # print(ager_data_feats.head())
-    # print(ager_data_feats.describe())
 
     d = {'A':[1.0,2.5,3.0], 'B':[1.1, 2.2, 3.3], 'C':[3.5, 4.0, 1.0], 'D':[1,2,3]}
     df = pd.DataFrame(d)
@@ -150,7 +164,7 @@ if False:
     print(df4)
 
 
-if True:
+if False:
     d1 = {'A':[1.0, 3.1, 2.0, 5.5], 'B':[0.1, 1.1, 2.4, 10.5]}
     d2 = {'A2': [1.0, 3.1, 2.0], 'B2': [0.1, 2.4, 10.5]}
     print("df1:\n")
