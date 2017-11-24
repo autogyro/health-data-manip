@@ -35,7 +35,7 @@ print(smoking_data.describe())
 
 ager_alcohol_data = ager_alcohol_data.reindex(smoking_data.index)
 
-ager_alcohol_data['Alcohol'] = smoking_data['SMQ040']
+ager_alcohol_data['SMQ040'] = smoking_data['SMQ040']
 
 print("Alcohol consumption consistent dataframe:\n")
 print(ager_alcohol_data.head())
@@ -46,8 +46,6 @@ print("*"*70)
 print("\nMerged dataframe\n")
 
 merged_data = ager_alcohol_data.copy()
-
-merged_data = pd.concat([ager_alcohol_data, smoking_data])
 
 print(merged_data.head())
 print(merged_data.describe())
