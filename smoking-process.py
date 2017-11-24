@@ -2,6 +2,8 @@
 #@Juan E. Rolon
 #https://github.com/juanerolon
 
+import sys
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,8 +20,10 @@ import feather
 ager_alcohol_data = feather.read_dataframe(project_path + 'ager_alcohol_data.feather')
 ager_alcohol_data = ager_alcohol_data.set_index('SEQNDX') #Restore the index saved during the export step
 
-
 smoking_data = smoking_data[['SEQN','SMQ040']]
+# downcast float column to int before setting it up as index
+smoking_data['SEQN'] = pd.to_numeric(smoking_data['SEQN'], downcast='integer')
+
 smoking_data = smoking_data.set_index('SEQN')
 smoking_data = smoking_data.reindex(ager_alcohol_data.index)
 
@@ -31,12 +35,17 @@ print(smoking_data.describe())
 
 ager_alcohol_data = ager_alcohol_data.reindex(smoking_data.index)
 
+ager_alcohol_data['Alcohol'] = smoking_data['SMQ040']
+
 print("Alcohol consumption consistent dataframe:\n")
 print(ager_alcohol_data.head())
 print(ager_alcohol_data.describe())
 
+#------------------------------------------
 print("*"*70)
 print("\nMerged dataframe\n")
+
+merged_data = ager_alcohol_data.copy()
 
 merged_data = pd.concat([ager_alcohol_data, smoking_data])
 
@@ -58,4 +67,12 @@ print("Number of records SMQ040  containing NO answer: {}".format(nSMQ040_NO))
 print("Number of records SMQ040  containing refused answer: {}".format(nSMQ040_refused))
 print("Number of records SMQ040  containing unknown answer: {}".format(nSMQ040_unknown))
 
-#We will need to merge/encode SMQ040 =1 SMQ040 =2 into a singled True (YES or 1) value
+#We need to merge/encode SMQ040 =1 SMQ040 =2 into a singled True (YES or 1) value
+#It will be a good idea to set indexex to integers in all previous scripts
+
+
+
+
+
+
+
