@@ -2,6 +2,7 @@
 #@Juan E. Rolon
 #https://github.com/juanerolon
 
+import sys
 
 import pandas as pd
 import numpy as np
@@ -14,7 +15,7 @@ datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/ca
 demographics_data = pd.read_sas(datasets_path + 'demographics/DEMO_H.XPT')
 
 age_g18 = demographics_data[(demographics_data.RIDAGEYR >= 18.0)]
-ager_data = age_g18[(age_g18.RIDAGEYR <= 45.0)]
+ager_data = age_g18[age_g18.RIDAGEYR <= 45.0]
 
 nag = ager_data.RIDAGEYR.count()
 print("Num records of age-restricted data (18 <= age <= 45): {}".format(nag))
@@ -24,6 +25,8 @@ print("Num seqn numbers of age-restricted data: {} ".format(len(age_group_seqns)
 
 #-------------------------------------------------------------------
 #switch index of dataframe to be the unique seqn numbers
+# downcast float column to int before setting it up as index
+ager_data['SEQN'] = pd.to_numeric(ager_data['SEQN'], downcast='integer')
 ager_data = ager_data.set_index('SEQN')
 
 nvals_age = ager_data.RIDAGEYR.count()
@@ -59,7 +62,12 @@ print(ager_data.INDHHIN2.describe())
 print("Processing alcohol data; data will be reindexed using demographics data SEQNs:\n")
 
 alcohol_data = pd.read_sas(datasets_path + 'alcohol_use/ALQ_H.XPT')
+
+# downcast float column to int before setting it up as index
+alcohol_data['SEQN'] = pd.to_numeric(alcohol_data['SEQN'], downcast='integer')
 alcohol_data = alcohol_data.set_index('SEQN')
+
+#REINDEX DATASET
 alcohol_data = alcohol_data.reindex(ager_data.index)
 
 nalch = len(list(alcohol_data.index))
@@ -217,10 +225,13 @@ print("ALQ101 - Had at least 12 alcohol drinks/1 yr? YES=1.0 NO=2.0")
 
 #Export cleaned dataset to Apache Arrow feather format
 #Compatible with R; uses fast I/O throughput in solid state drives
+#WARNING: the export method does not preserved the df indexex;
+#If needed, add a column storing a copy of the index series
 import feather
 path = 'ager_alcohol_data.feather'
-feather.write_dataframe(ager_alcohol_data, path)
 
+ager_alcohol_data['SEQNDX'] = ager_alcohol_data.index
+feather.write_dataframe(ager_alcohol_data, path)
 df_test = feather.read_dataframe(path)
 
 print(df_test.head())
