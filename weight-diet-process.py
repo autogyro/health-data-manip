@@ -64,7 +64,14 @@ weight_data = weight_data.reindex(alcohol_smoking_data.index)
 #Purge rows with NaNs
 weight_data.dropna(axis=0, how='any', inplace=True)
 
-print(weight_data.head())
-print(weight_data.describe())
+#print(weight_data.head())
+#print(weight_data.describe())
 
+alcohol_smoking_data = alcohol_smoking_data.reindex(weight_data.index)
+alcohol_smoking_data.dropna(axis=0, how='any', inplace=True)
 
+merged_data = alcohol_smoking_data.copy()
+merged_data['BMI'] = weight_data['BMI']
+
+print(merged_data.head(3))
+print(merged_data.describe())
