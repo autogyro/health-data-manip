@@ -82,8 +82,19 @@ merged_data['Alcohol'] = merged_data['SMQ040'].apply(lambda x: binarize_smq040(x
 #Purge rows in case we got NaNs after applying the function above to the selected column
 smoking_data.dropna(axis=0, how='any', inplace=True)
 
-
 print(merged_data.head(3))
 print(merged_data.describe())
 
+
+#Export cleaned dataset to Apache Arrow feather format
+#Compatible with R; uses fast I/O throughput in solid state drives
+#WARNING: the export method does not preserved the df indexex;
+#If needed, add a column storing a copy of the index series
+import feather
+filename = 'alcohol_smoking_data.feather'
+merged_data['SEQNDX'] = merged_data.index
+feather.write_dataframe(merged_data, filename)
+df_test = feather.read_dataframe(filename)
+print(df_test.head())
+print(df_test.describe())
 
