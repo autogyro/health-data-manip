@@ -90,11 +90,13 @@ print(merged_data.describe())
 #Compatible with R; uses fast I/O throughput in solid state drives
 #WARNING: the export method does not preserved the df indexex;
 #If needed, add a column storing a copy of the index series
-import feather
+
 filename = 'alcohol_smoking_data.feather'
 merged_data['SEQNDX'] = merged_data.index
 feather.write_dataframe(merged_data, filename)
 df_test = feather.read_dataframe(filename)
 print(df_test.head())
 print(df_test.describe())
+
+
 
