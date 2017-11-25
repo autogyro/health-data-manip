@@ -54,14 +54,17 @@ weight_data = weight_data[weight_data.WHD020 != 9999.0]
 #simple BMI formula
 def bmi(h, w):
     return np.round((w/h**2) * 703.0, 2)
-
+print("Adding BMI column .....\n")
 weight_data['BMI'] = bmi(weight_data['WHD010'], weight_data['WHD020'])
 
-print("Adding BMI column .....\n")
+#Downcast SEQN to ints
+weight_data['SEQN'] = pd.to_numeric(weight_data['SEQN'], downcast='integer')
+weight_data = weight_data.set_index('SEQN')
+weight_data = weight_data.reindex(alcohol_smoking_data.index)
+#Purge rows with NaNs
+weight_data.dropna(axis=0, how='any', inplace=True)
+
 print(weight_data.head())
 print(weight_data.describe())
-
-
-
 
 
