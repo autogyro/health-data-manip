@@ -75,3 +75,18 @@ merged_data['BMI'] = weight_data['BMI']
 
 print(merged_data.head(3))
 print(merged_data.describe())
+
+
+#----- Nutrition data ----------#
+print("*"*80 +"\nNutrition data preview: \n")
+nutrition_data = nutrition_data[['SEQN','DBD895', 'DBD900', 'DBD905', 'DBD910']]
+
+print(nutrition_data.head(3))
+
+codes = "DBD895 Num. of meals not home prepared \n" +\
+"DBD900 Num, of meals from fast food or pizza place\n" +\
+"DBD905 Num. of ready-to-eat foods in past 30 days\n" +\
+"DBD910 Num. of frozen meals/pizza in past 30 days\n"
+
+print(codes)
+
