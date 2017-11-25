@@ -20,3 +20,48 @@ nutrition_data = pd.read_sas(datasets_path + 'diet_nutrition/DBQ_H.XPT')
 import feather
 alcohol_smoking_data = feather.read_dataframe(project_path + 'alcohol_smoking_data.feather')
 alcohol_smoking_data = alcohol_smoking_data.set_index('SEQNDX') #Restore the index saved during the export step
+
+weight_data = weight_data[['SEQN', 'WHD010', 'WHD020']]
+#Purge rows with NaNs
+weight_data.dropna(axis=0, how='any', inplace=True)
+
+print(weight_data.describe())
+#WHD010 = 7777 Refused
+#WHD010 = 9999 Unknown
+#WHD020 = 7777 Refused
+#WHD020 = 9999 Unknown
+print("WHD010 - Current self-reported height (inches)")
+print("WHD020 - Current self-reported weight (pounds)")
+
+nWHD010_refused = weight_data[weight_data.WHD010 == 7777.0].WHD010.count()
+nWHD010_unknown = weight_data[weight_data.WHD010 == 9999.0].WHD010.count()
+
+nWHD020_refused = weight_data[weight_data.WHD020 == 7777.0].WHD020.count()
+nWHD020_unknown = weight_data[weight_data.WHD020 == 9999.0].WHD020.count()
+
+print("WHD010 refused answers: {}".format(nWHD010_refused))
+print("WHD010 unknown answers: {}".format(nWHD010_unknown))
+print("WHD020 refused answers: {}".format(nWHD020_refused))
+print("WHD020 unknown answers: {}".format(nWHD020_unknown))
+
+#Purge rows containing unknown or refused answers in variables WHD010 and WHD020
+print("Purging rows with refused and unknown answers......\n")
+weight_data = weight_data[weight_data.WHD010 != 7777.0]
+weight_data = weight_data[weight_data.WHD010 != 9999.0]
+weight_data = weight_data[weight_data.WHD020 != 7777.0]
+weight_data = weight_data[weight_data.WHD020 != 9999.0]
+
+#simple BMI formula
+def bmi(h, w):
+    return np.round((w/h**2) * 703.0, 2)
+
+weight_data['BMI'] = bmi(weight_data['WHD010'], weight_data['WHD020'])
+
+print("Adding BMI column .....\n")
+print(weight_data.head())
+print(weight_data.describe())
+
+
+
+
+
