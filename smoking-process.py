@@ -78,13 +78,12 @@ def binarize_smq040(x):
         return np.nan
 
 
-merged_data['Alcohol'] = merged_data['SMQ040'].apply(lambda x: binarize_smq040(x))
+merged_data['Smoking'] = merged_data['SMQ040'].apply(lambda x: binarize_smq040(x))
 #Purge rows in case we got NaNs after applying the function above to the selected column
 smoking_data.dropna(axis=0, how='any', inplace=True)
 
 print(merged_data.head(3))
 print(merged_data.describe())
-
 
 #Export cleaned dataset to Apache Arrow feather format
 #Compatible with R; uses fast I/O throughput in solid state drives
