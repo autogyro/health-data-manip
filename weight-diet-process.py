@@ -82,14 +82,38 @@ print("*"*80 +"\nNutrition data preview: \n")
 nutrition_data = np.round(nutrition_data[['SEQN','DBD895', 'DBD900', 'DBD905', 'DBD910']],2)
 nutrition_data .dropna(axis=0, how='any', inplace=True)
 
-print(nutrition_data.head(3))
-print(np.round(nutrition_data.describe(), 2))
+#downcast SEQN to integer values and set it as dataframe index
+nutrition_data['SEQN'] = pd.to_numeric(nutrition_data['SEQN'], downcast='integer')
+nutrition_data = nutrition_data.set_index('SEQN')
 
 codes = \
-"\nDBD895 Num. of meals not home prepared in past 7 days (Range:1 to 21)\n" +\
-"DBD900 Num, of meals from fast food or pizza place past 7 days (Range:1 to 21)\n" +\
-"DBD905 Num. of ready-to-eat foods in past 30 days (Range:1 to 180)\n" +\
-"DBD910 Num. of frozen meals/pizza in past 30 days (Range:1 to 180)\n"
-
+"\nDBD895 Num. of meals not home prepared in past 7 days (Range:0 to 21)\n" +\
+"DBD900 Num, of meals from fast food or pizza place past 7 days (Range:0 to 21)\n" +\
+"DBD905 Num. of ready-to-eat foods in past 30 days (Range:0 to 180)\n" +\
+"DBD910 Num. of frozen meals/pizza in past 30 days (Range:0 to 180)\n"
 print(codes)
+
+#DBD895 = 5555 More than 21
+#DBD895 = 7777 Refused
+#DBD895 = 9999 Unknown
+
+#DBD900 = 5555 More than 21
+#DBD900 = 7777 Refused
+#DBD900 = 9999 Unknown
+
+#Purge rows with refused or unknown answers
+nutrition_data = nutrition_data[nutrition_data.DBD895  != 7777.0]
+nutrition_data = nutrition_data[nutrition_data.DBD895  != 9999.0]
+
+nutrition_data = nutrition_data[nutrition_data.DBD900 != 7777.0]
+nutrition_data = nutrition_data[nutrition_data.DBD900 != 9999.0]
+
+nutrition_data = nutrition_data[nutrition_data.DBD905 != 7777.0]
+nutrition_data = nutrition_data[nutrition_data.DBD905 != 9999.0]
+
+nutrition_data = nutrition_data[nutrition_data.DBD910 != 7777.0]
+nutrition_data = nutrition_data[nutrition_data.DBD910 != 9999.0]
+
+print(nutrition_data.head(3))
+print(np.round(nutrition_data.describe(), 2))
 
