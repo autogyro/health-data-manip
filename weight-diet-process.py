@@ -73,7 +73,7 @@ alcohol_smoking_data.dropna(axis=0, how='any', inplace=True)
 merged_data = alcohol_smoking_data.copy()
 merged_data['BMI'] = weight_data['BMI']
 
-print(merged_data.head(3))
+print(merged_data.head())
 print(merged_data.describe())
 
 
@@ -114,6 +114,21 @@ nutrition_data = nutrition_data[nutrition_data.DBD905 != 9999.0]
 nutrition_data = nutrition_data[nutrition_data.DBD910 != 7777.0]
 nutrition_data = nutrition_data[nutrition_data.DBD910 != 9999.0]
 
-print(nutrition_data.head(3))
+print("DBD895, DBD900 > 21 values:\n")
+print(nutrition_data[nutrition_data.DBD895  > 21.0].DBD895)
+print(nutrition_data[nutrition_data.DBD900  > 21.0].DBD900)
+print("........ \n")
+
+#Also purge unreasonable values of weekly junk food and/or pizza consumption
+nutrition_data = nutrition_data[nutrition_data.DBD895  != 5555.0]
+nutrition_data = nutrition_data[nutrition_data.DBD895  != 5555.0]
+
+#Align nutrition data with merged data from previous step
+nutrition_data = nutrition_data.reindex(merged_data.index)
+nutrition_data .dropna(axis=0, how='any', inplace=True)
+
+print(nutrition_data.head())
 print(np.round(nutrition_data.describe(), 2))
+
+
 
