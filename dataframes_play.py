@@ -10,24 +10,85 @@ import numpy as np
 import pandas as pd
 
 
-#In this example we use the pandas apply method and a pair of functions
-#to re-encode the values of a dataframe column according to a given
-#criterion
-def foo(x):
-    if (x==1) or (x==2):
-        return 'Yes'
-    else:
-        return np.nan
+#Test MinMax Scaler, Normalizer
 
-d = {'a':[1,2,1,1,1,2,3,2,1,2,2,3], 'b':[1.0,5.0,1.0,1.0,2.0,4.0,3.0,8.0,1.0,3.0,2.0,3.0]}
+d = {'A': [1.5, 2.5, 0.5], 'B':[4.1, 6.6, 10.1]}
 df = pd.DataFrame(d)
-df['c'] = df['a'].apply(lambda x: foo(x))
-
-#This statement will be useful to convert an il-defined float index to int;
-#Implement policy of assuring integer valued indexes in all dataframes
-df['d'] = pd.to_numeric(df['b'], downcast='integer')
-
 print(df)
+
+from sklearn.preprocessing import MinMaxScaler, Normalizer
+
+print("\nMinMaxScaler:\n")
+scaler = MinMaxScaler()
+scaler.fit(df)
+nptdf = scaler.transform(df)
+nptdf = np.round(nptdf ,2)
+print(pd.DataFrame(nptdf,columns=['A', 'B']))
+
+print("\nNormalizer:\n")
+scaler = Normalizer()
+scaler.fit(df)
+nptdf = scaler.transform(df)
+nptdf = np.round(nptdf ,2)
+print(pd.DataFrame(nptdf,columns=['A', 'B']))
+
+
+
+
+if False:
+    #Illustrates you can apply numPy functions to entire dataframes
+    d = {'a':[1.11331, 9.53626], 'b':[0.09144, 53.44221]}
+    df = pd.DataFrame(d)
+    print(df)
+    print(np.round(df,2))
+
+
+if False:
+
+    d = {'a': [1, 2, 3], 'b':[4, 5, 6]}
+    df = pd.DataFrame(d)
+    print(df)
+
+    def foo2D(x, y):
+        return x + y
+
+    df['c'] = foo2D(df['a'], df['b'])
+    print(df)
+
+if False:
+    d = {'a':[1,2,3]}
+    df = pd.DataFrame(d)
+
+    print(df)
+
+    def foo(x):
+        return x+1
+
+    df['b'] = foo(df['a'])
+
+    print(df)
+
+
+
+if False:
+    #In this example we use the pandas apply method and a pair of functions
+    #to re-encode the values of a dataframe column according to a given
+    #criterion
+    def foo(x):
+        if (x==1) or (x==2):
+            return 'Yes'
+        else:
+            return np.nan
+
+    d = {'a':[1,2,1,1,1,2,3,2,1,2,2,3], 'b':[1.0,5.0,1.0,1.0,2.0,4.0,3.0,8.0,1.0,3.0,2.0,3.0]}
+    df = pd.DataFrame(d)
+    df['c'] = df['a'].apply(lambda x: foo(x))
+
+    #This statement will be useful to convert an il-defined float index to int;
+    #Implement policy of assuring integer valued indexes in all dataframes
+    df['d'] = pd.to_numeric(df['b'], downcast='integer')
+
+    print(df)
 
 if False:
     # Clear rows containing nans; IN-PLACE; method modifies supplied dataframe, returns None
