@@ -77,6 +77,14 @@ merged_data['BMI'] = weight_data['BMI']
 #for better readability:
 
 
+merged_data.rename(columns = {'RIDAGEYR':'Age'}, inplace=True)
+merged_data.rename(columns = {'RIAGENDR':'Gender'}, inplace=True)
+merged_data.rename(columns = {'INDHHIN2':'IncomeLevel'}, inplace=True)
+merged_data.rename(columns = {'Income':'IncomeBracket'}, inplace=True)
+
+#Drop redundant columns
+
+merged_data.drop(['SMQ040'], axis=1, inplace=True)
 
 print(merged_data.head())
 print(merged_data.describe())
