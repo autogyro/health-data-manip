@@ -73,6 +73,11 @@ alcohol_smoking_data.dropna(axis=0, how='any', inplace=True)
 merged_data = alcohol_smoking_data.copy()
 merged_data['BMI'] = weight_data['BMI']
 
+#We need at this point to rename some columns
+#for better readability:
+
+
+
 print(merged_data.head())
 print(merged_data.describe())
 
@@ -127,8 +132,17 @@ nutrition_data = nutrition_data[nutrition_data.DBD895  != 5555.0]
 nutrition_data = nutrition_data.reindex(merged_data.index)
 nutrition_data .dropna(axis=0, how='any', inplace=True)
 
+#define function to transform food consumption to percentage values
+#based on an equivalence of 100% to 21 for DBD895, DBD900, and
+#100% to 180 for DBD905, DBD910, respectivly.
+def percent_transform(x,n):
+    return np.round(float(x/n *100.0),2)
+
+
+nutrition_data['7-Day NotHome'] = nutrition_data['DBD895'].apply(lambda x: percent_transform(x, 21))
+nutrition_data['7-Day FastFood'] = nutrition_data['DBD900'].apply(lambda x: percent_transform(x, 21))
+nutrition_data['30-Day ReadyFood'] = nutrition_data['DBD905'].apply(lambda x: percent_transform(x, 180))
+nutrition_data['30-Day FrozenFood'] = nutrition_data['DBD910'].apply(lambda x: percent_transform(x, 180))
+
 print(nutrition_data.head())
 print(np.round(nutrition_data.describe(), 2))
-
-
-
