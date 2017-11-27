@@ -81,10 +81,19 @@ merged_data.rename(columns = {'RIDAGEYR':'Age'}, inplace=True)
 merged_data.rename(columns = {'RIAGENDR':'Gender'}, inplace=True)
 merged_data.rename(columns = {'INDHHIN2':'IncomeLevel'}, inplace=True)
 merged_data.rename(columns = {'Income':'IncomeBracket'}, inplace=True)
+merged_data.rename(columns = {'ALQ130':'Alcohol'}, inplace=True)
+
 
 #Drop redundant columns
-
 merged_data.drop(['SMQ040'], axis=1, inplace=True)
+merged_data.drop(['ALQ101'], axis=1, inplace=True)
+
+#Downcast values to more consistent types
+merged_data['IncomeLevel'] = pd.to_numeric(merged_data['IncomeLevel'], downcast='integer')
+merged_data['Gender'] = pd.to_numeric(merged_data['Gender'], downcast='integer')
+merged_data['Alcohol'] = pd.to_numeric(merged_data['Alcohol'], downcast='integer')
+
+#print(merged_data.ALQ130.unique())
 
 print(merged_data.head())
 print(merged_data.describe())
