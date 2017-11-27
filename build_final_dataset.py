@@ -56,6 +56,9 @@ insurance_data['Insurance'] = insurance_data['Insurance'].apply(lambda x: binari
 
 merged_data['Insurance'] = insurance_data['Insurance']
 
+merged_data['Insurance'].fillna(value=0, inplace=True) #Individuals to consuming alcohol (NaNs ---> 0)
+merged_data['Insurance'] = pd.to_numeric(merged_data['Insurance'], downcast='integer')
+
 print("\nMerged Data Previews Second Stage:\n")
 print(merged_data.head())
 print(merged_data.describe())
@@ -72,11 +75,16 @@ cholpressure_data['SEQN'] = pd.to_numeric(cholpressure_data['SEQN'], downcast='i
 cholpressure_data = cholpressure_data.set_index('SEQN')
 
 cholpressure_data = cholpressure_data.reindex(merged_data.index)
-
 cholpressure_data.fillna(value=0, inplace=True)
 
-print(cholpressure_data.head())
-print(cholpressure_data.describe())
+def binarize_12(x):
+    if (x == 1.0):
+        return 1
+    elif (x== 2.0):
+        return 0
+    else:
+        return 0
 
 for col in cholpressure_data.columns:
-    print(col)
+    cholpressure_data[col] = cholpressure_data[col].apply(lambda x: binarize_12(x))
+
