@@ -10,27 +10,27 @@ import numpy as np
 import pandas as pd
 
 
-#Test MinMax Scaler, Normalizer
+def percent_transform(x,n):
+    return np.round(float(x/n *100.0),2)
 
-d = {'A': [1.5, 2.5, 0.5], 'B':[4.1, 6.6, 10.1]}
-df = pd.DataFrame(d)
-print(df)
+print(percent_transform(7,21))
 
-from sklearn.preprocessing import MinMaxScaler, Normalizer
 
-print("\nMinMaxScaler:\n")
-scaler = MinMaxScaler()
-scaler.fit(df)
-nptdf = scaler.transform(df)
-nptdf = np.round(nptdf ,2)
-print(pd.DataFrame(nptdf,columns=['A', 'B']))
+if False:
+    print("\nMinMaxScaler:\n")
+    scaler = MinMaxScaler()
+    scaler.fit(df)
+    nptdf = scaler.transform(df)
+    nptdf = np.round(nptdf ,2)
+    print(pd.DataFrame(nptdf,columns=['A', 'B']))
 
-print("\nNormalizer:\n")
-scaler = Normalizer()
-scaler.fit(df)
-nptdf = scaler.transform(df)
-nptdf = np.round(nptdf ,2)
-print(pd.DataFrame(nptdf,columns=['A', 'B']))
+if False:
+    print("\nNormalizer:\n")
+    scaler = Normalizer()
+    scaler.fit(df)
+    nptdf = scaler.transform(df)
+    nptdf = np.round(nptdf ,2)
+    print(pd.DataFrame(nptdf,columns=['A', 'B']))
 
 
 
