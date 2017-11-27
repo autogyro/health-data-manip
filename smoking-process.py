@@ -20,6 +20,11 @@ import feather
 ager_alcohol_data = feather.read_dataframe(project_path + 'ager_alcohol_data.feather')
 ager_alcohol_data = ager_alcohol_data.set_index('SEQNDX') #Restore the index saved during the export step
 
+# print(ager_alcohol_data.head())
+# print(ager_alcohol_data.describe())
+#
+# sys.exit()
+
 smoking_data = smoking_data[['SEQN','SMQ040']]
 # downcast float column to int before setting it up as index
 smoking_data['SEQN'] = pd.to_numeric(smoking_data['SEQN'], downcast='integer')
@@ -27,19 +32,20 @@ smoking_data['SEQN'] = pd.to_numeric(smoking_data['SEQN'], downcast='integer')
 smoking_data = smoking_data.set_index('SEQN')
 smoking_data = smoking_data.reindex(ager_alcohol_data.index)
 
-smoking_data.dropna(axis=0, how='any', inplace=True)
+smoking_data.fillna(value=0, inplace=True) #Individuals to consuming alcohol (NaNs ---> 0)
+
+#smoking_data.dropna(axis=0, how='any', inplace=True)
 
 print("Smoking behavior dataframe:\n")
 print(smoking_data.head(5))
 print(smoking_data.describe())
-
-ager_alcohol_data = ager_alcohol_data.reindex(smoking_data.index)
 
 ager_alcohol_data['SMQ040'] = smoking_data['SMQ040']
 
 print("Alcohol consumption consistent dataframe:\n")
 print(ager_alcohol_data.head())
 print(ager_alcohol_data.describe())
+
 
 #------------------------------------------
 print("*"*70)
@@ -72,18 +78,21 @@ print("Number of records SMQ040  containing unknown answer: {}".format(nSMQ040_u
 def binarize_smq040(x):
     if (x== 1.0) or (x== 2.0):
         return 1
-    elif (x== 3.0):
+    elif (x== 0.0) or (x== 3.0):
         return 0
     else:
         return np.nan
 
 
 merged_data['Smoking'] = merged_data['SMQ040'].apply(lambda x: binarize_smq040(x))
+
 #Purge rows in case we got NaNs after applying the function above to the selected column
-smoking_data.dropna(axis=0, how='any', inplace=True)
+#merged_data.dropna(axis=0, how='any', inplace=True)
 
 print(merged_data.head(3))
 print(merged_data.describe())
+
+
 
 #Export cleaned dataset to Apache Arrow feather format
 #Compatible with R; uses fast I/O throughput in solid state drives

@@ -109,6 +109,8 @@ print(ager_data.head(2))
 print("")
 print(ager_data.describe())
 
+
+
 nansv_income = ager_data.INDHHIN2.isnull().sum()
 n_refused = ager_data[ager_data.INDHHIN2 == 77.0].INDHHIN2.count()
 n_unknown = ager_data[ager_data.INDHHIN2 == 99.0].INDHHIN2.count()
@@ -160,14 +162,18 @@ print(alcohol_data.head(2))
 print("")
 print(alcohol_data.describe())
 
+
+
 nansv101 = alcohol_data.ALQ101.isnull().sum()
 nal101_yes = alcohol_data[alcohol_data.ALQ101 == 1.0].ALQ101.count()
 nal101_no = alcohol_data[alcohol_data.ALQ101 == 2.0].ALQ101.count()
 nal101_unknown = alcohol_data[alcohol_data.ALQ101 == 9.0].ALQ101.count()
 nal101_refused = alcohol_data[alcohol_data.ALQ101 == 7.0].ALQ101.count()
 nansv130 = alcohol_data.ALQ130.isnull().sum()
+
 tmpdf = alcohol_data[alcohol_data.ALQ130 >=1.0]
 tmpdf = tmpdf[tmpdf.ALQ130 <=25.0]
+
 nal130_values = tmpdf.ALQ130.count()
 nal130_unknown = alcohol_data[alcohol_data.ALQ130 == 999.0].ALQ130.count()
 nal130_refused = alcohol_data[alcohol_data.ALQ130 == 777.0].ALQ130.count()
@@ -186,15 +192,19 @@ print("Number of records ALQ130  containing unknown answer: {}".format(nal130_un
 print(".\n"*2)
 print("*"*60)
 
+#--------------------------------------------------------------
+
 print("Merging demographic and alcohol consumption data:\n")
 
-ager_data = ager_data.reindex(alcohol_data.index)
+#ager_data = ager_data.reindex(alcohol_data.index)
+
 alcohol_data = alcohol_data.reindex(ager_data.index)
+alcohol_data.fillna(value=0, inplace=True) #Individuals to consuming alcohol (NaNs ---> 0)
 
 ager_alcohol_data = pd.concat([ager_data['RIDAGEYR'],ager_data['RIAGENDR'],ager_data['INDHHIN2'],
                                alcohol_data['ALQ101'], alcohol_data['ALQ130']], axis=1)
 
-ager_alcohol_data.dropna(axis=0, how='any', inplace=True)
+#ager_alcohol_data.dropna(axis=0, how='any', inplace=True)
 
 #Map income code values INDHHIN2 to income range categories
 income_d = {1: '$0.0 - 4.9K', 2: '$5.0 - 9.9K', 3:'$10.0 - 14.9K', 4:'$15.0 - 19.9K',
@@ -214,6 +224,7 @@ ager_alcohol_data['Income'] = income_column
 
 print(ager_alcohol_data.head())
 print(ager_alcohol_data.describe())
+
 
 print("\nLabel description:\n")
 print("RIDAGEYR - Age in years at screening")
@@ -236,3 +247,6 @@ df_test = feather.read_dataframe(path)
 
 print(df_test.head())
 print(df_test.describe())
+
+
+

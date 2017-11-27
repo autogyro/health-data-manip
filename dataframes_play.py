@@ -10,10 +10,21 @@ import numpy as np
 import pandas as pd
 
 
-def percent_transform(x,n):
-    return np.round(float(x/n *100.0),2)
 
-print(percent_transform(7,21))
+#Extract unique elements from dataframe column (or series)
+d = {'A':[1,2,2,3,4,4,5,5], 'B':[1.1,2.3,2,3,4,4.3,5,5.1]}
+df = pd.DataFrame(d)
+print(df)
+
+print(df.A.unique())
+
+
+if False:
+
+    def percent_transform(x,n):
+        return np.round(float(x/n *100.0),2)
+
+    print(percent_transform(7,21))
 
 
 if False:

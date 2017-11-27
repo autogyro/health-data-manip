@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-#path to datasets folders
+#Path to datasets folders
 datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/'
 project_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/'
 
@@ -22,6 +22,7 @@ alcohol_smoking_data = feather.read_dataframe(project_path + 'alcohol_smoking_da
 alcohol_smoking_data = alcohol_smoking_data.set_index('SEQNDX') #Restore the index saved during the export step
 
 weight_data = weight_data[['SEQN', 'WHD010', 'WHD020']]
+
 #Purge rows with NaNs
 weight_data.dropna(axis=0, how='any', inplace=True)
 
@@ -60,12 +61,15 @@ weight_data['BMI'] = bmi(weight_data['WHD010'], weight_data['WHD020'])
 #Downcast SEQN to ints
 weight_data['SEQN'] = pd.to_numeric(weight_data['SEQN'], downcast='integer')
 weight_data = weight_data.set_index('SEQN')
+
 weight_data = weight_data.reindex(alcohol_smoking_data.index)
+
 #Purge rows with NaNs
 weight_data.dropna(axis=0, how='any', inplace=True)
 
-#print(weight_data.head())
-#print(weight_data.describe())
+print(weight_data.head())
+print(weight_data.describe())
+
 
 alcohol_smoking_data = alcohol_smoking_data.reindex(weight_data.index)
 alcohol_smoking_data.dropna(axis=0, how='any', inplace=True)
@@ -147,14 +151,13 @@ nutrition_data = nutrition_data[nutrition_data.DBD895  != 5555.0]
 
 #Align nutrition data with merged data from previous step
 nutrition_data = nutrition_data.reindex(merged_data.index)
-nutrition_data .dropna(axis=0, how='any', inplace=True)
+nutrition_data .dropna(axis=0, how='any', inplace=True)      #Purge rows with NaNs
 
 #define function to transform food consumption to percentage values
 #based on an equivalence of 100% to 21 for DBD895, DBD900, and
 #100% to 180 for DBD905, DBD910, respectivly.
 def percent_transform(x,n):
     return np.round(float(x/n *100.0),2)
-
 
 nutrition_data['7-Day NotHome'] = nutrition_data['DBD895'].apply(lambda x: percent_transform(x, 21))
 nutrition_data['7-Day FastFood'] = nutrition_data['DBD900'].apply(lambda x: percent_transform(x, 21))
@@ -174,3 +177,12 @@ merged_data['7-Day FastFood'] = nutrition_data['7-Day FastFood']
 
 print(merged_data.head())
 print(merged_data.describe())
+
+#Save merged dataframe
+filename = 'independent_variables_df.feather'
+merged_data['SEQN'] = merged_data.index
+feather.write_dataframe(merged_data, filename)
+
+
+
+print("...\n\n END ")
