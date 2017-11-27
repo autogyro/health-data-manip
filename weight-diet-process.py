@@ -163,3 +163,14 @@ nutrition_data['30-Day FrozenFood'] = nutrition_data['DBD910'].apply(lambda x: p
 
 print(nutrition_data.head())
 print(np.round(nutrition_data.describe(), 2))
+
+print("\n\n Merging Demographics, Alcohol consumption, Smoking status, Diet and Nutrition data.... \n")
+
+
+merged_data = merged_data.reindex(nutrition_data.index)
+
+merged_data['7-Day NotHome'] = nutrition_data['7-Day NotHome']
+merged_data['7-Day FastFood'] = nutrition_data['7-Day FastFood']
+
+print(merged_data.head())
+print(merged_data.describe())
