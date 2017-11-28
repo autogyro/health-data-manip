@@ -376,7 +376,16 @@ if True:
         print("BMI BRACKETS counts = {} ..... Count: {}".format(val, nv))
     print('Count total: {}\n'.format(snv))
 
-    
+
 print("\nMerged Data Previews Seventh Stage:\n")
 print(merged_data.head())
 print(merged_data.describe())
+
+#Save Final stage merged dataframe
+filename_final = 'final_health_survey_df.feather'
+feather.write_dataframe(merged_data, filename_final)
+
+csv_filename = 'final_health_survey_df.csv'
+merged_data.to_csv(csv_filename)
+
+print("\n\nEND Saving Final Dataframe")
