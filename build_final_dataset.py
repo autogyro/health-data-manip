@@ -229,3 +229,30 @@ print("\nMerged Data Previews Fifth Stage:\n")
 print(merged_data.head())
 print(merged_data.describe())
 
+
+#Save Fifth stage merged dataframe
+filename_pre = 'prefinal_df.feather'
+merged_data['SEQN'] = merged_data.index
+feather.write_dataframe(merged_data, filename_pre)
+
+#-------------- Further processing ------------------------------------
+#Categorizing functions
+
+#Gender categories ints to labels
+def gender_cat(x):
+    if x == 1:
+        return 'Male'
+    elif x == 2:
+        return 'Female'
+    else:
+        return np.nan
+
+merged_data['Gender'] = merged_data['Gender'].apply(lambda x: gender_cat(x))
+print(merged_data.head())
+
+#Check column unique values
+if False:
+    print("\n\nUnique values in columns:\n")
+    for col in merged_data:
+        print("Column {}:\n".format(col))
+        print(merged_data[col].unique())
