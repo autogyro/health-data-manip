@@ -225,9 +225,9 @@ for col in diabetes_data.columns:
 for col in diabetes_data.columns:
     merged_data[col] = diabetes_data[col]
 
-print("\nMerged Data Previews Fifth Stage:\n")
-print(merged_data.head())
-print(merged_data.describe())
+# print("\nMerged Data Previews Fifth Stage:\n")
+# print(merged_data.head())
+# print(merged_data.describe())
 
 
 #Save Fifth stage merged dataframe
@@ -288,3 +288,26 @@ for val in np.sort(alq_unique):
     print("Bracket = {} ..... Count: {}".format(val, nv))
 print('Count total: {}'.format(snv))
 
+print("\nMerged Data Previews Sixth Stage:\n")
+print(merged_data.head())
+print(merged_data.describe())
+
+print("\nFast food consumption percentage")
+fast_food_unique = np.sort(merged_data['7-Day FastFood'].unique())
+snv = 0
+for val in np.sort(fast_food_unique):
+    nv = merged_data[merged_data['7-Day FastFood'] == val]['7-Day FastFood'].count()
+    snv += nv
+    print("Percentage fast food = {} ..... Count: {}".format(val, nv))
+print('Count total: {}\n'.format(snv))
+
+print("^"*80)
+
+print("\nNot home food consumption percentage")
+nothome_food_unique = np.sort(merged_data['7-Day NotHome'].unique())
+snv = 0
+for val in np.sort(nothome_food_unique):
+    nv = merged_data[merged_data['7-Day NotHome'] == val]['7-Day NotHome'].count()
+    snv += nv
+    print("Percentage not home = {} ..... Count: {}".format(val, nv))
+print('Count total: {}\n'.format(snv))
