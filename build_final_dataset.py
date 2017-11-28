@@ -63,6 +63,10 @@ print("\nMerged Data Previews Second Stage:\n")
 print(merged_data.head())
 print(merged_data.describe())
 
+print("\nIncome levels")
+print(merged_data.IncomeLevel.unique())
+
+
 #------------------------------------------------------------------------------------------
 print("\n\nProcesing cholesterol and hypertension data......\n\n")
 cholpressure_data = cholpressure_data[['SEQN', 'BPQ020','BPQ040A','BPQ080','BPQ090D']]
@@ -85,6 +89,23 @@ def binarize_12(x):
     else:
         return 0
 
+#binarize
 for col in cholpressure_data.columns:
     cholpressure_data[col] = cholpressure_data[col].apply(lambda x: binarize_12(x))
 
+print(cholpressure_data.head())
+print(cholpressure_data.describe())
+print("")
+
+for col in cholpressure_data.columns:
+    print("Yes answers in column = {}".format(col))
+    n = cholpressure_data[cholpressure_data[col] == 1][col].count()
+    print(n)
+
+#append all chol-pressure columns to merged_data dataframe
+for col in cholpressure_data.columns:
+    merged_data[col] = cholpressure_data[col]
+
+print("\nMerged Data Previews Third Stage:\n")
+print(merged_data.head())
+print(merged_data.describe())
