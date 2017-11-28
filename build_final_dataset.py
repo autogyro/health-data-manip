@@ -328,7 +328,7 @@ def categorize_food_cons(x):
 merged_data['NotHomeFood'] = merged_data['7-Day NotHome'].apply(lambda x: categorize_food_cons(x))
 merged_data['FastFood'] = merged_data['7-Day FastFood'].apply(lambda x: categorize_food_cons(x))
 
-if True:
+if False:
     print("\nNot home food consumption brackets")
     nothome_food_unique = np.sort(merged_data['NotHomeFood'].unique())
     snv = 0
@@ -350,11 +350,33 @@ if True:
     print('Count total: {}\n'.format(snv))
 
 
+# print("\nMerged Data Previews Seventh Stage:\n")
+# print(merged_data.head())
+# # print(merged_data.describe())
 
+def bmi_categorizer(x):
+    if x < 18.5:
+        return 'UnderWeight'
+    elif (x >=18.5) and (x <=24.9):
+        return 'HealthyWeight'
+    elif (x > 24.9) and (x <= 29.9):
+        return 'OeverWeight'
+    elif x > 29.9:
+        return 'Obese'
 
+merged_data['BMI_BRACKET'] = merged_data['BMI'].apply(lambda x: bmi_categorizer(x))
 
+if True:
+    print("\nBMI Frequency Brackets")
+    bmi_brackets_unique = np.sort(merged_data['BMI_BRACKET'].unique())
+    snv = 0
+    for val in np.sort(bmi_brackets_unique):
+        nv = merged_data[merged_data['BMI_BRACKET'] == val]['BMI_BRACKET'].count()
+        snv += nv
+        print("BMI BRACKETS counts = {} ..... Count: {}".format(val, nv))
+    print('Count total: {}\n'.format(snv))
 
+    
 print("\nMerged Data Previews Seventh Stage:\n")
 print(merged_data.head())
 print(merged_data.describe())
-
