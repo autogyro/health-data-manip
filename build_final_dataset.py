@@ -235,8 +235,8 @@ filename_pre = 'prefinal_df.feather'
 merged_data['SEQN'] = merged_data.index
 feather.write_dataframe(merged_data, filename_pre)
 
-#-------------- Further processing ------------------------------------
-#Categorizing functions
+#---------------------------------------- Further processing ----------------------------------------------------------
+#******* Categorizing functions *********
 
 #Gender categories ints to labels
 def gender_cat(x):
@@ -256,3 +256,35 @@ if False:
     for col in merged_data:
         print("Column {}:\n".format(col))
         print(merged_data[col].unique())
+
+print("\nCheck alcohol consumption frequency counts:\n")
+alq_unique = merged_data['Alcohol'].unique()
+snv =0
+for val in np.sort(alq_unique):
+    nv = merged_data[merged_data.Alcohol == val].Alcohol.count()
+    snv += nv
+    print("No. Drinks = {} ..... Count: {}".format(val, nv))
+print('Count total: {}'.format(snv))
+
+def categorize_alcohol(x):
+    if x == 0:
+        return 'Non-Drinker'
+    elif ((x >=1) and (x <=2)):
+        return 'ModerateDrinker'
+    elif ((x > 2) and (x <= 5)):
+        return 'Moderate-Heavy'
+    elif ((x > 5) and (x <= 8)):
+        return 'HeavyDrinker'
+    elif (x > 8):
+        return 'ExtremeDrinker'
+
+merged_data['AlcoholBracket'] = merged_data['Alcohol'].apply(lambda x: categorize_alcohol(x))
+
+alq_unique = merged_data['AlcoholBracket'].unique()
+snv = 0
+for val in np.sort(alq_unique):
+    nv = merged_data[merged_data.AlcoholBracket == val].AlcoholBracket.count()
+    snv += nv
+    print("Bracket = {} ..... Count: {}".format(val, nv))
+print('Count total: {}'.format(snv))
+
