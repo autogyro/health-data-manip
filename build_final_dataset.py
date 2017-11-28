@@ -16,8 +16,8 @@ project_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/cap
 #Datasets
 insurance_data = pd.read_sas(datasets_path + 'health_insurance/HIQ_H.xpt')     #DONE
 cholpressure_data = pd.read_sas(datasets_path + 'blood_pressure/BPQ_H.XPT')    #DONE
-cardiovascular_data = pd.read_sas(datasets_path + 'cardiovascular/CDQ_H.XPT')
-diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT')
+cardiovascular_data = pd.read_sas(datasets_path + 'cardiovascular/CDQ_H.XPT')  #DONE
+diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT') #DONE
 
 #Import alcohol-age cleaned dataset using Apache Arrow feather format
 import feather
@@ -154,3 +154,78 @@ print(cardiovascular_data.describe())
 for col in cardiovascular_data.columns:
     n = cardiovascular_data[cardiovascular_data[col] == 1][col].count()
     print("Yes answers in column {} = {}: ".format(col,n))
+
+
+#append all chol-pressure columns to merged_data dataframe
+for col in cardiovascular_data.columns:
+    merged_data[col] = cardiovascular_data[col]
+
+print("\nMerged Data Previews Fourht Stage:\n")
+print(merged_data.head())
+print(merged_data.describe())
+
+#-------------------------------- Process diabetes data ----------------------------------------
+#-----------------------------------------------------------------------------------------------
+
+print("\n\nProcessing diabetes data .......\n\n")
+
+
+
+diabetes_data = diabetes_data[['SEQN', 'DIQ010', 'DIQ160', 'DIQ170']]
+
+diabetes_data.rename(columns = {'DIQ010':'Diabetes'}, inplace=True)
+diabetes_data.rename(columns = {'DIQ160':'Prediabetes'}, inplace=True)
+diabetes_data.rename(columns = {'DIQ170':'RiskDiabetes'}, inplace=True)
+
+
+diabetes_data['SEQN'] = pd.to_numeric(diabetes_data['SEQN'], downcast='integer')
+diabetes_data = diabetes_data.set_index('SEQN')
+
+
+for col in diabetes_data:
+    diabetes_data = diabetes_data[diabetes_data[col] != 7.0] #Purge records with refused answers
+    diabetes_data = diabetes_data[diabetes_data[col] != 9.0] #Purge records with unknown answers
+
+
+
+diabetes_data.fillna(value=0, inplace=True)
+
+def binarize_123(x):
+    if (x == 1.0):
+        return 1
+    elif (x== 3.0):
+        return 1
+    elif (x== 2.0):
+        return 0
+    else:
+        return 0
+
+#binarize
+for col in diabetes_data.columns:
+    diabetes_data[col] = diabetes_data[col].apply(lambda x: binarize_123(x))
+
+diabetes_data = diabetes_data.reindex(merged_data.index)
+diabetes_data.fillna(value=0, inplace=True)
+
+for col in diabetes_data.columns:
+    diabetes_data[col] = pd.to_numeric(diabetes_data[col], downcast='integer')
+
+print(diabetes_data.head())
+print(diabetes_data.describe())
+
+print("\n\nUnique values in columns:\n")
+for col in diabetes_data:
+    print(diabetes_data[col].unique())
+
+for col in diabetes_data.columns:
+    n = diabetes_data[diabetes_data[col] == 1][col].count()
+    print("Yes answers in column {} = {}: ".format(col,n))
+
+#append all chol-pressure columns to merged_data dataframe
+for col in diabetes_data.columns:
+    merged_data[col] = diabetes_data[col]
+
+print("\nMerged Data Previews Fifth Stage:\n")
+print(merged_data.head())
+print(merged_data.describe())
+
