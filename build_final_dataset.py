@@ -288,26 +288,73 @@ for val in np.sort(alq_unique):
     print("Bracket = {} ..... Count: {}".format(val, nv))
 print('Count total: {}'.format(snv))
 
-print("\nMerged Data Previews Sixth Stage:\n")
+# print("\nMerged Data Previews Sixth Stage:\n")
+# print(merged_data.head())
+# print(merged_data.describe())
+
+if False:
+    print("\nFast food consumption percentage")
+    fast_food_unique = np.sort(merged_data['7-Day FastFood'].unique())
+    snv = 0
+    for val in np.sort(fast_food_unique):
+        nv = merged_data[merged_data['7-Day FastFood'] == val]['7-Day FastFood'].count()
+        snv += nv
+        print("Percentage fast food = {} ..... Count: {}".format(val, nv))
+    print('Count total: {}\n'.format(snv))
+
+    print("^"*80)
+
+    print("\nNot home food consumption percentage")
+    nothome_food_unique = np.sort(merged_data['7-Day NotHome'].unique())
+    snv = 0
+    for val in np.sort(nothome_food_unique):
+        nv = merged_data[merged_data['7-Day NotHome'] == val]['7-Day NotHome'].count()
+        snv += nv
+        print("Percentage not home = {} ..... Count: {}".format(val, nv))
+    print('Count total: {}\n'.format(snv))
+
+def categorize_food_cons(x):
+    if (x >= 0.0) and (x <=15.0):
+        return '0-15%'
+    elif ((x > 15.0) and (x <= 25.0)):
+        return '15-25%'
+    elif ((x > 25.0) and (x <= 40.0)):
+        return '25-40%'
+    elif ((x > 40.0) and (x <= 60.0)):
+        return '40-60%'
+    elif (x > 60.0):
+        return '60-100%'
+
+merged_data['NotHomeFood'] = merged_data['7-Day NotHome'].apply(lambda x: categorize_food_cons(x))
+merged_data['FastFood'] = merged_data['7-Day FastFood'].apply(lambda x: categorize_food_cons(x))
+
+if True:
+    print("\nNot home food consumption brackets")
+    nothome_food_unique = np.sort(merged_data['NotHomeFood'].unique())
+    snv = 0
+    for val in np.sort(nothome_food_unique):
+        nv = merged_data[merged_data['NotHomeFood'] == val]['NotHomeFood'].count()
+        snv += nv
+        print("Percentage Bracket not home = {} ..... Count: {}".format(val, nv))
+    print('Count total: {}\n'.format(snv))
+
+    print("^"*80)
+
+    print("\nFast food consumption brackets")
+    fast_food_unique = np.sort(merged_data['FastFood'].unique())
+    snv = 0
+    for val in np.sort(fast_food_unique):
+        nv = merged_data[merged_data['FastFood'] == val]['FastFood'].count()
+        snv += nv
+        print("Percentage Bracket fast food = {} ..... Count: {}".format(val, nv))
+    print('Count total: {}\n'.format(snv))
+
+
+
+
+
+
+print("\nMerged Data Previews Seventh Stage:\n")
 print(merged_data.head())
 print(merged_data.describe())
 
-print("\nFast food consumption percentage")
-fast_food_unique = np.sort(merged_data['7-Day FastFood'].unique())
-snv = 0
-for val in np.sort(fast_food_unique):
-    nv = merged_data[merged_data['7-Day FastFood'] == val]['7-Day FastFood'].count()
-    snv += nv
-    print("Percentage fast food = {} ..... Count: {}".format(val, nv))
-print('Count total: {}\n'.format(snv))
-
-print("^"*80)
-
-print("\nNot home food consumption percentage")
-nothome_food_unique = np.sort(merged_data['7-Day NotHome'].unique())
-snv = 0
-for val in np.sort(nothome_food_unique):
-    nv = merged_data[merged_data['7-Day NotHome'] == val]['7-Day NotHome'].count()
-    snv += nv
-    print("Percentage not home = {} ..... Count: {}".format(val, nv))
-print('Count total: {}\n'.format(snv))
