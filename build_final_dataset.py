@@ -278,7 +278,20 @@ def categorize_alcohol(x):
     elif (x > 8):
         return 'ExtremeDrinker'
 
+def numcategorize_alcohol(x):
+    if x == 0:
+        return 0
+    elif ((x >=1) and (x <=2)):
+        return 1
+    elif ((x > 2) and (x <= 5)):
+        return 2
+    elif ((x > 5) and (x <= 8)):
+        return 3
+    elif (x > 8):
+        return 4
+
 merged_data['AlcoholBracket'] = merged_data['Alcohol'].apply(lambda x: categorize_alcohol(x))
+merged_data['NUM_AlcoholBracket'] = merged_data['Alcohol'].apply(lambda x: numcategorize_alcohol(x))
 
 alq_unique = merged_data['AlcoholBracket'].unique()
 snv = 0
@@ -325,8 +338,23 @@ def categorize_food_cons(x):
     elif (x > 60.0):
         return '60-100%'
 
+def numcategorize_food_cons(x):
+    if (x >= 0.0) and (x <=15.0):
+        return 15
+    elif ((x > 15.0) and (x <= 25.0)):
+        return 25
+    elif ((x > 25.0) and (x <= 40.0)):
+        return 40
+    elif ((x > 40.0) and (x <= 60.0)):
+        return 60
+    elif (x > 60.0):
+        return 100
+
 merged_data['NotHomeFood'] = merged_data['7-Day NotHome'].apply(lambda x: categorize_food_cons(x))
 merged_data['FastFood'] = merged_data['7-Day FastFood'].apply(lambda x: categorize_food_cons(x))
+
+merged_data['NUM_NotHomeFood'] = merged_data['7-Day NotHome'].apply(lambda x: numcategorize_food_cons(x))
+merged_data['NUM_FastFood'] = merged_data['7-Day FastFood'].apply(lambda x: numcategorize_food_cons(x))
 
 if False:
     print("\nNot home food consumption brackets")
@@ -364,7 +392,18 @@ def bmi_categorizer(x):
     elif x > 29.9:
         return 'Obese'
 
+def numbmi_categorizer(x):
+    if x < 18.5:
+        return 1
+    elif (x >=18.5) and (x <=24.9):
+        return 2
+    elif (x > 24.9) and (x <= 29.9):
+        return 3
+    elif x > 29.9:
+        return 4
+
 merged_data['BMI_BRACKET'] = merged_data['BMI'].apply(lambda x: bmi_categorizer(x))
+merged_data['NUM_BMI_BRACKET'] = merged_data['BMI'].apply(lambda x: numbmi_categorizer(x))
 
 if True:
     print("\nBMI Frequency Brackets")
