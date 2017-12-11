@@ -44,23 +44,45 @@ while span <= np.ceil(max) + bin_size:
 
 bins = np.round(bins, 2)
 print(bins)
+print("")
+#----------------------------------------------
 
 bins_str = []
 for m in range(len(bins) -1 ):
     label = "{} to {}".format(bins[m], bins[m+1])
     bins_str.append(label)
-
 print(bins_str)
-
 print("")
+print("-----------------------------------------")
+#-----------------------------------------------
+
+# feat = 'sample'
+# for m in range(len(bins)-1):
+#     df1 = df[(df[feat] >= bins[m])]
+#     df2 = df1[df1[feat]< bins[m+1]]
+#     nv =  df2[feat].count()
+#     print(bins_str[m] + ": {}".format(nv))
+#-----------------------------------------------
+
+
 feat = 'sample'
+feat2 = 'value'
 for m in range(len(bins)-1):
     df1 = df[(df[feat] >= bins[m])]
     df2 = df1[df1[feat]< bins[m+1]]
     nv =  df2[feat].count()
-    print(bins_str[m] + ": {}".format(nv))
 
-#------------------------------------------
+    print(df2)
+    print("Bin: " + bins_str[m])
+    print("Sample count: {}".format(nv))
+    print("")
+    s1 = df2[df2[feat2] == 1][feat2].count()
+    s0 = df2[df2[feat2] == 0][feat2].count()
+
+    print("s1 = {}, s0={}".format(s1,s0))
+    print("")
+
+
 
 
 
