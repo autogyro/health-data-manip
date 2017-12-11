@@ -67,9 +67,11 @@ print("-----------------------------------------")
 
 feat = 'sample'
 feat2 = 'value'
+s1_array = []
+s0_array = []
 for m in range(len(bins)-1):
     df1 = df[(df[feat] >= bins[m])]
-    df2 = df1[df1[feat]< bins[m+1]]
+    df2 = df1[df1[feat] < bins[m+1]]
     nv =  df2[feat].count()
 
     print(df2)
@@ -78,13 +80,28 @@ for m in range(len(bins)-1):
     print("")
     s1 = df2[df2[feat2] == 1][feat2].count()
     s0 = df2[df2[feat2] == 0][feat2].count()
+    s1_array.append(s1)
+    s0_array.append(s0)
 
     print("s1 = {}, s0={}".format(s1,s0))
     print("")
 
 
+index = np.arange(len(bins_str))
+bar_width = 0.35
+opacity = 0.8
 
+plt.bar(index, s0_array, bar_width, alpha=opacity, color='k', label='0 values')
+plt.bar(index + bar_width, s1_array, bar_width, alpha=opacity, color='g', label='1 values')
 
+plt.xlabel('Bins')
+plt.ylabel('Binary Counts')
+plt.title('Generic plot')
+plt.xticks(index + bar_width / 2.0, bins_str)
+plt.legend(frameon=False, loc='upper right', fontsize='small')
+
+plt.tight_layout()
+plt.show()
 
 if False:
 
