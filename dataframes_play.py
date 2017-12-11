@@ -9,104 +9,206 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-#Random sample of reals in [a,b] (b - a) * random_sample() + a
+# Random sample of reals in [a,b] (b - a) * random_sample() + a
 #
-#Three-by-two array of random numbers from [-5, 0)
+# Three-by-two array of random numbers from [-5, 0)
 # 5 * np.random.random_sample((3, 2)) - 5
 #
 
-#Num elements in sample
+# Num elements in sample
 num_elements = 100
 
-#Interval where random numbers live
+# Interval where random numbers live
 a, b = 1.0, 10.0
 
-
-#Float values random generator
-data = a + (b-a)*np.random.random_sample(num_elements)
-#Binary values random generator
+# Float values random generator
+data = a + (b - a) * np.random.random_sample(num_elements)
+# Binary values random generator
 data2 = np.random.randint(2, size=num_elements)
-#Bin size
+# Bin size
 bin_size = 2.0
 
-#Built generic dataframe for data above
+# Built generic dataframe for data above
 d = {'sample': data, 'value': data2}
 df = pd.DataFrame(d)
 
-#Simple stats
-max = np.round(np.max(df['sample'].values),4)
-min = np.round(np.min(df['sample'].values),4)
-rango = np.round((max-min),4)
-
-print("Dataframe head:\n")
-print(df.head(10))
-print("")
-print("max: {}, min: {}, range: {}\n".format(max, min, rango))
-print("Ceiling max: {}".format(np.ceil(max)))
-print("Floored min: {}".format(np.floor(min)))
-
-#Create bins
-bins = []
-span = np.floor(min)
-
-while span <= np.ceil(max) + bin_size:
-    bins.append(span)
-    span += bin_size
-
-bins = np.round(bins, 2)
-print(bins)
-print("")
-#----------------------------------------------
-
-#Create bin's labels
-bins_str = []
-for m in range(len(bins) -1 ):
-    label = "{} to {}".format(bins[m], bins[m+1])
-    bins_str.append(label)
-print(bins_str)
-print("")
-print("-----------------------------------------")
 
 
-#Fill appropiate continuous feat bins and corresponding count of feat2 binary values
+def twofeat_barplot(df, xfeature, yfeature, nbins, title,
+                    xlabel, ylabel, ytrue_label, yfalse_label,verbose=False):
 
-feat = 'sample'
-feat2 = 'value'
-s1_array = []
-s0_array = []
-for m in range(len(bins)-1):
-    df1 = df[(df[feat] >= bins[m])]
-    df2 = df1[df1[feat] < bins[m+1]]
-    nv =  df2[feat].count()
+    max = np.max(df[xfeature].values)
+    min = np.min(df[xfeature].values)
+    rng = np.abs(max-min)
+    bin_size = np.round(rng/nbins,0)
 
-    print(df2)
-    print("Bin: " + bins_str[m])
-    print("Sample count: {}".format(nv))
-    print("")
-    s1 = df2[df2[feat2] == 1][feat2].count()
-    s0 = df2[df2[feat2] == 0][feat2].count()
-    s1_array.append(s1)
-    s0_array.append(s0)
+    #Create bins
+    bins = []
+    bins_str = []
 
-    print("s1 = {}, s0={}".format(s1,s0))
-    print("")
+    span = np.floor(min)
+
+    while span <= np.ceil(max) + bin_size:
+        bins.append(span)
+        span += bin_size
+
+    bins = np.round(bins, 2)
+
+    for m in range(len(bins) -1 ):
+        label = "{} to {}".format(bins[m], bins[m+1])
+        bins_str.append(label)
+
+    #Fill bars over bins
+    s1_array = []
+    s0_array = []
+
+    for m in range(len(bins)-1):
+        df1 = df[(df[xfeature] >= bins[m])]
+        df2 = df1[df1[xfeature] < bins[m+1]]
+        nv =  df2[xfeature].count()
+
+        s1 = df2[df2[yfeature] == 1][yfeature].count()
+        s0 = df2[df2[yfeature] == 0][yfeature].count()
+        s1_array.append(s1)
+        s0_array.append(s0)
+
+        if verbose:
+            print("Dataframe Bin")
+            print(df2)
+            print("Bin: " + bins_str[m])
+            print("Sample count: {}".format(nv))
+            print("")
+            print("True counts s1 = {}, False counts s0={}".format(s1,s0))
+            print("")
 
 
-index = np.arange(len(bins_str))
-bar_width = 0.35
-opacity = 0.8
+    index = np.arange(len(bins_str))
+    bar_width = 0.35
+    opacity = 0.8
 
-plt.bar(index, s0_array, bar_width, alpha=opacity, color='k', label='0 values')
-plt.bar(index + bar_width, s1_array, bar_width, alpha=opacity, color='g', label='1 values')
+    plt.bar(index, s0_array, bar_width, alpha=opacity, color='k', label=yfalse_label)
+    plt.bar(index + bar_width, s1_array, bar_width, alpha=opacity, color='g', label=ytrue_label)
 
-plt.xlabel('Bins')
-plt.ylabel('Binary Counts')
-plt.title('Generic plot')
-plt.xticks(index + bar_width / 2.0, bins_str)
-plt.legend(frameon=False, loc='upper right', fontsize='small')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.xticks(index + bar_width / 2.0, bins_str)
+    plt.legend(frameon=False, loc='upper right', fontsize='small')
 
+
+
+
+title = 'Generic Bar Plot'
+xlabel = 'Random Numbers'
+ylabel = 'No. Records'
+ytrue_label = '1'
+yfalse_label = '0'
+
+twofeat_barplot(df, 'sample', 'value', 5, title, xlabel, ylabel, ytrue_label, yfalse_label)
 plt.tight_layout()
 plt.show()
+
+if False:
+
+    #Random sample of reals in [a,b] (b - a) * random_sample() + a
+    #
+    #Three-by-two array of random numbers from [-5, 0)
+    # 5 * np.random.random_sample((3, 2)) - 5
+    #
+
+    #Num elements in sample
+    num_elements = 100
+
+    #Interval where random numbers live
+    a, b = 1.0, 10.0
+
+
+    #Float values random generator
+    data = a + (b-a)*np.random.random_sample(num_elements)
+    #Binary values random generator
+    data2 = np.random.randint(2, size=num_elements)
+    #Bin size
+    bin_size = 2.0
+
+    #Built generic dataframe for data above
+    d = {'sample': data, 'value': data2}
+    df = pd.DataFrame(d)
+
+    #Simple stats
+    max = np.round(np.max(df['sample'].values),4)
+    min = np.round(np.min(df['sample'].values),4)
+    rango = np.round((max-min),4)
+
+    print("Dataframe head:\n")
+    print(df.head(10))
+    print("")
+    print("max: {}, min: {}, range: {}\n".format(max, min, rango))
+    print("Ceiling max: {}".format(np.ceil(max)))
+    print("Floored min: {}".format(np.floor(min)))
+
+    #Create bins
+    bins = []
+    span = np.floor(min)
+
+    while span <= np.ceil(max) + bin_size:
+        bins.append(span)
+        span += bin_size
+
+    bins = np.round(bins, 2)
+    print(bins)
+    print("")
+    #----------------------------------------------
+
+    #Create bin's labels
+    bins_str = []
+    for m in range(len(bins) -1 ):
+        label = "{} to {}".format(bins[m], bins[m+1])
+        bins_str.append(label)
+    print(bins_str)
+    print("")
+    print("-----------------------------------------")
+
+
+    #Fill appropiate continuous feat bins and corresponding count of feat2 binary values
+    verbose = True
+    feat = 'sample'
+    feat2 = 'value'
+    s1_array = []
+    s0_array = []
+    for m in range(len(bins)-1):
+        df1 = df[(df[feat] >= bins[m])]
+        df2 = df1[df1[feat] < bins[m+1]]
+        nv =  df2[feat].count()
+        s1 = df2[df2[feat2] == 1][feat2].count()
+        s0 = df2[df2[feat2] == 0][feat2].count()
+        s1_array.append(s1)
+        s0_array.append(s0)
+
+        if verbose:
+            print("Dataframe Bin")
+            print(df2)
+            print("Bin: " + bins_str[m])
+            print("Sample count: {}".format(nv))
+            print("")
+            print("True counts s1 = {}, False counts s0={}".format(s1,s0))
+            print("")
+
+
+    index = np.arange(len(bins_str))
+    bar_width = 0.35
+    opacity = 0.8
+
+    plt.bar(index, s0_array, bar_width, alpha=opacity, color='k', label='0 values')
+    plt.bar(index + bar_width, s1_array, bar_width, alpha=opacity, color='g', label='1 values')
+
+    plt.xlabel('Bins')
+    plt.ylabel('Binary Counts')
+    plt.title('Generic plot')
+    plt.xticks(index + bar_width / 2.0, bins_str)
+    plt.legend(frameon=False, loc='upper right', fontsize='small')
+
+    plt.tight_layout()
+    plt.show()
 
 if False:
 
