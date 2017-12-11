@@ -15,19 +15,29 @@ import pandas as pd
 # 5 * np.random.random_sample((3, 2)) - 5
 #
 
+#Num elements in sample
+num_elements = 100
+
+#Interval where random numbers live
 a, b = 1.0, 10.0
 
-data = a + (b-a)*np.random.random_sample(10)
-data2 = np.random.randint(2, size=10)
 
+#Float values random generator
+data = a + (b-a)*np.random.random_sample(num_elements)
+#Binary values random generator
+data2 = np.random.randint(2, size=num_elements)
+#Bin size
+bin_size = 2.0
+
+#Built generic dataframe for data above
 d = {'sample': data, 'value': data2}
-
 df = pd.DataFrame(d)
 
+#Simple stats
 max = np.round(np.max(df['sample'].values),4)
 min = np.round(np.min(df['sample'].values),4)
 rango = np.round((max-min),4)
-bin_size = 2.0
+
 print("Dataframe:\n")
 print(df.head(10))
 print("")
@@ -35,6 +45,7 @@ print("max: {}, min: {}, range: {}\n".format(max, min, rango))
 print("Ceiling max: {}".format(np.ceil(max)))
 print("Floored min: {}".format(np.floor(min)))
 
+#Create bins
 bins = []
 span = np.floor(min)
 
@@ -47,6 +58,7 @@ print(bins)
 print("")
 #----------------------------------------------
 
+#Create bin's labels
 bins_str = []
 for m in range(len(bins) -1 ):
     label = "{} to {}".format(bins[m], bins[m+1])
@@ -54,16 +66,9 @@ for m in range(len(bins) -1 ):
 print(bins_str)
 print("")
 print("-----------------------------------------")
-#-----------------------------------------------
 
-# feat = 'sample'
-# for m in range(len(bins)-1):
-#     df1 = df[(df[feat] >= bins[m])]
-#     df2 = df1[df1[feat]< bins[m+1]]
-#     nv =  df2[feat].count()
-#     print(bins_str[m] + ": {}".format(nv))
-#-----------------------------------------------
 
+#Fill appropiate continuous feat bins and corresponding count of feat2 binary values
 
 feat = 'sample'
 feat2 = 'value'
