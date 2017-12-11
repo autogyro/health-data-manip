@@ -15,17 +15,21 @@ import pandas as pd
 # 5 * np.random.random_sample((3, 2)) - 5
 #
 
-a, b = -1.3, 10.0
+a, b = 1.0, 10.0
 
-data = a + (b-a)*np.random.random_sample(100000)
-df = pd.DataFrame(data, columns=['sample'])
+data = a + (b-a)*np.random.random_sample(10)
+data2 = np.random.randint(2, size=10)
+
+d = {'sample': data, 'value': data2}
+
+df = pd.DataFrame(d)
 
 max = np.round(np.max(df['sample'].values),4)
 min = np.round(np.min(df['sample'].values),4)
 rango = np.round((max-min),4)
-bin_size = 1.1
+bin_size = 2.0
 print("Dataframe:\n")
-print(df.head())
+print(df.head(10))
 print("")
 print("max: {}, min: {}, range: {}\n".format(max, min, rango))
 print("Ceiling max: {}".format(np.ceil(max)))
@@ -40,6 +44,24 @@ while span <= np.ceil(max) + bin_size:
 
 bins = np.round(bins, 2)
 print(bins)
+
+bins_str = []
+for m in range(len(bins) -1 ):
+    label = "{} to {}".format(bins[m], bins[m+1])
+    bins_str.append(label)
+
+print(bins_str)
+
+print("")
+feat = 'sample'
+for m in range(len(bins)-1):
+    df1 = df[(df[feat] >= bins[m])]
+    df2 = df1[df1[feat]< bins[m+1]]
+    nv =  df2[feat].count()
+    print(bins_str[m] + ": {}".format(nv))
+
+#------------------------------------------
+
 
 
 if False:
