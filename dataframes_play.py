@@ -35,7 +35,7 @@ df = pd.DataFrame(d)
 
 
 def twofeat_barplot(df, xfeature, yfeature, nbins, title,
-                    xlabel, ylabel, ytrue_label, yfalse_label,verbose=False):
+                    xlabel, ylabel, ytrue_label, yfalse_label,xticks_rotation='horizontal', verbose=False):
 
     max = np.max(df[xfeature].values)
     min = np.min(df[xfeature].values)
@@ -92,7 +92,7 @@ def twofeat_barplot(df, xfeature, yfeature, nbins, title,
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.xticks(index + bar_width / 2.0, bins_str)
+    plt.xticks(index + bar_width / 2.0, bins_str, rotation=xticks_rotation)
     plt.legend(frameon=False, loc='upper right', fontsize='small')
 
 
