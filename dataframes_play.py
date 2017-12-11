@@ -9,15 +9,53 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+#Random sample of reals in [a,b] (b - a) * random_sample() + a
+#
+#Three-by-two array of random numbers from [-5, 0)
+# 5 * np.random.random_sample((3, 2)) - 5
+#
+
+a, b = -1.3, 10.0
+
+data = a + (b-a)*np.random.random_sample(100000)
+df = pd.DataFrame(data, columns=['sample'])
+
+max = np.round(np.max(df['sample'].values),4)
+min = np.round(np.min(df['sample'].values),4)
+rango = np.round((max-min),4)
+bin_size = 1.1
+print("Dataframe:\n")
+print(df.head())
+print("")
+print("max: {}, min: {}, range: {}\n".format(max, min, rango))
+print("Ceiling max: {}".format(np.ceil(max)))
+print("Floored min: {}".format(np.floor(min)))
+
+bins = []
+span = np.floor(min)
+
+while span <= np.ceil(max) + bin_size:
+    bins.append(span)
+    span += bin_size
+
+bins = np.round(bins, 2)
+print(bins)
 
 
-#Extract unique elements from dataframe column (or series)
-d = {'A':[1,2,2,3,4,4,5,5], 'B':[1.1,2.3,2,3,4,4.3,5,5.1]}
-df = pd.DataFrame(d)
-print(df)
+if False:
 
-print(df.A.unique())
+    d = {'A': [1, 2, 2, 3, 4, 4, 5, 5], 'B': [1.1, 2.3, 2, 3, 4, 4.3, 5, 5.1], 'C': ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']}
+    df = pd.DataFrame(d)
 
+    print(df[['A', 'C']])
+
+
+if False:
+    # Extract unique elements from dataframe column (or series)
+    d = {'A': [1, 2, 2, 3, 4, 4, 5, 5], 'B': [1.1, 2.3, 2, 3, 4, 4.3, 5, 5.1]}
+    df = pd.DataFrame(d)
+    print(df)
+    print(df.A.unique())
 
 if False:
 
