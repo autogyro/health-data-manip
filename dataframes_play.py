@@ -38,7 +38,7 @@ max = np.round(np.max(df['sample'].values),4)
 min = np.round(np.min(df['sample'].values),4)
 rango = np.round((max-min),4)
 
-print("Dataframe:\n")
+print("Dataframe head:\n")
 print(df.head(10))
 print("")
 print("max: {}, min: {}, range: {}\n".format(max, min, rango))
