@@ -37,6 +37,27 @@ df = pd.DataFrame(d)
 def twofeat_barplot(df, xfeature, yfeature, nbins, title,
                     xlabel, ylabel, ytrue_label, yfalse_label,xticks_rotation='horizontal', verbose=False):
 
+    """Plots a barplot histogram-like of the number of records corresponding to True and False values of a
+    dataframe column 'yfeature' versus a continuous-valued column 'xfeature'. The x-axis bins are computed
+    automatically after specifying the number of bins requested at input. The chart contains two bars per
+    bin, corresponding each to a boolean True (0) or False (1).
+
+    inputs:
+
+    df: dataframe
+    xfeature: string name of the column specified as x-axis in the plot
+    yfeature: string name of the column speficied ax y-axis in the plot. yfeature values are binary (1 or 0)
+    nbins: number of bins for the barplot.
+    title: chart title
+    xlabel: x-axis label
+    ylabel: y-axis label
+    ytrue_label: label for bar assigned to number of True values in yfeature column
+    yfalse_label: label for bar assigned to number of False values in yfeature column
+    xticks_rotation: orientation of bin labels as specified by matplotlib
+    verbose: if True prints summary counts info for each dataframe used to plot bars generated per bin
+
+    """
+
     max = np.max(df[xfeature].values)
     min = np.min(df[xfeature].values)
     rng = np.abs(max-min)
