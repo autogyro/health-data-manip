@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+
 # Random sample of reals in [a,b] (b - a) * random_sample() + a
 #
 # Three-by-two array of random numbers from [-5, 0)
@@ -32,6 +33,75 @@ bin_size = 2.0
 d = {'sample': data, 'value': data2}
 df = pd.DataFrame(d)
 
+
+
+def restrict_by_interval(df, feat, min_val, max_val, boundary):
+
+    if (boundary == 'inclusive'):
+        dflm = df[(df[feature] >= min_val)]
+        dflm = dflm[dflm[feature] <= max_val]
+        return dflm
+    elif (boundary == 'exclusive'):
+        dflm = df[(df[feature] >= min_val)]
+        dflm = dflm[dflm[feature] <= max_val]
+        return dflm
+    elif (boundary == 'left'):
+        dflm = df[(df[feature] >= min_val)]
+        dflm = dflm[dflm[feature] < max_val]
+    elif (boundary == 'right'):
+        dflm = df[(df[feature] > min_val)]
+        dflm = dflm[dflm[feature] <= max_val]
+    else:
+        raise Exception("Incorrect boundary specificiation. Choose between 'inclusive', 'exclusive', 'left', 'right'")
+
+
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+print(gcd(71,20))
+
+def plot_binary_histogram(df, feature, title, xlabel, ylabel,
+                          ytrue_label, yfalse_label):
+    """Creates a bar plot of a single feature that takes binary values (0, 1).
+    input: dataframe(df), feature string name (feature)"""
+
+    s1 = df[df[feature] == 1][feature].count()
+    s0 = df[df[feature] == 0][feature].count()
+    bars = [s1, s0]
+    s1_array = [s1]
+    s0_array = [s0]
+
+    maxval = np.max(bars)
+
+    index = np.arange(len([1]))
+    bar_width = 0.1
+    opacity = 0.8
+
+    plt.bar(index, s0_array, bar_width, alpha=opacity, color='b', label=yfalse_label)
+    plt.bar(index + bar_width, s1_array, bar_width, alpha=opacity, color='r', label=ytrue_label)
+
+    plt.ylim(0, maxval*1.25)
+
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    #plt.xticks(index, bar_labels, rotation='horizontal')
+    plt.tick_params(
+        axis='x',  # changes apply to the x-axis
+        which='both',  # both major and minor ticks are affected
+        bottom='off',  # ticks along the bottom edge are off
+        top='off',  # ticks along the top edge are off
+        labelbottom='off')  # labels along the bottom edge are off
+    plt.legend(frameon=False, loc='upper right', fontsize='small')
+
+
+if False:
+
+    plot_binary_histogram(df, 'value', 'title', 'val label', 'ylabel',
+                              'ytrue', 'yfalse')
+    plt.show()
 
 
 def twofeat_barplot(df, xfeature, yfeature, nbins, title,
@@ -118,16 +188,16 @@ def twofeat_barplot(df, xfeature, yfeature, nbins, title,
 
 
 
+if False:
+    title = 'Generic Bar Plot'
+    xlabel = 'Random Numbers'
+    ylabel = 'No. Records'
+    ytrue_label = '1'
+    yfalse_label = '0'
 
-title = 'Generic Bar Plot'
-xlabel = 'Random Numbers'
-ylabel = 'No. Records'
-ytrue_label = '1'
-yfalse_label = '0'
-
-twofeat_barplot(df, 'sample', 'value', 5, title, xlabel, ylabel, ytrue_label, yfalse_label)
-plt.tight_layout()
-plt.show()
+    twofeat_barplot(df, 'sample', 'value', 5, title, xlabel, ylabel, ytrue_label, yfalse_label)
+    plt.tight_layout()
+    plt.show()
 
 if False:
 
