@@ -17,7 +17,7 @@ import pandas as pd
 #
 
 # Num elements in sample
-num_elements = 100
+num_elements = 10
 
 # Interval where random numbers live
 a, b = 1.0, 10.0
@@ -34,8 +34,16 @@ d = {'sample': data, 'value': data2}
 df = pd.DataFrame(d)
 
 
-
-def restrict_by_interval(df, feat, min_val, max_val, boundary):
+def restrict_by_interval(df, feature, min_val, max_val, boundary):
+    """Restricts daframe to records containing values inside the interval specified
+    for a continuous feature.
+    Inputs:
+    dataframe: df
+    continuous feature: feature
+    lower limit: min_val
+    upper limit: max_val
+    boundary or interval type: boundary: 'inclusive', 'exclusive', 'left', 'right'
+    """
 
     if (boundary == 'inclusive'):
         dflm = df[(df[feature] >= min_val)]
@@ -48,11 +56,22 @@ def restrict_by_interval(df, feat, min_val, max_val, boundary):
     elif (boundary == 'left'):
         dflm = df[(df[feature] >= min_val)]
         dflm = dflm[dflm[feature] < max_val]
+        return dflm
     elif (boundary == 'right'):
         dflm = df[(df[feature] > min_val)]
         dflm = dflm[dflm[feature] <= max_val]
+        return dflm
     else:
-        raise Exception("Incorrect boundary specificiation. Choose between 'inclusive', 'exclusive', 'left', 'right'")
+        raise Exception("Incorrect interval boundary specificiation.\n"
+                        " Choose between 'inclusive []', 'exclusive ()', 'left [)', 'right (]'")
+        return None
+
+if False:
+    print(df.head(11))
+
+    df2 = restrict_by_interval(df,'sample', 2,6,'righ')
+
+    print(df2)
 
 
 def gcd(a, b):
@@ -60,7 +79,7 @@ def gcd(a, b):
         a, b = b, a % b
     return a
 
-print(gcd(71,20))
+#print(gcd(71,20))
 
 def plot_binary_histogram(df, feature, title, xlabel, ylabel,
                           ytrue_label, yfalse_label):
