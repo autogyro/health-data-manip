@@ -51,7 +51,10 @@ alcohol_data = alcohol_data[['ALQ130']]
 alcohol_data.rename(columns = {'ALQ130':'ALCOHOL_NUM'}, inplace=True)
 alcohol_data['ALCOHOL_NUM'].fillna(value=0, inplace=True)
 alcohol_data['ALCOHOL_NUM'] = pd.to_numeric(alcohol_data['ALCOHOL_NUM'], downcast='integer')
+alcohol_data.ALCOHOL_NUM.replace(to_replace=999, value=0, inplace=True)
 
 print(alcohol_data.head())
+print("\nCounts:")
+print(alcohol_data.count())
 
 
