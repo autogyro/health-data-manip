@@ -33,6 +33,13 @@ bin_size = 2.0
 d = {'sample': data, 'value': data2}
 df = pd.DataFrame(d)
 
+#Test replacing values in dataframe
+if False:
+    print(df)
+
+    df.value.replace(to_replace=1, value=2, inplace=True, limit=None, regex=False, method='pad', axis=None)
+
+    print(df)
 
 def restrict_by_interval(df, feature, min_val, max_val, boundary):
     """Restricts daframe to records containing values inside the interval specified
