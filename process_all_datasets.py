@@ -20,17 +20,9 @@ gut = SourceFileLoader("graph_utils", mod_path+"graph_utils.py").load_module()
 datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/'
 project_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/'
 
-######## Load datasets ########
-
-#Demographics dataset
-demographics_data = pd.read_sas(datasets_path + 'demographics/DEMO_H.XPT')
-
-#Alcohol consumption dataset
-alcohol_data = pd.read_sas(datasets_path + 'alcohol_use/ALQ_H.XPT')
-
-###############################
-
 #Process demographics dataframe
+print("")
+demographics_data = pd.read_sas(datasets_path + 'demographics/DEMO_H.XPT')
 
 ager_data = txt.restrict_by_interval(demographics_data, 'RIDAGEYR', 18, 45, 'inclusive')
 ager_data = txt.switch_df_index(ager_data, 'SEQN')
@@ -42,13 +34,24 @@ ager_data.rename(columns = {'RIDAGEYR':'AGE', 'RIAGENDR':'GENDER', 'INDHHIN2':'I
 ager_data.dropna(axis=0, how='any', inplace=True)
 ager_data = ager_data[ager_data.INCOME_LEVEL != 77.0]
 ager_data = ager_data[ager_data.INCOME_LEVEL != 99.0]
+#Downcast selected features
+ager_data['AGE'] = pd.to_numeric(ager_data['AGE'], downcast='integer')
+ager_data['GENDER'] = pd.to_numeric(ager_data['GENDER'], downcast='integer')
+ager_data['INCOME_LEVEL'] = pd.to_numeric(ager_data['INCOME_LEVEL'], downcast='integer')
 
 print(ager_data.head())
-
+print("\nCounts:")
+print(ager_data.count())
 
 #Process alcohol consumption dataframe
+print("")
+alcohol_data = pd.read_sas(datasets_path + 'alcohol_use/ALQ_H.XPT')
+alcohol_data = txt.switch_df_index(alcohol_data, 'SEQN')
+alcohol_data = alcohol_data[['ALQ130']]
+alcohol_data.rename(columns = {'ALQ130':'ALCOHOL_NUM'}, inplace=True)
+alcohol_data['ALCOHOL_NUM'].fillna(value=0, inplace=True)
+alcohol_data['ALCOHOL_NUM'] = pd.to_numeric(alcohol_data['ALCOHOL_NUM'], downcast='integer')
 
-
-
+print(alcohol_data.head())
 
 
