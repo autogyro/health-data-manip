@@ -33,7 +33,20 @@ bin_size = 2.0
 d = {'sample': data, 'value': data2}
 df = pd.DataFrame(d)
 
-#Test replacing values in dataframe
+
+#Test global value replacement
+if True:
+    dx = {'a':[1,2,2,1], 'b':[2,2,0,0]}
+    dxf = pd.DataFrame(dx)
+    print(dxf)
+    print("")
+    dxf.replace(to_replace=2, value='two', inplace=True)
+
+    print(dxf)
+
+
+
+#Test replacing values in dataframe series
 if False:
     print(df)
 
