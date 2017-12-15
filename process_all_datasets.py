@@ -73,3 +73,23 @@ smoking_data.SMOKING.replace(to_replace=3, value=0, inplace=True)
 print(smoking_data.head())
 print("\nCounts:")
 print(smoking_data.count())
+
+#Process weight data
+print("")
+weight_data = pd.read_sas(datasets_path + 'weight_history/WHQ_H.XPT')
+weight_data = txt.switch_df_index(weight_data, 'SEQN')
+weight_data = weight_data[['WHD010', 'WHD020']]
+weight_data.dropna(axis=0, how='any', inplace=True)
+weight_data = weight_data[weight_data.WHD010 != 7777.0]
+weight_data = weight_data[weight_data.WHD010 != 9999.0]
+weight_data = weight_data[weight_data.WHD020 != 7777.0]
+weight_data = weight_data[weight_data.WHD020 != 9999.0]
+
+def bmi(h, w):
+    return np.round((w/h**2) * 703.0, 2)
+
+weight_data['BMI'] = bmi(weight_data['WHD010'], weight_data['WHD020'])
+weight_data.drop(['WHD010', 'WHD020'], axis=1, inplace=True)
+
+print(weight_data.head())
+print(weight_data.count())
