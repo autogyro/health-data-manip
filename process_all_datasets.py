@@ -24,7 +24,7 @@ project_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/cap
 print("")
 demographics_data = pd.read_sas(datasets_path + 'demographics/DEMO_H.XPT')
 
-ager_data = txt.restrict_by_interval(demographics_data, 'RIDAGEYR', 18, 45, 'inclusive')
+ager_data = txt.restrict_by_interval(demographics_data, 'RIDAGEYR', 18, 65, 'inclusive')
 ager_data = txt.switch_df_index(ager_data, 'SEQN')
 #Restrict dataframe to selected columns
 ager_data = ager_data[['RIDAGEYR', 'RIAGENDR','INDHHIN2']]
@@ -57,4 +57,19 @@ print(alcohol_data.head())
 print("\nCounts:")
 print(alcohol_data.count())
 
+#Process smoking consumption dataframe
+print("")
+smoking_data = pd.read_sas(datasets_path + 'smoking/SMQ_H.XPT')
+smoking_data = txt.switch_df_index(smoking_data, 'SEQN')
+smoking_data = smoking_data[['SMQ040']]
+smoking_data.rename(columns = {'SMQ040':'SMOKING'}, inplace=True)
+smoking_data['SMOKING'].fillna(value=0, inplace=True)
+smoking_data['SMOKING'] = pd.to_numeric(smoking_data['SMOKING'], downcast='integer')
+smoking_data.SMOKING.replace(to_replace=1, value=1, inplace=True)
+smoking_data.SMOKING.replace(to_replace=2, value=1, inplace=True)
+smoking_data.SMOKING.replace(to_replace=0, value=0, inplace=True)
+smoking_data.SMOKING.replace(to_replace=3, value=0, inplace=True)
 
+print(smoking_data.head())
+print("\nCounts:")
+print(smoking_data.count())
