@@ -14,12 +14,6 @@ mod_path = "/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capston
 txt = SourceFileLoader("text_utils", mod_path+"text_utils.py").load_module()
 gut = SourceFileLoader("graph_utils", mod_path+"graph_utils.py").load_module()
 
-#small utility function
-def headcounts(df):
-    print(df.head())
-    print("\nCounts:")
-    print(df.count())
-
 
 #Path to datasets folders
 
@@ -46,7 +40,7 @@ ager_data['AGE'] = pd.to_numeric(ager_data['AGE'], downcast='integer')
 ager_data['GENDER'] = pd.to_numeric(ager_data['GENDER'], downcast='integer')
 ager_data['INCOME_LEVEL'] = pd.to_numeric(ager_data['INCOME_LEVEL'], downcast='integer')
 
-headcounts(ager_data)
+txt.headcounts(ager_data)
 
 #Process alcohol consumption dataframe
 ######################################
@@ -59,7 +53,7 @@ alcohol_data['ALCOHOL_NUM'].fillna(value=0, inplace=True)
 alcohol_data['ALCOHOL_NUM'] = pd.to_numeric(alcohol_data['ALCOHOL_NUM'], downcast='integer')
 alcohol_data.ALCOHOL_NUM.replace(to_replace=999, value=0, inplace=True)
 
-headcounts(alcohol_data)
+txt.headcounts(alcohol_data)
 
 #Process smoking consumption dataframe
 ######################################
@@ -75,7 +69,7 @@ smoking_data.SMOKING.replace(to_replace=2, value=1, inplace=True)
 smoking_data.SMOKING.replace(to_replace=0, value=0, inplace=True)
 smoking_data.SMOKING.replace(to_replace=3, value=0, inplace=True)
 
-headcounts(smoking_data)
+txt.headcounts(smoking_data)
 
 #Process weight data
 ####################
@@ -96,7 +90,7 @@ def bmi(h, w):
 weight_data['BMI'] = bmi(weight_data['WHD010'], weight_data['WHD020'])
 weight_data.drop(['WHD010', 'WHD020'], axis=1, inplace=True)
 
-headcounts(weight_data)
+txt.headcounts(weight_data)
 
 
 #Process nutrition data
@@ -123,9 +117,16 @@ def percent_transform(x,n):
 nutrition_data['NOTHOME_FOOD'] = nutrition_data['NOTHOME_FOOD'].apply(lambda x: percent_transform(x, 21))
 nutrition_data['FAST_FOOD'] = nutrition_data['FAST_FOOD'].apply(lambda x: percent_transform(x, 21))
 
-headcounts(nutrition_data)
+txt.headcounts(nutrition_data)
 
 
+#Process nutrition data
+#######################
+insurance_data = pd.read_sas(datasets_path + 'health_insurance/HIQ_H.xpt')
+insurance_data = txt.switch_df_index(insurance_data, 'SEQN')
+insurance_data = insurance_data[['HIQ011']]
 
+txt.headcounts(insurance_data)
+txt.get_feature_counts(insurance_data, ['HIQ011'])
 
 
