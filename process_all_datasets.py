@@ -125,8 +125,44 @@ txt.headcounts(nutrition_data)
 insurance_data = pd.read_sas(datasets_path + 'health_insurance/HIQ_H.xpt')
 insurance_data = txt.switch_df_index(insurance_data, 'SEQN')
 insurance_data = insurance_data[['HIQ011']]
+insurance_data.rename(columns = {'HIQ011':'INSURANCE'}, inplace=True)
+insurance_data['INSURANCE'].fillna(value=0, inplace=True)
+insurance_data['INSURANCE'] = pd.to_numeric(insurance_data['INSURANCE'], downcast='integer')
+for val in [2,7,9]:
+    insurance_data.INSURANCE.replace(to_replace=val, value=0, inplace=True)
 
 txt.headcounts(insurance_data)
-txt.get_feature_counts(insurance_data, ['HIQ011'])
+txt.get_feature_counts(insurance_data, ['INSURANCE'])
+txt.count_feature_nans(insurance_data, ['INSURANCE'])
+
+
+#Process blood-pressure cholesterol text data
+#############################################
+
+cholpressure_data = pd.read_sas(datasets_path + 'blood_pressure/BPQ_H.XPT')
+cholpressure_data = txt.switch_df_index(cholpressure_data, 'SEQN')
+cholpressure_data = cholpressure_data[['BPQ020','BPQ030', 'BPQ040A', 'BPQ050A', 'BPQ080', 'BPQ090D']]
+
+old_names = ['BPQ020','BPQ030', 'BPQ040A', 'BPQ050A', 'BPQ080', 'BPQ090D']
+new_names = ['HYPERTENSION_ONSET', 'HYPERTENSION_1', 'HYPERTENSION_2', 'HYPERTENSION_3', 'HIGHCHOL_ONSET', 'HIGHCHOL']
+
+for n, new_name in enumerate(new_names):
+    cholpressure_data.rename(columns={old_names[n]: new_name}, inplace=True)
+
+#------global nans imputation
+cholpressure_data.fillna(value=0, inplace=True)
+
+for feat in new_names:
+    cholpressure_data[feat] = pd.to_numeric(cholpressure_data[feat], downcast='integer')
+
+for val in [2,7,9]:
+    cholpressure_data.replace(to_replace=val, value=0, inplace=True)
+
+#txt.headcounts(cholpressure_data)
+txt.get_feature_counts(cholpressure_data, new_names)
+txt.count_feature_nans(cholpressure_data, new_names)
+
+
+
 
 
