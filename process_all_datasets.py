@@ -14,7 +14,7 @@ mod_path = "/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capston
 txt = SourceFileLoader("text_utils", mod_path+"text_utils.py").load_module()
 gut = SourceFileLoader("graph_utils", mod_path+"graph_utils.py").load_module()
 
-
+#small utility function
 def headcounts(df):
     print(df.head())
     print("\nCounts:")
@@ -27,6 +27,7 @@ datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/ca
 project_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/'
 
 #Process demographics dataframe
+###############################
 print("")
 demographics_data = pd.read_sas(datasets_path + 'demographics/DEMO_H.XPT')
 
@@ -48,6 +49,7 @@ ager_data['INCOME_LEVEL'] = pd.to_numeric(ager_data['INCOME_LEVEL'], downcast='i
 headcounts(ager_data)
 
 #Process alcohol consumption dataframe
+######################################
 print("")
 alcohol_data = pd.read_sas(datasets_path + 'alcohol_use/ALQ_H.XPT')
 alcohol_data = txt.switch_df_index(alcohol_data, 'SEQN')
@@ -60,6 +62,7 @@ alcohol_data.ALCOHOL_NUM.replace(to_replace=999, value=0, inplace=True)
 headcounts(alcohol_data)
 
 #Process smoking consumption dataframe
+######################################
 print("")
 smoking_data = pd.read_sas(datasets_path + 'smoking/SMQ_H.XPT')
 smoking_data = txt.switch_df_index(smoking_data, 'SEQN')
@@ -75,6 +78,7 @@ smoking_data.SMOKING.replace(to_replace=3, value=0, inplace=True)
 headcounts(smoking_data)
 
 #Process weight data
+####################
 print("")
 weight_data = pd.read_sas(datasets_path + 'weight_history/WHQ_H.XPT')
 weight_data = txt.switch_df_index(weight_data, 'SEQN')
@@ -96,6 +100,7 @@ headcounts(weight_data)
 
 
 #Process nutrition data
+#######################
 nutrition_data = pd.read_sas(datasets_path + 'diet_nutrition/DBQ_H.XPT')
 nutrition_data = txt.switch_df_index(nutrition_data, 'SEQN')
 nutrition_data = nutrition_data[['DBD895', 'DBD900']]
@@ -110,6 +115,13 @@ nutrition_data.NOTHOME_FOOD.replace(to_replace=9999, value=mean_val1, inplace=Tr
 mean_val2 = int(np.round(nutrition_data['FAST_FOOD'].values.mean()))
 nutrition_data.FAST_FOOD.replace(to_replace=5555, value=mean_val2, inplace=True)
 nutrition_data.FAST_FOOD.replace(to_replace=9999, value=mean_val2, inplace=True)
+
+#-----data transformation to percentage values
+def percent_transform(x,n):
+    return np.round(float(x/n *100.0),2)
+
+nutrition_data['NOTHOME_FOOD'] = nutrition_data['NOTHOME_FOOD'].apply(lambda x: percent_transform(x, 21))
+nutrition_data['FAST_FOOD'] = nutrition_data['FAST_FOOD'].apply(lambda x: percent_transform(x, 21))
 
 headcounts(nutrition_data)
 
