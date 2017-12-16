@@ -15,6 +15,12 @@ txt = SourceFileLoader("text_utils", mod_path+"text_utils.py").load_module()
 gut = SourceFileLoader("graph_utils", mod_path+"graph_utils.py").load_module()
 
 
+def headcounts(df):
+    print(df.head())
+    print("\nCounts:")
+    print(df.count())
+
+
 #Path to datasets folders
 
 datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/'
@@ -39,9 +45,7 @@ ager_data['AGE'] = pd.to_numeric(ager_data['AGE'], downcast='integer')
 ager_data['GENDER'] = pd.to_numeric(ager_data['GENDER'], downcast='integer')
 ager_data['INCOME_LEVEL'] = pd.to_numeric(ager_data['INCOME_LEVEL'], downcast='integer')
 
-print(ager_data.head())
-print("\nCounts:")
-print(ager_data.count())
+headcounts(ager_data)
 
 #Process alcohol consumption dataframe
 print("")
@@ -53,9 +57,7 @@ alcohol_data['ALCOHOL_NUM'].fillna(value=0, inplace=True)
 alcohol_data['ALCOHOL_NUM'] = pd.to_numeric(alcohol_data['ALCOHOL_NUM'], downcast='integer')
 alcohol_data.ALCOHOL_NUM.replace(to_replace=999, value=0, inplace=True)
 
-print(alcohol_data.head())
-print("\nCounts:")
-print(alcohol_data.count())
+headcounts(alcohol_data)
 
 #Process smoking consumption dataframe
 print("")
@@ -70,9 +72,7 @@ smoking_data.SMOKING.replace(to_replace=2, value=1, inplace=True)
 smoking_data.SMOKING.replace(to_replace=0, value=0, inplace=True)
 smoking_data.SMOKING.replace(to_replace=3, value=0, inplace=True)
 
-print(smoking_data.head())
-print("\nCounts:")
-print(smoking_data.count())
+headcounts(smoking_data)
 
 #Process weight data
 print("")
@@ -80,6 +80,7 @@ weight_data = pd.read_sas(datasets_path + 'weight_history/WHQ_H.XPT')
 weight_data = txt.switch_df_index(weight_data, 'SEQN')
 weight_data = weight_data[['WHD010', 'WHD020']]
 weight_data.dropna(axis=0, how='any', inplace=True)
+
 weight_data = weight_data[weight_data.WHD010 != 7777.0]
 weight_data = weight_data[weight_data.WHD010 != 9999.0]
 weight_data = weight_data[weight_data.WHD020 != 7777.0]
@@ -91,5 +92,28 @@ def bmi(h, w):
 weight_data['BMI'] = bmi(weight_data['WHD010'], weight_data['WHD020'])
 weight_data.drop(['WHD010', 'WHD020'], axis=1, inplace=True)
 
-print(weight_data.head())
-print(weight_data.count())
+headcounts(weight_data)
+
+
+#Process nutrition data
+nutrition_data = pd.read_sas(datasets_path + 'diet_nutrition/DBQ_H.XPT')
+nutrition_data = txt.switch_df_index(nutrition_data, 'SEQN')
+nutrition_data = nutrition_data[['DBD895', 'DBD900']]
+nutrition_data.rename(columns = {'DBD895':'NOTHOME_FOOD', 'DBD900':'FAST_FOOD' }, inplace=True)
+nutrition_data .dropna(axis=0, how='any', inplace=True)
+nutrition_data['NOTHOME_FOOD'] = pd.to_numeric(nutrition_data['NOTHOME_FOOD'], downcast='integer')
+nutrition_data['FAST_FOOD'] = pd.to_numeric(nutrition_data['FAST_FOOD'], downcast='integer')
+#-----data imputation
+mean_val1 = int(np.round(nutrition_data['NOTHOME_FOOD'].values.mean()))
+nutrition_data.NOTHOME_FOOD.replace(to_replace=5555, value=mean_val1, inplace=True)
+nutrition_data.NOTHOME_FOOD.replace(to_replace=9999, value=mean_val1, inplace=True)
+mean_val2 = int(np.round(nutrition_data['FAST_FOOD'].values.mean()))
+nutrition_data.FAST_FOOD.replace(to_replace=5555, value=mean_val2, inplace=True)
+nutrition_data.FAST_FOOD.replace(to_replace=9999, value=mean_val2, inplace=True)
+
+headcounts(nutrition_data)
+
+
+
+
+
