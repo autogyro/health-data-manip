@@ -10,32 +10,67 @@ import numpy as np
 import pandas as pd
 
 
-# Random sample of reals in [a,b] (b - a) * random_sample() + a
-#
-# Three-by-two array of random numbers from [-5, 0)
-# 5 * np.random.random_sample((3, 2)) - 5
-#
+if True:
 
-# Num elements in sample
-num_elements = 10
+    d={'a':[0,0,1,1], 'b':[0,1,0,1]}
+    df= pd.DataFrame(d)
 
-# Interval where random numbers live
-a, b = 1.0, 10.0
+    print(df)
 
-# Float values random generator
-data = a + (b - a) * np.random.random_sample(num_elements)
-# Binary values random generator
-data2 = np.random.randint(2, size=num_elements)
-# Bin size
-bin_size = 2.0
+    def bit_logic(x, y, op):
+        if op == 'OR':
+            return int((x or y))
+        elif op =='AND':
+            return int((x and y))
+        elif op == 'NAND':
+            return int(not (x and y))
+        elif op == 'NOR':
+            return int(not (x or y))
+        elif op == 'XOR':
+            return int((x and (not y)) or ((not x) and y))
+        else:
+            raise Exception("Incorrect Boolean operator selection")
 
-# Built generic dataframe for data above
-d = {'sample': data, 'value': data2}
-df = pd.DataFrame(d)
+
+    print("OR LOGIC")
+    df['c'] = np.vectorize(bit_logic)(df['a'].values, df['b'].values, 'OR')
+    print(df)
+    print("XOR LOGIC")
+    df['c'] = np.vectorize(bit_logic)(df['a'].values, df['b'].values, 'XOR')
+    print(df)
+
+
+
+
+
+if False:
+
+    # Random sample of reals in [a,b] (b - a) * random_sample() + a
+    #
+    # Three-by-two array of random numbers from [-5, 0)
+    # 5 * np.random.random_sample((3, 2)) - 5
+    #
+
+    # Num elements in sample
+    num_elements = 10
+
+    # Interval where random numbers live
+    a, b = 1.0, 10.0
+
+    # Float values random generator
+    data = a + (b - a) * np.random.random_sample(num_elements)
+    # Binary values random generator
+    data2 = np.random.randint(2, size=num_elements)
+    # Bin size
+    bin_size = 2.0
+
+    # Built generic dataframe for data above
+    d = {'sample': data, 'value': data2}
+    df = pd.DataFrame(d)
 
 
 #Test global value replacement
-if True:
+if False:
     dx = {'a':[1,2,2,1], 'b':[2,2,0,0]}
     dxf = pd.DataFrame(dx)
     print(dxf)
