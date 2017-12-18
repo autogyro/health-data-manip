@@ -10,14 +10,16 @@ import numpy as np
 import pandas as pd
 
 
+# Test logic gate operations across column elements
 if True:
 
-    d={'a':[0,0,1,1], 'b':[0,1,0,1]}
+    d={'input_1':[0,0,1,1], 'input_2':[0,1,0,1]}
     df= pd.DataFrame(d)
 
-    print(df)
 
     def bit_logic(x, y, op):
+        """Implements bitwise boolean operations among bits x and y
+        Bit states are represented by integers 0,1"""
         if op == 'OR':
             return int((x or y))
         elif op =='AND':
@@ -31,17 +33,12 @@ if True:
         else:
             raise Exception("Incorrect Boolean operator selection")
 
-
-    print("OR LOGIC")
-    df['c'] = np.vectorize(bit_logic)(df['a'].values, df['b'].values, 'OR')
+    print("OR GATE")
+    df['output'] = np.vectorize(bit_logic)(df['input_1'].values, df['input_2'].values, 'OR')
     print(df)
-    print("XOR LOGIC")
-    df['c'] = np.vectorize(bit_logic)(df['a'].values, df['b'].values, 'XOR')
+    print("XOR GATE")
+    df['output'] = np.vectorize(bit_logic)(df['input_1'].values, df['input_2'].values, 'XOR')
     print(df)
-
-
-
-
 
 if False:
 
