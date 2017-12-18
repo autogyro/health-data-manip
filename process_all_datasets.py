@@ -172,7 +172,24 @@ txt.headcounts(cholpressure_data)
 txt.get_feature_counts(cholpressure_data, new_names)
 
 
+#Process blood-pressure cholesterol text data
+#############################################
+cardiovascular_data = pd.read_sas(datasets_path + 'cardiovascular/CDQ_H.XPT')  #DONE
+cardiovascular_data = txt.switch_df_index(cardiovascular_data, 'SEQN')
+cardiovascular_data = cardiovascular_data[['CDQ001', 'CDQ008', 'CDQ010']]
+cardiovascular_data.rename(columns = {'CDQ001':'CHEST_DISCOMFORT'}, inplace=True)
+cardiovascular_data.rename(columns = {'CDQ008':'CHEST_PAIN_30MIN'}, inplace=True)
+cardiovascular_data.rename(columns = {'CDQ010':'BREATH_SHORTNESS'}, inplace=True)
+cardio_features = ['CHEST_DISCOMFORT', 'CHEST_PAIN_30MIN', 'BREATH_SHORTNESS']
+cardiovascular_data.fillna(value=0, inplace=True)
+for feat in cardio_features:
+    cardiovascular_data[feat] = pd.to_numeric(cardiovascular_data[feat], downcast='integer')
+for val in [2,7,9]:
+    cardiovascular_data.replace(to_replace=val, value=0, inplace=True)
 
+
+txt.headcounts(cardiovascular_data)
+#diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT') #DONE
 
 
 
