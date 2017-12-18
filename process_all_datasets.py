@@ -172,7 +172,7 @@ txt.headcounts(cholpressure_data)
 txt.get_feature_counts(cholpressure_data, new_names)
 
 
-#Process blood-pressure cholesterol text data
+#Process cardiovascular text data
 #############################################
 cardiovascular_data = pd.read_sas(datasets_path + 'cardiovascular/CDQ_H.XPT')  #DONE
 cardiovascular_data = txt.switch_df_index(cardiovascular_data, 'SEQN')
@@ -189,7 +189,47 @@ for val in [2,7,9]:
 
 
 txt.headcounts(cardiovascular_data)
-#diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT') #DONE
 
+
+
+#Process diabetes text data
+#############################################
+diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT') #DONE
+diabetes_dataa = txt.switch_df_index(diabetes_data, 'SEQN')
+diabetes_data = diabetes_data[['DIQ175A','DIQ010', 'DIQ160', 'DIQ170']]
+old_diab_features = ['DIQ175A','DIQ010', 'DIQ160', 'DIQ170']
+diabetes_features = ['FAMILIAL_DIABETES', 'DIAGNOSED_DIABETES', 'DIAGNOSED_PREDIABETES', 'RISK_DIABETES']
+for n, new_name in enumerate(diabetes_features):
+    diabetes_data.rename(columns={old_diab_features[n]: new_name}, inplace=True)
+diabetes_data.fillna(value=0, inplace=True)
+for feat in diabetes_features:
+    diabetes_data[feat] = pd.to_numeric(diabetes_data[feat], downcast='integer')
+
+for val in [77,99]:
+    diabetes_data['FAMILIAL_DIABETES'].replace(to_replace=val, value=0, inplace=True)
+
+
+
+
+txt.headcounts(diabetes_data)
+
+
+
+
+#DIQ175A - Family history
+#10	Family history
+#77	Refused
+#99	Don't know
+#DIQ010 - Doctor told you have diabetes
+#1	Yes
+#2	No
+#3	Borderline
+#7	Refused
+#DIQ160 - Ever told you have prediabetes
+#DIQ170 - Ever told have health risk for diabetes
+#1	Yes
+#2	No
+#7	Refused
+#9	Don't know
 
 
