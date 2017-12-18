@@ -154,13 +154,23 @@ cholpressure_data.fillna(value=0, inplace=True)
 
 for feat in new_names:
     cholpressure_data[feat] = pd.to_numeric(cholpressure_data[feat], downcast='integer')
-
+#-----missing values imputation
 for val in [2,7,9]:
     cholpressure_data.replace(to_replace=val, value=0, inplace=True)
+#-----combine HYPERTENSION features
+cholpressure_data['HYPERTENSION'] = np.vectorize(txt.bit_logic)\
+    (cholpressure_data['HYPERTENSION_1'].values, cholpressure_data['HYPERTENSION_2'].values, 'OR')
 
-#txt.headcounts(cholpressure_data)
+cholpressure_data['HYPERTENSION'] = np.vectorize(txt.bit_logic)\
+    (cholpressure_data['HYPERTENSION'].values, cholpressure_data['HYPERTENSION_3'].values, 'OR')
+
+cholpressure_data.drop(['HYPERTENSION_1', 'HYPERTENSION_2', 'HYPERTENSION_3'], axis=1, inplace=True)
+
+new_names = ['HYPERTENSION_ONSET', 'HYPERTENSION', 'HIGHCHOL_ONSET', 'HIGHCHOL']
+
+txt.headcounts(cholpressure_data)
 txt.get_feature_counts(cholpressure_data, new_names)
-txt.count_feature_nans(cholpressure_data, new_names)
+
 
 
 
