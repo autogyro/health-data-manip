@@ -205,11 +205,18 @@ diabetes_data.fillna(value=0, inplace=True)
 for feat in diabetes_features:
     diabetes_data[feat] = pd.to_numeric(diabetes_data[feat], downcast='integer')
 
+diabetes_data['FAMILIAL_DIABETES'].replace(to_replace=10, value=1, inplace=True)
 for val in [77,99]:
     diabetes_data['FAMILIAL_DIABETES'].replace(to_replace=val, value=0, inplace=True)
 
+for val in [1,3]:
+    diabetes_data['DIAGNOSED_DIABETES'].replace(to_replace=val, value=1, inplace=True)
+for val in [2,7,9]:
+    diabetes_data['DIAGNOSED_DIABETES'].replace(to_replace=val, value=0, inplace=True)
 
-
+for val in [2,7,9]:
+    diabetes_data['DIAGNOSED_PREDIABETES'].replace(to_replace=val, value=0, inplace=True)
+    diabetes_data['RISK_DIABETES'].replace(to_replace=val, value=0, inplace=True)
 
 txt.headcounts(diabetes_data)
 
