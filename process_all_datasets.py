@@ -42,16 +42,7 @@ for feat in demo_features:
     demographics_data[feat] = pd.to_numeric(demographics_data[feat], downcast='integer')
 
 
-txt.get_feature_counts(demographics_data,demo_features)
-txt.count_feature_nans(demographics_data, demo_features)
-
-
-sys.exit()
-
-
-
-
-txt.headcounts(ager_data)
+txt.headcounts(demographics_data)
 
 #Process alcohol consumption dataframe
 ######################################
@@ -63,6 +54,8 @@ alcohol_data.rename(columns = {'ALQ130':'ALCOHOL_NUM'}, inplace=True)
 alcohol_data['ALCOHOL_NUM'].fillna(value=0, inplace=True)
 alcohol_data['ALCOHOL_NUM'] = pd.to_numeric(alcohol_data['ALCOHOL_NUM'], downcast='integer')
 alcohol_data.ALCOHOL_NUM.replace(to_replace=999, value=0, inplace=True)
+
+alcohol_features = ['ALCOHOL_NUM']
 
 txt.headcounts(alcohol_data)
 
@@ -79,6 +72,8 @@ smoking_data.SMOKING.replace(to_replace=1, value=1, inplace=True)
 smoking_data.SMOKING.replace(to_replace=2, value=1, inplace=True)
 smoking_data.SMOKING.replace(to_replace=0, value=0, inplace=True)
 smoking_data.SMOKING.replace(to_replace=3, value=0, inplace=True)
+
+smoking_features = ['SMOKING']
 
 txt.headcounts(smoking_data)
 
@@ -100,6 +95,8 @@ def bmi(h, w):
 
 weight_data['BMI'] = bmi(weight_data['WHD010'], weight_data['WHD020'])
 weight_data.drop(['WHD010', 'WHD020'], axis=1, inplace=True)
+
+weight_features = ['BMI']
 
 txt.headcounts(weight_data)
 
@@ -128,6 +125,8 @@ def percent_transform(x,n):
 nutrition_data['NOTHOME_FOOD'] = nutrition_data['NOTHOME_FOOD'].apply(lambda x: percent_transform(x, 21))
 nutrition_data['FAST_FOOD'] = nutrition_data['FAST_FOOD'].apply(lambda x: percent_transform(x, 21))
 
+nutrition_features = ['NOTHOME_FOOD', 'FAST_FOOD']
+
 txt.headcounts(nutrition_data)
 
 
@@ -142,6 +141,8 @@ insurance_data['INSURANCE'] = pd.to_numeric(insurance_data['INSURANCE'], downcas
 for val in [2,7,9]:
     insurance_data.INSURANCE.replace(to_replace=val, value=0, inplace=True)
 
+insurance_features = ['INSURANCE']
+
 txt.headcounts(insurance_data)
 txt.get_feature_counts(insurance_data, ['INSURANCE'])
 txt.count_feature_nans(insurance_data, ['INSURANCE'])
@@ -155,15 +156,15 @@ cholpressure_data = txt.switch_df_index(cholpressure_data, 'SEQN')
 cholpressure_data = cholpressure_data[['BPQ020','BPQ030', 'BPQ040A', 'BPQ050A', 'BPQ080', 'BPQ090D']]
 
 old_names = ['BPQ020','BPQ030', 'BPQ040A', 'BPQ050A', 'BPQ080', 'BPQ090D']
-new_names = ['HYPERTENSION_ONSET', 'HYPERTENSION_1', 'HYPERTENSION_2', 'HYPERTENSION_3', 'HIGHCHOL_ONSET', 'HIGHCHOL']
+cholpressure_features = ['HYPERTENSION_ONSET', 'HYPERTENSION_1', 'HYPERTENSION_2', 'HYPERTENSION_3', 'HIGHCHOL_ONSET', 'HIGHCHOL']
 
-for n, new_name in enumerate(new_names):
+for n, new_name in enumerate(cholpressure_features):
     cholpressure_data.rename(columns={old_names[n]: new_name}, inplace=True)
 
 #------global nans imputation
 cholpressure_data.fillna(value=0, inplace=True)
 
-for feat in new_names:
+for feat in cholpressure_features:
     cholpressure_data[feat] = pd.to_numeric(cholpressure_data[feat], downcast='integer')
 #-----missing values imputation
 for val in [2,7,9]:
@@ -177,10 +178,10 @@ cholpressure_data['HYPERTENSION'] = np.vectorize(txt.bit_logic)\
 
 cholpressure_data.drop(['HYPERTENSION_1', 'HYPERTENSION_2', 'HYPERTENSION_3'], axis=1, inplace=True)
 
-new_names = ['HYPERTENSION_ONSET', 'HYPERTENSION', 'HIGHCHOL_ONSET', 'HIGHCHOL']
+cholpressure_features = ['HYPERTENSION_ONSET', 'HYPERTENSION', 'HIGHCHOL_ONSET', 'HIGHCHOL']
 
 txt.headcounts(cholpressure_data)
-txt.get_feature_counts(cholpressure_data, new_names)
+txt.get_feature_counts(cholpressure_data, cholpressure_features)
 
 
 #Process cardiovascular text data
@@ -191,7 +192,9 @@ cardiovascular_data = cardiovascular_data[['CDQ001', 'CDQ008', 'CDQ010']]
 cardiovascular_data.rename(columns = {'CDQ001':'CHEST_DISCOMFORT'}, inplace=True)
 cardiovascular_data.rename(columns = {'CDQ008':'CHEST_PAIN_30MIN'}, inplace=True)
 cardiovascular_data.rename(columns = {'CDQ010':'BREATH_SHORTNESS'}, inplace=True)
+
 cardio_features = ['CHEST_DISCOMFORT', 'CHEST_PAIN_30MIN', 'BREATH_SHORTNESS']
+
 cardiovascular_data.fillna(value=0, inplace=True)
 for feat in cardio_features:
     cardiovascular_data[feat] = pd.to_numeric(cardiovascular_data[feat], downcast='integer')
@@ -209,7 +212,9 @@ diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT') #DONE
 diabetes_dataa = txt.switch_df_index(diabetes_data, 'SEQN')
 diabetes_data = diabetes_data[['DIQ175A','DIQ010', 'DIQ160', 'DIQ170']]
 old_diab_features = ['DIQ175A','DIQ010', 'DIQ160', 'DIQ170']
+
 diabetes_features = ['FAMILIAL_DIABETES', 'DIAGNOSED_DIABETES', 'DIAGNOSED_PREDIABETES', 'RISK_DIABETES']
+
 for n, new_name in enumerate(diabetes_features):
     diabetes_data.rename(columns={old_diab_features[n]: new_name}, inplace=True)
 diabetes_data.fillna(value=0, inplace=True)
@@ -232,22 +237,11 @@ for val in [2,7,9]:
 txt.headcounts(diabetes_data)
 
 
+#REINDEX DATAFRAMES TO CONFORM TO DEMOGRAPHICS DATA SEQN INDEX
+##############################################################
 
+alcohol_data = alcohol_data.reindex(demographics_data.index)
 
-#DIQ175A - Family history
-#10	Family history
-#77	Refused
-#99	Don't know
-#DIQ010 - Doctor told you have diabetes
-#1	Yes
-#2	No
-#3	Borderline
-#7	Refused
-#DIQ160 - Ever told you have prediabetes
-#DIQ170 - Ever told have health risk for diabetes
-#1	Yes
-#2	No
-#7	Refused
-#9	Don't know
+txt.count_feature_nans(alcohol_data)
 
 
