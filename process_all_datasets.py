@@ -240,8 +240,22 @@ txt.headcounts(diabetes_data)
 #REINDEX DATAFRAMES TO CONFORM TO DEMOGRAPHICS DATA SEQN INDEX
 ##############################################################
 
+txt.bitwise_index_compare(demographics_data,alcohol_data)
+
+sys.exit()
+
 alcohol_data = alcohol_data.reindex(demographics_data.index)
+mean_alcohol = int(np.round(alcohol_data.mean()))
+alcohol_data.fillna(value=mean_alcohol, inplace=True)
 
-txt.count_feature_nans(alcohol_data)
+#txt.get_feature_counts(alcohol_data, alcohol_features)
+txt.count_feature_nans(alcohol_data, alcohol_features)
+txt.headcounts(alcohol_data)
 
+
+print(alcohol_data.__name__)
+
+
+# print(alcohol_data.loc[s1])
+# print(demographics_data.AGE.loc[s1])
 
