@@ -10,6 +10,37 @@ import numpy as np
 import pandas as pd
 
 
+
+
+#Test set operations on dataframes
+
+if False:
+    a = np.array([1, 2, 3, 2, 4, 1])
+    b = np.array([3, 4, 5, 6])
+
+    difab = np.setdiff1d(a, b)
+    difba = np.setdiff1d(b, a)
+    interab = np.intersect1d(a, b)
+
+    print(difab)
+    print(difba)
+    print(interab)
+
+    d = {'a': [1, 2, 3, 2, 4, 1], 'b': [3, 4, 5, 6]}
+
+    df = pd.DataFrame.from_dict(d, orient='index')
+    df = df.transpose()
+    # df.fillna(value=0, inplace=True)
+    print(df)
+
+    difab = np.setdiff1d(df.a, df.b)
+    print(difab)
+
+    difba = np.setdiff1d(df.b, df.a)
+    print(len(difba))
+
+
+
 # Test logic gate operations across column elements
 if True:
 
