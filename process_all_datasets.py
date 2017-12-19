@@ -240,22 +240,40 @@ txt.headcounts(diabetes_data)
 #REINDEX DATAFRAMES TO CONFORM TO DEMOGRAPHICS DATA SEQN INDEX
 ##############################################################
 
-txt.bitwise_index_compare(demographics_data,alcohol_data)
+#Process alcohol consumption dataframe
+#-------------------------------------
+print("\nReindex alcohol dataframe using indexes from demographics dataframe")
+txt.bitwise_index_compare(demographics_data,alcohol_data) # compare indexes respect to master dataframe (demographics)
+alcohol_data = alcohol_data.reindex(demographics_data.index) # reindex
+mean_alcohol = int(np.round(alcohol_data.mean())) #compute mean values of features
+alcohol_data.fillna(value=mean_alcohol, inplace=True) # impute mean values replacing nans
 
-sys.exit()
-
-alcohol_data = alcohol_data.reindex(demographics_data.index)
-mean_alcohol = int(np.round(alcohol_data.mean()))
-alcohol_data.fillna(value=mean_alcohol, inplace=True)
-
-#txt.get_feature_counts(alcohol_data, alcohol_features)
 txt.count_feature_nans(alcohol_data, alcohol_features)
 txt.headcounts(alcohol_data)
 
+# print(alcohol_data.loc[index_set_1])
+# print(demographics_data.AGE.loc[index_set_1])
 
-print(alcohol_data.__name__)
+#Process smoking consumption dataframe
+#-------------------------------------
+print("\nReindex smoking dataframe using indexes from alcohol dataframe")
+txt.bitwise_index_compare(alcohol_data, smoking_data)
+smoking_data = smoking_data.reindex(alcohol_data.index)
+
+txt.count_feature_nans(smoking_data, smoking_features)
+txt.headcounts(smoking_data)
+
+#Process weight history dataframe
+#-------------------------------------
+print("\nReindex weight dataframe using indexes from smoking dataframe")
+txt.bitwise_index_compare(weight_data, smoking_data)
+weight_data = weight_data.reindex(smoking_data.index)
+mean_bmi = int(np.round(weight_data['BMI'].mean())) #compute mean values of features
+weight_data.fillna(value=mean_bmi, inplace=True)
 
 
-# print(alcohol_data.loc[s1])
-# print(demographics_data.AGE.loc[s1])
 
+txt.count_feature_nans(weight_data,weight_features)
+txt.headcounts(weight_data,10)
+
+print(weight_data.loc[73577])
