@@ -209,7 +209,7 @@ txt.headcounts(cardiovascular_data)
 #Process diabetes text data
 #############################################
 diabetes_data = pd.read_sas(datasets_path + 'diabetes/DIQ_H.XPT') #DONE
-diabetes_dataa = txt.switch_df_index(diabetes_data, 'SEQN')
+diabetes_data = txt.switch_df_index(diabetes_data, 'SEQN')
 diabetes_data = diabetes_data[['DIQ175A','DIQ010', 'DIQ160', 'DIQ170']]
 old_diab_features = ['DIQ175A','DIQ010', 'DIQ160', 'DIQ170']
 
@@ -302,5 +302,25 @@ cholpressure_data = cholpressure_data.reindex(nutrition_data.index)
 txt.headcounts(cholpressure_data)
 txt.count_feature_nans(cholpressure_data, cholpressure_features)
 
-#Process blood-pressure cholesterol dataframe
+#Process cardiovascular dataframe
 #--------------------------------------------
+print("\nReindex cardiovascular dataframe using indexes from cholpressure dataframe")
+txt.bitwise_index_compare(cholpressure_data,cardiovascular_data)
+cardiovascular_data = cardiovascular_data.reindex(cholpressure_data.index)
+
+txt.headcounts(cardiovascular_data)
+txt.count_feature_nans(cardiovascular_data, cardio_features)
+
+for feat in cardio_features:
+    val = 0
+    cardiovascular_data[feat].fillna(value=val,inplace=True)
+
+txt.headcounts(cardiovascular_data)
+txt.count_feature_nans(cardiovascular_data, cardio_features)
+
+#Process diabetes dataframe
+#--------------------------------------------
+print("\nReindex diabetes dataframe using indexes from cardiovascular dataframe")
+txt.bitwise_index_compare(cardiovascular_data, diabetes_data)
+diabetes_data = diabetes_data.reindex(demographics_data.index)
+txt.count_feature_nans(diabetes_data, diabetes_features)
