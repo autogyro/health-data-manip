@@ -326,7 +326,7 @@ diabetes_data = diabetes_data.reindex(demographics_data.index)
 txt.count_feature_nans(diabetes_data, diabetes_features)
 
 
-#CONCATENATE ALL DATASETS
+#CONCATENATE ALL DATAFRAMES
 ##############################################################
 
 nhanes_datasets_part_1 = [demographics_data, alcohol_data, smoking_data, weight_data, nutrition_data, cholpressure_data,
