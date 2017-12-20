@@ -276,8 +276,8 @@ txt.headcounts(weight_data,2)
 
 #Process nutrition dataframe
 #-------------------------------------
-print("\nReindex nutrition dataframe using indexes from smoking dataframe")
-txt.bitwise_index_compare(weight_data,nutrition_data,)
+print("\nReindex nutrition dataframe using indexes from weight history dataframe")
+txt.bitwise_index_compare(weight_data,nutrition_data)
 
 nutrition_data = nutrition_data.reindex(weight_data.index)
 
@@ -293,6 +293,14 @@ for feat in nutrition_features:
 txt.headcounts(nutrition_data)
 txt.count_feature_nans(nutrition_data, nutrition_features)
 
+#Process blood-pressure cholesterol dataframe
+#--------------------------------------------
 
+print("\nReindex cholesterol blood-pressure dataframe using indexes from nutrition dataframe")
+txt.bitwise_index_compare(nutrition_data,cholpressure_data)
+cholpressure_data = cholpressure_data.reindex(nutrition_data.index)
+txt.headcounts(cholpressure_data)
+txt.count_feature_nans(cholpressure_data, cholpressure_features)
 
-
+#Process blood-pressure cholesterol dataframe
+#--------------------------------------------
