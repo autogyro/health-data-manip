@@ -324,3 +324,16 @@ print("\nReindex diabetes dataframe using indexes from cardiovascular dataframe"
 txt.bitwise_index_compare(cardiovascular_data, diabetes_data)
 diabetes_data = diabetes_data.reindex(demographics_data.index)
 txt.count_feature_nans(diabetes_data, diabetes_features)
+
+
+#CONCATENATE ALL DATASETS
+##############################################################
+
+nhanes_datasets_part_1 = [demographics_data, alcohol_data, smoking_data, weight_data, nutrition_data, cholpressure_data,
+                         cardiovascular_data, diabetes_data]
+
+nhanes_df1 = pd.concat(nhanes_datasets_part_1, axis=1)
+
+
+txt.headcounts(nhanes_df1)
+txt.count_feature_nans(nhanes_df1, list(nhanes_df1.columns))
