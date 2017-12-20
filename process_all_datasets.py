@@ -259,21 +259,40 @@ txt.headcounts(alcohol_data)
 print("\nReindex smoking dataframe using indexes from alcohol dataframe")
 txt.bitwise_index_compare(alcohol_data, smoking_data)
 smoking_data = smoking_data.reindex(alcohol_data.index)
-
 txt.count_feature_nans(smoking_data, smoking_features)
 txt.headcounts(smoking_data)
 
 #Process weight history dataframe
 #-------------------------------------
 print("\nReindex weight dataframe using indexes from smoking dataframe")
-txt.bitwise_index_compare(weight_data, smoking_data)
+txt.bitwise_index_compare(smoking_data,weight_data)
 weight_data = weight_data.reindex(smoking_data.index)
+txt.count_feature_nans(weight_data,weight_features)
 mean_bmi = int(np.round(weight_data['BMI'].mean())) #compute mean values of features
 weight_data.fillna(value=mean_bmi, inplace=True)
-
-
-
 txt.count_feature_nans(weight_data,weight_features)
-txt.headcounts(weight_data,10)
+txt.headcounts(weight_data,2)
 
-print(weight_data.loc[73577])
+
+#Process nutrition dataframe
+#-------------------------------------
+print("\nReindex nutrition dataframe using indexes from smoking dataframe")
+txt.bitwise_index_compare(weight_data,nutrition_data,)
+
+nutrition_data = nutrition_data.reindex(weight_data.index)
+
+txt.count_feature_nans(nutrition_data, nutrition_features)
+
+txt.headcounts(nutrition_data)
+
+for feat in nutrition_features:
+    mval = np.round(nutrition_data[feat].mean(),2)
+    nutrition_data[feat].fillna(value=mval,inplace=True)
+    print(mval)
+
+txt.headcounts(nutrition_data)
+txt.count_feature_nans(nutrition_data, nutrition_features)
+
+
+
+
