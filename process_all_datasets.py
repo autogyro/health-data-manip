@@ -1,4 +1,4 @@
-# Script will load and process all datasets in selected NHANES surveys
+# Script will load and process all datasets in selected NHANES 2013-2014 surveys
 # @Juan E. Rolon
 # https://github.com/juanerolon
 
@@ -329,11 +329,93 @@ txt.count_feature_nans(diabetes_data, diabetes_features)
 #CONCATENATE ALL DATAFRAMES
 ##############################################################
 
-nhanes_datasets_part_1 = [demographics_data, alcohol_data, smoking_data, weight_data, nutrition_data, cholpressure_data,
+nhanes1314_datasets_p1 = [demographics_data, alcohol_data, smoking_data, weight_data, nutrition_data, cholpressure_data,
                          cardiovascular_data, diabetes_data]
 
-nhanes_df1 = pd.concat(nhanes_datasets_part_1, axis=1)
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+nhanes_2013_2014_df1 = pd.concat(nhanes1314_datasets_p1, axis=1)
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+txt.headcounts(nhanes_2013_2014_df1)
+txt.count_feature_nans(nhanes_2013_2014_df1, list(nhanes_2013_2014_df1.columns))
 
 
-txt.headcounts(nhanes_df1)
-txt.count_feature_nans(nhanes_df1, list(nhanes_df1.columns))
+#PROCESS STANDARD BIOCHEMISTRY DATASET
+##############################################################
+biochemistry_data = pd.read_sas(datasets_path + '__standard_biochem/BIOPRO_H.XPT')
+
+#CODES:
+#........ LBXSAL - Albumin (g/dL)
+#........ LBDSALSI - Albumin (g/L)   ** D
+#........ LBXSAPSI - Alkaline phosphatase (IU/L)
+#........ LBXSASSI - Aspartate aminotransferase AST (IU/L)
+#........ LBXSATSI - Alanine aminotransferase ALT (IU/L)
+#........ LBXSBU - Blood urea nitrogen (mg/dL)
+#........ LBDSBUSI - Blood urea nitrogen (mmol/L)  ** D
+#........ LBXSC3SI - Bicarbonate (mmol/L)
+#........ LBXSCA - Total calcium (mg/dL)
+#........ LBDSCASI - Total calcium (mmol/L)  ** D
+#........ LBXSCH - Cholesterol (mg/dL)
+#........ LBDSCHSI - Cholesterol (mmol/L)  ** D
+#........ LBXSCK - Creatine Phosphokinase(CPK) (IU/L)
+#........ LBXSCLSI - Chloride (mmol/L)
+#........ LBXSCR - Creatinine (mg/dL)
+#........ LBDSCRSI - Creatinine (umol/L)  ** D
+#........ LBXSGB - Globulin (g/dL)
+#........ LBDSGBSI - Globulin (g/L)   ** D
+#........ LBXSGL - Glucose, refrigerated serum (mg/dL)
+#........ LBDSGLSI - Glucose, refrigerated serum (mmol/L)  ** D
+#........ LBXSGTSI - Gamma glutamyl transferase (U/L)
+#........ LBXSIR - Iron, refrigerated serum (ug/dL)
+#........ LBDSIRSI - Iron, refrigerated serum (umol/L)  ** D
+#........ LBXSKSI - Potassium (mmol/L)
+#........ LBXSLDSI - Lactate dehydrogenase (U/L)
+#........ LBXSNASI - Sodium (mmol/L)
+#........ LBXSOSSI - Osmolality (mmol/Kg)
+#........ LBXSPH - Phosphorus (mg/dL)
+#........ LBDSPHSI - Phosphorus (mmol/L)   ** D
+#........ LBXSTB - Total bilirubin (mg/dL)
+#........ LBDSTBSI - Total bilirubin (umol/L)     ** D
+#........ LBXSTP - Total protein (g/dL)
+#........ LBDSTPSI - Total protein (g/L)  ** D
+#........ LBXSTR - Triglycerides, refrigerated (mg/dL)
+#........ LBDSTRSI - Triglycerides, refrigerated (mmol/L) ** D
+#........ LBXSUA - Uric acid (mg/dL)
+#........ LBDSUASI - Uric acid (umol/L) ** D
+#
+
+#discard redundant features
+bio_redundant_features = ['LBDSUASI', 'LBDSTRSI', 'LBDSTPSI', 'LBDSTBSI', 'LBDSPHSI', 'LBDSIRSI', 'LBDSGLSI', 'LBDSGBSI',
+                          'LBDSCRSI', 'LBDSCHSI', 'LBDSCASI', 'LBDSBUSI', 'LBDSALSI']
+
+biochemistry_data.drop(bio_redundant_features, axis=1, inplace=True)
+biochemistry_data = txt.switch_df_index(biochemistry_data, 'SEQN')
+
+biochem_features = list(biochemistry_data.columns)
+
+#Intial removal of records with missing values
+biochemistry_data.dropna(axis=0, how='any', inplace=True) #Remove all records with missing biochemistry data
+
+txt.bitwise_index_compare(nhanes_2013_2014_df1,biochemistry_data)
+biochemistry_data = biochemistry_data.reindex(nhanes_2013_2014_df1.index)
+
+#Remove again records with missing alues after reindexing
+biochemistry_data.dropna(axis=0, how='any', inplace=True) #Remove all records with missing biochemistry data
+
+#txt.count_feature_nans(biochemistry_data,biochem_features)
+txt.count_rows_with_nans(biochemistry_data)
+
+lsn = txt.get_nanrows_indexes(biochemistry_data)
+
+print(biochemistry_data.head())
+
+
+#MERGE QUESTIONAIRE AND BIOCHEMISTRY DATASETS
+#################################################
+questionaire_data = nhanes_2013_2014_df1.copy(deep=True)
+questionaire_data = questionaire_data.reindex(biochemistry_data.index)
+txt.count_rows_with_nans(questionaire_data)
+nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
+txt.count_rows_with_nans(nhanes_2013_2014_full_data)
+
+txt.headcounts(nhanes_2013_2014_full_data)
