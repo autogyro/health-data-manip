@@ -421,10 +421,9 @@ nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],ax
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
-print(list(biochemistry_data.columns))
 
 
-if False:
+if True:
     old_bio_features = ['LBXSAL', 'LBXSAPSI', 'LBXSASSI', 'LBXSATSI',
                         'LBXSBU', 'LBXSC3SI', 'LBXSCA', 'LBXSCH',
                         'LBXSCK', 'LBXSCLSI', 'LBXSCR', 'LBXSGB',
@@ -439,17 +438,22 @@ if False:
                         'LACTATE_DEHYDROGENASE(U/L)', 'SODIUM(mmol/L)', 'OSMOLALITY(mmol/Kg)', 'PHOSPHORUS(mg/dL)',
                         'TOTAL_BILIRUBIN(mg/dL)', 'TOTAL_PROTEIN(g/dL)', 'TRIGLYCERIDES(mg/dL)', 'URIC_ACID(mg/dL)']
 
+
+
     for n, new_name in enumerate(new_bio_features):
-        nhanes_2013_2014_full_data.rename(columns={old_bio_features[n]: new_bio_features}, inplace=True)
+        biochemistry_data.rename(columns={old_bio_features[n]: new_name}, inplace=True)
+
+    for n, new_name in enumerate(new_bio_features):
+        nhanes_2013_2014_full_data.rename(columns={old_bio_features[n]: new_name}, inplace=True)
 
 
-if False:
+if True:
     txt.count_rows_with_nans(nhanes_2013_2014_full_data)
     txt.headcounts(nhanes_2013_2014_full_data)
 
 #EXPORT DATASETS
 ############################################################################################
-if False:
+if True:
     import feather
 
     #Save Final stage merged dataframe
