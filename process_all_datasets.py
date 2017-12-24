@@ -410,12 +410,32 @@ lsn = txt.get_nanrows_indexes(biochemistry_data)
 print(biochemistry_data.head())
 
 
-#MERGE QUESTIONAIRE AND BIOCHEMISTRY DATASETS
-#################################################
+#-------------------- MERGE QUESTIONAIRE AND BIOCHEMISTRY DATASETS -------------------------
+############################################################################################
 questionaire_data = nhanes_2013_2014_df1.copy(deep=True)
 questionaire_data = questionaire_data.reindex(biochemistry_data.index)
 txt.count_rows_with_nans(questionaire_data)
-nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
-txt.count_rows_with_nans(nhanes_2013_2014_full_data)
 
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+txt.count_rows_with_nans(nhanes_2013_2014_full_data)
 txt.headcounts(nhanes_2013_2014_full_data)
+
+#EXPORT DATASETS
+############################################################################################
+if False:
+    import feather
+
+    #Save Final stage merged dataframe
+    filename_final = 'nhanes_2013_2014_full_data.feather'
+    feather.write_dataframe(nhanes_2013_2014_full_data, filename_final)
+
+    csv_filename = 'nhanes_2013_2014_full_data.csv'
+    nhanes_2013_2014_full_data.to_csv(csv_filename)
+
+if False:
+    nhanes_full_test = feather.read_dataframe(project_path + 'nhanes_2013_2014_full_data.feather')
+    nhanes_full_test = nhanes_full_test.set_index('SEQN') #Restore the index saved during the export step
+
