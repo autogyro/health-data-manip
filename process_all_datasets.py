@@ -420,8 +420,32 @@ txt.count_rows_with_nans(questionaire_data)
 nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-txt.count_rows_with_nans(nhanes_2013_2014_full_data)
-txt.headcounts(nhanes_2013_2014_full_data)
+
+print(list(biochemistry_data.columns))
+
+
+if False:
+    old_bio_features = ['LBXSAL', 'LBXSAPSI', 'LBXSASSI', 'LBXSATSI',
+                        'LBXSBU', 'LBXSC3SI', 'LBXSCA', 'LBXSCH',
+                        'LBXSCK', 'LBXSCLSI', 'LBXSCR', 'LBXSGB',
+                        'LBXSGL', 'LBXSGTSI', 'LBXSIR', 'LBXSKSI',
+                        'LBXSLDSI', 'LBXSNASI', 'LBXSOSSI', 'LBXSPH',
+                        'LBXSTB', 'LBXSTP', 'LBXSTR', 'LBXSUA']
+
+    new_bio_features = ['ALBUMIN(g/dL)', 'ALKALINE_PHOSPHATASE(IU/L)', 'ASPARTATE_AMINOTRANSFERASE_AST(IU/L)', 'ALANINE_AMINOTRANSFERASE_ALT(IU/L)',
+                        'BLOOD_UREA_NITROGEN(mg/dL)', 'BICARBONATE(mmol/L)', 'TOTAL_CALCIUM(mg/dL)', 'CHOLESTEROL(mg/dL)',
+                        'CREATINE_PHOSPHOKINASE(IU/L)', 'CHLORIDE(mmol/L)', 'CREATININE(mg/dL)', 'GLOBULIN(g/dL)',
+                        'GLUCOSE_RSERUM(mg/dL)', 'GAMMA_GLUT_TRNSF(U/L)', 'IRON_RSERUM(ug/dL)', 'POTASSIUM(mmol/L)',
+                        'LACTATE_DEHYDROGENASE(U/L)', 'SODIUM(mmol/L)', 'OSMOLALITY(mmol/Kg)', 'PHOSPHORUS(mg/dL)',
+                        'TOTAL_BILIRUBIN(mg/dL)', 'TOTAL_PROTEIN(g/dL)', 'TRIGLYCERIDES(mg/dL)', 'URIC_ACID(mg/dL)']
+
+    for n, new_name in enumerate(new_bio_features):
+        nhanes_2013_2014_full_data.rename(columns={old_bio_features[n]: new_bio_features}, inplace=True)
+
+
+if False:
+    txt.count_rows_with_nans(nhanes_2013_2014_full_data)
+    txt.headcounts(nhanes_2013_2014_full_data)
 
 #EXPORT DATASETS
 ############################################################################################
