@@ -6,7 +6,7 @@ import sys
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot
+import matplotlib.pyplot as plt
 
 #import local modules
 from importlib.machinery import SourceFileLoader
@@ -420,9 +420,6 @@ txt.count_rows_with_nans(questionaire_data)
 nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-
-
-
 if True:
     old_bio_features = ['LBXSAL', 'LBXSAPSI', 'LBXSASSI', 'LBXSATSI',
                         'LBXSBU', 'LBXSC3SI', 'LBXSCA', 'LBXSCH',
@@ -439,21 +436,34 @@ if True:
                         'TOTAL_BILIRUBIN(mg/dL)', 'TOTAL_PROTEIN(g/dL)', 'TRIGLYCERIDES(mg/dL)', 'URIC_ACID(mg/dL)']
 
 
-
+if True:
     for n, new_name in enumerate(new_bio_features):
         biochemistry_data.rename(columns={old_bio_features[n]: new_name}, inplace=True)
+
+if False:
 
     for n, new_name in enumerate(new_bio_features):
         nhanes_2013_2014_full_data.rename(columns={old_bio_features[n]: new_name}, inplace=True)
 
 
-if True:
+if False:
+    from scipy.stats import normaltest
+    cols = list(biochemistry_data.columns)
+    for feat in cols:
+        statistic, p = normaltest(biochemistry_data[feat].values)
+        if p >= 0.05:
+            print ("The feature {} likely has a normal distribution".format(feat))
+        else:
+            print ("The feature {} likely doesn't have a normal distribution".format(feat))
+
+
+if False:
     txt.count_rows_with_nans(nhanes_2013_2014_full_data)
     txt.headcounts(nhanes_2013_2014_full_data)
 
 #EXPORT DATASETS
 ############################################################################################
-if True:
+if False:
     import feather
 
     #Save Final stage merged dataframe
@@ -463,7 +473,21 @@ if True:
     csv_filename = 'nhanes_2013_2014_full_data.csv'
     nhanes_2013_2014_full_data.to_csv(csv_filename)
 
+#Test exported files
 if False:
     nhanes_full_test = feather.read_dataframe(project_path + 'nhanes_2013_2014_full_data.feather')
     nhanes_full_test = nhanes_full_test.set_index('SEQN') #Restore the index saved during the export step
 
+###############################################################################################
+
+
+if False:
+    feats = []
+    for m in range(20,24):
+        feats.append(old_bio_features[m])
+
+    data = biochemistry_data[feats]
+    print(data.head())
+
+    pd.scatter_matrix(data, alpha = 0.3, figsize = (16,8), diagonal = 'kde')
+    plt.show()
