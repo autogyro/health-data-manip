@@ -348,12 +348,16 @@ biochemistry_data = pd.read_sas(datasets_path + '__standard_biochem/BIOPRO_H.XPT
 #........ LBXSAL - Albumin (g/dL)
 #........ LBDSALSI - Albumin (g/L)   ** D
 #........ LBXSAPSI - Alkaline phosphatase (IU/L)
+
 #........ LBXSASSI - Aspartate aminotransferase AST (IU/L)
 #........ LBXSATSI - Alanine aminotransferase ALT (IU/L)
+
 #........ LBXSBU - Blood urea nitrogen (mg/dL)
 #........ LBDSBUSI - Blood urea nitrogen (mmol/L)  ** D
 #........ LBXSC3SI - Bicarbonate (mmol/L)
+
 #........ LBXSCA - Total calcium (mg/dL)
+
 #........ LBDSCASI - Total calcium (mmol/L)  ** D
 #........ LBXSCH - Cholesterol (mg/dL)
 #........ LBDSCHSI - Cholesterol (mmol/L)  ** D
@@ -361,7 +365,9 @@ biochemistry_data = pd.read_sas(datasets_path + '__standard_biochem/BIOPRO_H.XPT
 #........ LBXSCLSI - Chloride (mmol/L)
 #........ LBXSCR - Creatinine (mg/dL)
 #........ LBDSCRSI - Creatinine (umol/L)  ** D
+
 #........ LBXSGB - Globulin (g/dL)
+
 #........ LBDSGBSI - Globulin (g/L)   ** D
 #........ LBXSGL - Glucose, refrigerated serum (mg/dL)
 #........ LBDSGLSI - Glucose, refrigerated serum (mmol/L)  ** D
@@ -370,13 +376,17 @@ biochemistry_data = pd.read_sas(datasets_path + '__standard_biochem/BIOPRO_H.XPT
 #........ LBDSIRSI - Iron, refrigerated serum (umol/L)  ** D
 #........ LBXSKSI - Potassium (mmol/L)
 #........ LBXSLDSI - Lactate dehydrogenase (U/L)
+
 #........ LBXSNASI - Sodium (mmol/L)
 #........ LBXSOSSI - Osmolality (mmol/Kg)
+
 #........ LBXSPH - Phosphorus (mg/dL)
 #........ LBDSPHSI - Phosphorus (mmol/L)   ** D
 #........ LBXSTB - Total bilirubin (mg/dL)
 #........ LBDSTBSI - Total bilirubin (umol/L)     ** D
+
 #........ LBXSTP - Total protein (g/dL)
+
 #........ LBDSTPSI - Total protein (g/L)  ** D
 #........ LBXSTR - Triglycerides, refrigerated (mg/dL)
 #........ LBDSTRSI - Triglycerides, refrigerated (mmol/L) ** D
@@ -436,7 +446,7 @@ if True:
                         'TOTAL_BILIRUBIN(mg/dL)', 'TOTAL_PROTEIN(g/dL)', 'TRIGLYCERIDES(mg/dL)', 'URIC_ACID(mg/dL)']
 
 
-if True:
+if False:
     for n, new_name in enumerate(new_bio_features):
         biochemistry_data.rename(columns={old_bio_features[n]: new_name}, inplace=True)
 
@@ -478,7 +488,52 @@ if False:
     nhanes_full_test = feather.read_dataframe(project_path + 'nhanes_2013_2014_full_data.feather')
     nhanes_full_test = nhanes_full_test.set_index('SEQN') #Restore the index saved during the export step
 
+
+#TEST VISUALS
 ###############################################################################################
+
+feats = []
+for m in range(0, 3):
+    feats.append(old_bio_features[m])
+
+data = biochemistry_data[feats]
+
+log_data = np.log(data)
+
+
+#sns.reset_orig()
+plt.figure(1, figsize=(9, 7))
+
+plt.subplot(1, 2, 1)
+plt.title('Box plot scaled data - includes all outliers')
+log_data.boxplot(showfliers=True)
+plt.ylim(0,15)
+plt.show()
+
+
+
+
+if False:
+    import seaborn as sns
+
+    feats = []
+    for m in range(0,24):
+        feats.append(old_bio_features[m])
+
+    data = biochemistry_data[feats]
+    print(data.head())
+
+    cols = list(data.columns)
+    corr_matrix = np.corrcoef(data[cols].values.T)
+
+    plt.figure(1, figsize=(10, 8))
+    sns.set(font_scale=0.5)
+    heat_map = sns.heatmap(corr_matrix, cbar=True, annot=True, square=True, fmt='.2f',
+                           annot_kws={'size': 6}, yticklabels=cols, xticklabels=cols)
+    plt.xticks(rotation='vertical')
+    plt.yticks(rotation='horizontal')
+    plt.tight_layout()
+    plt.show()
 
 
 if False:
