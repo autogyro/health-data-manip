@@ -492,27 +492,31 @@ if False:
 #TEST VISUALS
 ###############################################################################################
 
-feats = []
-for m in range(0, 3):
-    feats.append(old_bio_features[m])
 
-data = biochemistry_data[feats]
+########## Box Plots ##########
+if False:
 
-log_data = np.log(data)
+    feats = []
+    for m in range(12, 24):
+        feats.append(old_bio_features[m])
 
+    data = biochemistry_data[feats]
 
-#sns.reset_orig()
-plt.figure(1, figsize=(9, 7))
-
-plt.subplot(1, 2, 1)
-plt.title('Box plot scaled data - includes all outliers')
-log_data.boxplot(showfliers=True)
-plt.ylim(0,15)
-plt.show()
+    log_data = np.log(data)
 
 
+    #sns.reset_orig()
+    plt.figure(1, figsize=(16, 7))
+
+    plt.subplot(1, 1, 1)
+    plt.title('Box plot scaled data - includes all outliers')
+    log_data.boxplot(showfliers=True)
+    plt.ylim(0,15)
+    plt.show()
 
 
+
+########## Heatmap ##########
 if False:
     import seaborn as sns
 
@@ -536,6 +540,8 @@ if False:
     plt.show()
 
 
+
+########## ScatterMatrixPlot ##########
 if False:
     feats = []
     for m in range(20,24):
