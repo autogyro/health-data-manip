@@ -492,6 +492,20 @@ if False:
 #TEST VISUALS
 ###############################################################################################
 
+from sklearn.decomposition import PCA
+
+feats = []
+for m in range(0, 6):
+    feats.append(old_bio_features[m])
+
+data = biochemistry_data[feats]
+log_data = np.log(data)
+
+pca = PCA(n_components=data.shape[1])
+pca.fit(log_data)
+pca_results = gut.pca_results(log_data, pca)
+plt.show()
+
 
 ########## Box Plots ##########
 if False:
