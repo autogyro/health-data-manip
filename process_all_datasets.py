@@ -492,19 +492,44 @@ if False:
 #TEST VISUALS
 ###############################################################################################
 
+
+
+
+#Principal components analysis
 from sklearn.decomposition import PCA
 
-feats = []
-for m in range(0, 6):
-    feats.append(old_bio_features[m])
-
-data = biochemistry_data[feats]
+data = biochemistry_data
 log_data = np.log(data)
 
 pca = PCA(n_components=data.shape[1])
 pca.fit(log_data)
 pca_results = gut.pca_results(log_data, pca)
-plt.show()
+
+print("Cumulative sum of of explained variance by dimension:")
+print(pca_results['Explained Variance'].cumsum())
+print("")
+print("PCA detailed results:")
+print(pca_results)
+
+csv_filename = 'pca_analysis_biochemistry.csv'
+pca_results.to_csv(csv_filename)
+
+
+
+
+if False:
+
+    feats = []
+    for m in range(0, 6):
+        feats.append(old_bio_features[m])
+
+    data = biochemistry_data[feats]
+    log_data = np.log(data)
+
+    pca = PCA(n_components=data.shape[1])
+    pca.fit(log_data)
+    pca_results = gut.pca_results(log_data, pca)
+    plt.show()
 
 
 ########## Box Plots ##########
