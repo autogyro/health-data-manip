@@ -361,7 +361,10 @@ biochemistry_data = pd.read_sas(datasets_path + '__standard_biochem/BIOPRO_H.XPT
 #........ LBDSCASI - Total calcium (mmol/L)  ** D
 #........ LBXSCH - Cholesterol (mg/dL)
 #........ LBDSCHSI - Cholesterol (mmol/L)  ** D
+
 #........ LBXSCK - Creatine Phosphokinase(CPK) (IU/L)
+
+
 #........ LBXSCLSI - Chloride (mmol/L)
 #........ LBXSCR - Creatinine (mg/dL)
 #........ LBDSCRSI - Creatinine (umol/L)  ** D
@@ -492,27 +495,58 @@ if False:
 #TEST VISUALS
 ###############################################################################################
 
-
-
-
 #Principal components analysis
-from sklearn.decomposition import PCA
 
-data = biochemistry_data
-log_data = np.log(data)
+#drop features which did not explain much of the variance of the data
+#see initial pca results on full biochem data (below)
 
-pca = PCA(n_components=data.shape[1])
-pca.fit(log_data)
-pca_results = gut.pca_results(log_data, pca)
+print("****** PCA ******")
 
-print("Cumulative sum of of explained variance by dimension:")
-print(pca_results['Explained Variance'].cumsum())
-print("")
-print("PCA detailed results:")
-print(pca_results)
+low_var_features = ['LBXSAL', 'LBXSC3SI', 'LBXSCA', 'LBXSCH', 'LBXSCLSI', 'LBXSGB', 'LBXSGL', 'LBXSKSI',
+                    'LBXSLDSI', 'LBXSNASI', 'LBXSOSSI', 'LBXSPH', 'LBXSTP']
 
-csv_filename = 'pca_analysis_biochemistry.csv'
-pca_results.to_csv(csv_filename)
+biochemistry_data.drop(low_var_features, axis=1, inplace=True)
+
+txt.headcounts(biochemistry_data)
+
+if False:
+    from sklearn.decomposition import PCA
+
+    data = biochemistry_data
+    log_data = np.log(data)
+
+    pca = PCA(n_components=data.shape[1])
+    pca.fit(log_data)
+    pca_results = gut.pca_results(log_data, pca)
+
+    print("Cumulative sum of of explained variance by dimension:")
+    print(pca_results['Explained Variance'].cumsum())
+    print("")
+    print("PCA detailed results:")
+    print(pca_results)
+
+    csv_filename = 'pca_analysis_biochemistry.csv'
+    pca_results.to_csv(csv_filename)
+
+#PCA of full biochem data
+if False:
+    from sklearn.decomposition import PCA
+
+    data = biochemistry_data
+    log_data = np.log(data)
+
+    pca = PCA(n_components=data.shape[1])
+    pca.fit(log_data)
+    pca_results = gut.pca_results(log_data, pca)
+
+    print("Cumulative sum of of explained variance by dimension:")
+    print(pca_results['Explained Variance'].cumsum())
+    print("")
+    print("PCA detailed results:")
+    print(pca_results)
+
+    csv_filename = 'pca_analysis_biochemistry.csv'
+    pca_results.to_csv(csv_filename)
 
 
 
