@@ -511,7 +511,32 @@ if True:
 
     txt.headcounts(biochemistry_data)
 
+
+
 if True:
+
+    from sklearn.cluster import KMeans
+    from sklearn.metrics import silhouette_score
+
+    from sklearn.decomposition import PCA
+    biochemistry_data = np.log(biochemistry_data)
+    pca = PCA(n_components=2) #.....................No. of dimensions
+    pca.fit(biochemistry_data)
+    reduced_data = pca.transform(biochemistry_data)
+    reduced_data = pd.DataFrame(reduced_data, columns = ['Dimension 1', 'Dimension 2'])
+
+    "K-Means Silhouette Scoring Tests:\n"
+    for kn in range(2, 9):
+
+        clm = KMeans(n_clusters=kn, random_state=0)
+        clm.fit(reduced_data)
+        preds = clm.predict(reduced_data)
+        centers = clm.cluster_centers_
+        #sample_preds = clm.predict(pca_samples)
+        score = silhouette_score(reduced_data, preds, random_state=10)
+        print("Number of clusters = {}, Score = {}".format(kn, np.round(score, 4)))
+
+if False:
     from sklearn.decomposition import PCA
     biochemistry_data = np.log(biochemistry_data)
     pca = PCA(n_components=2)
