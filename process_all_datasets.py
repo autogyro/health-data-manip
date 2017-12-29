@@ -502,14 +502,16 @@ if False:
 
 print("****** PCA ******")
 
-low_var_features = ['LBXSAL', 'LBXSC3SI', 'LBXSCA', 'LBXSCH', 'LBXSCLSI', 'LBXSGB', 'LBXSGL', 'LBXSKSI',
-                    'LBXSLDSI', 'LBXSNASI', 'LBXSOSSI', 'LBXSPH', 'LBXSTP']
+if True:
 
-biochemistry_data.drop(low_var_features, axis=1, inplace=True)
+    low_var_features = ['LBXSAL', 'LBXSC3SI', 'LBXSCA', 'LBXSCH', 'LBXSCLSI', 'LBXSGB', 'LBXSGL', 'LBXSKSI',
+                        'LBXSLDSI', 'LBXSNASI', 'LBXSOSSI', 'LBXSPH', 'LBXSTP']
 
-txt.headcounts(biochemistry_data)
+    biochemistry_data.drop(low_var_features, axis=1, inplace=True)
 
-if False:
+    txt.headcounts(biochemistry_data)
+
+if True:
     from sklearn.decomposition import PCA
 
     data = biochemistry_data
@@ -525,8 +527,39 @@ if False:
     print("PCA detailed results:")
     print(pca_results)
 
-    csv_filename = 'pca_analysis_biochemistry.csv'
+    csv_filename = 'pca_analysis_reduced_biodata.csv'
     pca_results.to_csv(csv_filename)
+
+#Generate pair of heatmaps for dimensios vs features corr and variance
+#Suitable for reduced data pca analysis (above)
+if True:
+    import seaborn as sns
+
+    cols = list(pca_results.columns)[1:]
+    rows = list(pca_results.index)
+    pca_matrix = pca.components_
+    pca_squared_matrix = np.square(pca.components_)
+
+    plt.figure(1, figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    sns.set(font_scale=1.0)
+    heat_map = sns.heatmap(pca_matrix, cbar=True, annot=True, square=True, fmt='.4f',
+                           annot_kws={'size': 8}, yticklabels=rows, xticklabels=cols)
+    plt.title("Feature loadings correlation matrix")
+    plt.xticks(rotation='vertical')
+    plt.yticks(rotation='horizontal')
+
+    plt.subplot(1, 2, 2)
+    sns.set(font_scale=1.0)
+    heat_map = sns.heatmap(pca_squared_matrix, cmap="YlGnBu", cbar=True, annot=True, square=True, fmt='.4f',
+                           annot_kws={'size': 8}, yticklabels=rows, xticklabels=cols)
+    plt.title("Variance percentages explained by feature")
+    plt.xticks(rotation='vertical')
+    plt.yticks(rotation='horizontal')
+
+    plt.tight_layout()
+    plt.show()
 
 #PCA of full biochem data
 if False:
@@ -593,20 +626,25 @@ if False:
 if False:
     import seaborn as sns
 
-    feats = []
-    for m in range(0,24):
-        feats.append(old_bio_features[m])
+    data = biochemistry_data
 
-    data = biochemistry_data[feats]
-    print(data.head())
+    #old code block
+    if False:
+
+        feats = []
+        for m in range(0,24):
+            feats.append(old_bio_features[m])
+
+        data = biochemistry_data[feats]
+        print(data.head())
 
     cols = list(data.columns)
     corr_matrix = np.corrcoef(data[cols].values.T)
 
     plt.figure(1, figsize=(10, 8))
-    sns.set(font_scale=0.5)
+    sns.set(font_scale=1.0)
     heat_map = sns.heatmap(corr_matrix, cbar=True, annot=True, square=True, fmt='.2f',
-                           annot_kws={'size': 6}, yticklabels=cols, xticklabels=cols)
+                           annot_kws={'size': 12}, yticklabels=cols, xticklabels=cols)
     plt.xticks(rotation='vertical')
     plt.yticks(rotation='horizontal')
     plt.tight_layout()
