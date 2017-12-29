@@ -502,7 +502,9 @@ if False:
 
 print("****** PCA ******")
 
-if True:
+
+#First set of low-variance-carrying features
+if False:
 
     low_var_features = ['LBXSAL', 'LBXSC3SI', 'LBXSCA', 'LBXSCH', 'LBXSCLSI', 'LBXSGB', 'LBXSGL', 'LBXSKSI',
                         'LBXSLDSI', 'LBXSNASI', 'LBXSOSSI', 'LBXSPH', 'LBXSTP']
@@ -511,19 +513,37 @@ if True:
 
     txt.headcounts(biochemistry_data)
 
-
-
 if True:
+
+    low_var_features = ['LBXSAL', 'LBXSC3SI', 'LBXSCA', 'LBXSCH', 'LBXSCLSI', 'LBXSGB', 'LBXSGL', 'LBXSKSI',
+                        'LBXSLDSI', 'LBXSNASI', 'LBXSOSSI', 'LBXSPH', 'LBXSTP']
+
+    colinear_features = ['LBXSTB', 'LBXSASSI', 'LBXSCR', 'LBXSUA', 'LBXSAPSI']
+
+    biochemistry_data.drop(low_var_features, axis=1, inplace=True)
+    biochemistry_data.drop(colinear_features, axis=1, inplace=True)
+
+    txt.headcounts(biochemistry_data)
+
+
+
+if False:
 
     from sklearn.cluster import KMeans
     from sklearn.metrics import silhouette_score
 
     from sklearn.decomposition import PCA
+
+    ndims = 2
+    dim_labels = []
+    for i in range(1, ndims + 1):
+        dim_labels.append("Dimension {}".format(i))
+
     biochemistry_data = np.log(biochemistry_data)
-    pca = PCA(n_components=2) #.....................No. of dimensions
+    pca = PCA(n_components=ndims) #.....................No. of dimensions
     pca.fit(biochemistry_data)
     reduced_data = pca.transform(biochemistry_data)
-    reduced_data = pd.DataFrame(reduced_data, columns = ['Dimension 1', 'Dimension 2'])
+    reduced_data = pd.DataFrame(reduced_data, columns = dim_labels)
 
     "K-Means Silhouette Scoring Tests:\n"
     for kn in range(2, 9):
@@ -564,7 +584,7 @@ if False:
     print("PCA detailed results:")
     print(pca_results)
 
-    csv_filename = 'pca_analysis_reduced_biodata.csv'
+    csv_filename = 'pca_analysis_reduced_biodata2.csv'
     pca_results.to_csv(csv_filename)
 
 #Generate pair of heatmaps for dimensios vs features corr and variance
@@ -620,14 +640,10 @@ if False:
 
 
 
-
-if False:
-
-    feats = []
-    for m in range(0, 6):
-        feats.append(old_bio_features[m])
-
-    data = biochemistry_data[feats]
+#Bar plot of pca results
+if True:
+    from sklearn.decomposition import PCA
+    data = biochemistry_data
     log_data = np.log(data)
 
     pca = PCA(n_components=data.shape[1])
