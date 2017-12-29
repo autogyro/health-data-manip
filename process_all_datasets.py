@@ -513,6 +513,18 @@ if True:
 
 if True:
     from sklearn.decomposition import PCA
+    biochemistry_data = np.log(biochemistry_data)
+    pca = PCA(n_components=2)
+    pca.fit(biochemistry_data)
+    reduced_data = pca.transform(biochemistry_data)
+    reduced_data = pd.DataFrame(reduced_data, columns = ['Dimension 1', 'Dimension 2'])
+    gut.biplot(biochemistry_data, reduced_data, pca)
+    plt.show()
+
+
+
+if False:
+    from sklearn.decomposition import PCA
 
     data = biochemistry_data
     log_data = np.log(data)
@@ -532,7 +544,7 @@ if True:
 
 #Generate pair of heatmaps for dimensios vs features corr and variance
 #Suitable for reduced data pca analysis (above)
-if True:
+if False:
     import seaborn as sns
 
     cols = list(pca_results.columns)[1:]
