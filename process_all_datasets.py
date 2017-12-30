@@ -527,6 +527,18 @@ if True:
 
 
 
+
+
+
+############################################# Initial Visual Tests #####################################################
+
+
+########## ScatterMatrixPlot ##########
+if True:
+
+    pd.scatter_matrix(biochemistry_data, alpha = 0.3, figsize = (16,8), diagonal = 'kde')
+    plt.show()
+
 if False:
 
     from sklearn.cluster import KMeans
@@ -641,7 +653,7 @@ if False:
 
 
 #Bar plot of pca results
-if True:
+if False:
     from sklearn.decomposition import PCA
     data = biochemistry_data
     log_data = np.log(data)
@@ -705,14 +717,3 @@ if False:
 
 
 
-########## ScatterMatrixPlot ##########
-if False:
-    feats = []
-    for m in range(20,24):
-        feats.append(old_bio_features[m])
-
-    data = biochemistry_data[feats]
-    print(data.head())
-
-    pd.scatter_matrix(data, alpha = 0.3, figsize = (16,8), diagonal = 'kde')
-    plt.show()
