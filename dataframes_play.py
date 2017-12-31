@@ -10,15 +10,20 @@ import numpy as np
 import pandas as pd
 
 
-d = {'a':[0.1, 1.5, 8.0, 0.01, 10.0, 3.5], 'b':[0.1, 1.5, 8.0, 0.01, 10.0, 3.5]}
-
+d = {'a':[0.1, 1.5, 8.0, 0.01, 10.0, 3.5], 'b':[0.1, 1.5, 8.0, 0.01, 10.0, 3.5], 'c':[0.1, 1.5, 8.0, 0.01, 10.0, 3.5]}
 df = pd.DataFrame(d)
 print(df)
 
-skewed = ['a']
-
+skewed = ['a', 'c']
 df[skewed] = df[skewed].apply(lambda x: np.log(x + 1))
+print(df)
 
+
+from sklearn.preprocessing import MinMaxScaler
+
+scaler = MinMaxScaler() # default=(0, 1)
+numerical_features = ['a', 'b', 'c']
+df[numerical_features] = scaler.fit_transform(df[numerical_features])
 print(df)
 
 if False:
