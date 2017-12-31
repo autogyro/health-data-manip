@@ -10,6 +10,27 @@ import numpy as np
 import pandas as pd
 
 
+d = {'a':[0.1, 1.5, 8.0, 0.01, 10.0, 3.5], 'b':[0.1, 1.5, 8.0, 0.01, 10.0, 3.5]}
+
+df = pd.DataFrame(d)
+print(df)
+
+skewed = ['a']
+
+df[skewed] = df[skewed].apply(lambda x: np.log(x + 1))
+
+print(df)
+
+if False:
+
+    d = {'a':[np.nan,2,3, np.nan, 4, 5], 'b': [np.nan, np.nan, 5,6,7,8]}
+    df = pd.DataFrame(d)
+    print(df)
+
+    dfn = df[df.isnull().any(axis=1)]
+    tot = len(dfn.index)
+    print(dfn)
+    print("Num of record rows with nans: {}".format(tot))
 
 
 #Test set operations on dataframes
@@ -42,7 +63,7 @@ if False:
 
 
 # Test logic gate operations across column elements
-if True:
+if False:
 
     d={'input_1':[0,0,1,1], 'input_2':[0,1,0,1]}
     df= pd.DataFrame(d)
