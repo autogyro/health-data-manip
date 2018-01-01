@@ -523,21 +523,10 @@ if True:
     biochemistry_data.drop(low_var_features, axis=1, inplace=True)
     biochemistry_data.drop(colinear_features, axis=1, inplace=True)
 
-    txt.headcounts(biochemistry_data)
-
-
-
-
-
-
-############################################# Initial Visual Tests #####################################################
-
-
-########## ScatterMatrixPlot ##########
-
+    #txt.headcounts(biochemistry_data)
 
 if True:
-    #Transformed features
+    #Transform features
 
     # Log(x+1) transform
     features = list(biochemistry_data.columns)
@@ -547,6 +536,19 @@ if True:
 
     scaler = MinMaxScaler()  # default=(0, 1)
     biochemistry_data[features] = scaler.fit_transform(biochemistry_data[features])
+
+    txt.headcounts(biochemistry_data)
+
+
+############################################# Initial Visual Tests #####################################################
+
+
+########## ScatterMatrixPlot ##########
+
+
+if False:
+    #Transformed features
+
     pd.scatter_matrix(biochemistry_data, alpha = 0.3, figsize = (16,8), diagonal = 'kde')
     plt.show()
 
