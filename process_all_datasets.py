@@ -539,6 +539,8 @@ if True:
 
     txt.headcounts(biochemistry_data)
 
+    txt.count_feature_nans(biochemistry_data, features)
+
 
 ############################################# Initial Visual Tests #####################################################
 
@@ -549,12 +551,6 @@ if True:
 if False:
     #Transformed features
 
-    pd.scatter_matrix(biochemistry_data, alpha = 0.3, figsize = (16,8), diagonal = 'kde')
-    plt.show()
-
-
-if False:
-    #raw features
     pd.scatter_matrix(biochemistry_data, alpha = 0.3, figsize = (16,8), diagonal = 'kde')
     plt.show()
 
@@ -570,7 +566,6 @@ if False:
     for i in range(1, ndims + 1):
         dim_labels.append("Dimension {}".format(i))
 
-    biochemistry_data = np.log(biochemistry_data)
     pca = PCA(n_components=ndims) #.....................No. of dimensions
     pca.fit(biochemistry_data)
     reduced_data = pca.transform(biochemistry_data)
@@ -589,7 +584,7 @@ if False:
 
 if False:
     from sklearn.decomposition import PCA
-    biochemistry_data = np.log(biochemistry_data)
+
     pca = PCA(n_components=2)
     pca.fit(biochemistry_data)
     reduced_data = pca.transform(biochemistry_data)
@@ -603,11 +598,9 @@ if False:
     from sklearn.decomposition import PCA
 
     data = biochemistry_data
-    log_data = np.log(data)
-
     pca = PCA(n_components=data.shape[1])
-    pca.fit(log_data)
-    pca_results = gut.pca_results(log_data, pca)
+    pca.fit(data)
+    pca_results = gut.pca_results(data, pca)
 
     print("Cumulative sum of of explained variance by dimension:")
     print(pca_results['Explained Variance'].cumsum())
@@ -654,11 +647,10 @@ if False:
     from sklearn.decomposition import PCA
 
     data = biochemistry_data
-    log_data = np.log(data)
 
     pca = PCA(n_components=data.shape[1])
-    pca.fit(log_data)
-    pca_results = gut.pca_results(log_data, pca)
+
+    pca_results = gut.pca_results(data, pca)
 
     print("Cumulative sum of of explained variance by dimension:")
     print(pca_results['Explained Variance'].cumsum())
@@ -675,11 +667,11 @@ if False:
 if False:
     from sklearn.decomposition import PCA
     data = biochemistry_data
-    log_data = np.log(data)
+
 
     pca = PCA(n_components=data.shape[1])
-    pca.fit(log_data)
-    pca_results = gut.pca_results(log_data, pca)
+    pca.fit(data)
+    pca_results = gut.pca_results(data, pca)
     plt.show()
 
 
@@ -692,7 +684,7 @@ if False:
 
     data = biochemistry_data[feats]
 
-    log_data = np.log(data)
+
 
 
     #sns.reset_orig()
@@ -700,7 +692,7 @@ if False:
 
     plt.subplot(1, 1, 1)
     plt.title('Box plot scaled data - includes all outliers')
-    log_data.boxplot(showfliers=True)
+    data.boxplot(showfliers=True)
     plt.ylim(0,15)
     plt.show()
 
