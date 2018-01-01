@@ -534,8 +534,25 @@ if True:
 
 
 ########## ScatterMatrixPlot ##########
-if True:
 
+
+if True:
+    #Transformed features
+
+    # Log(x+1) transform
+    features = list(biochemistry_data.columns)
+    biochemistry_data[features] = biochemistry_data[features ].apply(lambda x: np.log(x + 1))
+
+    from sklearn.preprocessing import MinMaxScaler
+
+    scaler = MinMaxScaler()  # default=(0, 1)
+    biochemistry_data[features] = scaler.fit_transform(biochemistry_data[features])
+    pd.scatter_matrix(biochemistry_data, alpha = 0.3, figsize = (16,8), diagonal = 'kde')
+    plt.show()
+
+
+if False:
+    #raw features
     pd.scatter_matrix(biochemistry_data, alpha = 0.3, figsize = (16,8), diagonal = 'kde')
     plt.show()
 
