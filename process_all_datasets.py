@@ -371,9 +371,8 @@ scaler = MinMaxScaler()  # default=(0, 1)
 nhanes_2013_2014_df1[scaled_features] = scaler.fit_transform(nhanes_2013_2014_df1[scaled_features])
 
 print(nhanes_2013_2014_df1.head())
-txt.count_feature_nans(nhanes_2013_2014_df1, list(nhanes_2013_2014_df1.columns))
+#txt.count_feature_nans(nhanes_2013_2014_df1, list(nhanes_2013_2014_df1.columns))
 
-sys.exit()
 
 csv_filename_qdata = 'questionnaire_data.csv'
 nhanes_2013_2014_df1.to_csv(csv_filename_qdata)
@@ -519,17 +518,7 @@ if False:
     txt.count_rows_with_nans(nhanes_2013_2014_full_data)
     txt.headcounts(nhanes_2013_2014_full_data)
 
-#EXPORT DATASETS
-############################################################################################
-if False:
-    import feather
 
-    #Save Final stage merged dataframe
-    filename_final = 'nhanes_2013_2014_full_data.feather'
-    feather.write_dataframe(nhanes_2013_2014_full_data, filename_final)
-
-    csv_filename = 'nhanes_2013_2014_full_data.csv'
-    nhanes_2013_2014_full_data.to_csv(csv_filename)
 
 #Test exported files
 if False:
@@ -558,14 +547,19 @@ if False:
 
     txt.headcounts(biochemistry_data)
 
+
+#_____________________________________________ ANALYZE THIS STEP FURTHER _______________________
+#Turn to false to include all low_var features
 if True:
 
     low_var_features = ['LBXSAL', 'LBXSC3SI', 'LBXSCA', 'LBXSCH', 'LBXSCLSI', 'LBXSGB', 'LBXSGL', 'LBXSKSI',
                         'LBXSLDSI', 'LBXSNASI', 'LBXSOSSI', 'LBXSPH', 'LBXSTP']
 
-    colinear_features = ['LBXSTB', 'LBXSASSI', 'LBXSCR', 'LBXSUA', 'LBXSAPSI']
-
     biochemistry_data.drop(low_var_features, axis=1, inplace=True)
+
+#Turn to True to include all colinear features
+if True:
+    colinear_features = ['LBXSTB', 'LBXSASSI', 'LBXSCR', 'LBXSUA', 'LBXSAPSI']
     biochemistry_data.drop(colinear_features, axis=1, inplace=True)
 
     #txt.headcounts(biochemistry_data)
@@ -585,6 +579,27 @@ if True:
     txt.headcounts(biochemistry_data)
 
     txt.count_feature_nans(biochemistry_data, features)
+
+
+questionaire_data = nhanes_2013_2014_df1.copy(deep=True)
+nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
+
+#EXPORT DATASETS
+
+biochemistry_data.to_csv('biochemistry_data.csv')
+
+
+if True:
+    import feather
+
+    #Save Final stage merged dataframe
+    filename_final = 'nhanes_2013_2014_full_data.feather'
+    feather.write_dataframe(nhanes_2013_2014_full_data, filename_final)
+
+    csv_filename = 'nhanes_2013_2014_full_data.csv'
+    nhanes_2013_2014_full_data.to_csv(csv_filename)
+
+
 
 
 ############################################# Initial Visual Tests #####################################################
