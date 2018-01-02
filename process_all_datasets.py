@@ -334,6 +334,40 @@ nhanes1314_datasets_p1 = [demographics_data, alcohol_data, smoking_data, weight_
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 nhanes_2013_2014_df1 = pd.concat(nhanes1314_datasets_p1, axis=1)
+
+
+#*************************************
+#Touch up pre-processing
+
+#GENDER CATEGORICAL
+nhanes_2013_2014_df1.GENDER.replace(to_replace=1, value='Male', inplace=True)
+nhanes_2013_2014_df1.GENDER.replace(to_replace=2, value='Female', inplace=True)
+
+#ETHNICITY CATEGORICAL
+nhanes_2013_2014_df1.ETHNICITY.replace(to_replace=1, value='Hispanic', inplace=True)
+nhanes_2013_2014_df1.ETHNICITY.replace(to_replace=2, value='Hispanic', inplace=True)
+nhanes_2013_2014_df1.ETHNICITY.replace(to_replace=3, value='White', inplace=True)
+nhanes_2013_2014_df1.ETHNICITY.replace(to_replace=4, value='Black', inplace=True)
+nhanes_2013_2014_df1.ETHNICITY.replace(to_replace=6, value='Asian', inplace=True)
+nhanes_2013_2014_df1.ETHNICITY.replace(to_replace=7, value='Other', inplace=True)
+
+#INCOME_LEVEL (Make income level to be in monotonic increasing order)
+nhanes_2013_2014_df1.INCOME_LEVEL.replace(to_replace=12, value=6, inplace=True)
+nhanes_2013_2014_df1.INCOME_LEVEL.replace(to_replace=13, value=3, inplace=True)
+nhanes_2013_2014_df1.INCOME_LEVEL.replace(to_replace=14, value=11, inplace=True)
+nhanes_2013_2014_df1.INCOME_LEVEL.replace(to_replace=15, value=12, inplace=True)
+#after this change, income level = 12 becomes max level
+
+
+print(nhanes_2013_2014_df1.INCOME_LEVEL.head())
+txt.count_feature_nans(nhanes_2013_2014_df1, ['INCOME_LEVEL'])
+
+
+sys.exit()
+
+csv_filename_qdata = 'questionnaire_data.csv'
+nhanes_2013_2014_df1.to_csv(csv_filename_qdata)
+
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 txt.headcounts(nhanes_2013_2014_df1)
@@ -426,6 +460,7 @@ print(biochemistry_data.head())
 #-------------------- MERGE QUESTIONAIRE AND BIOCHEMISTRY DATASETS -------------------------
 ############################################################################################
 questionaire_data = nhanes_2013_2014_df1.copy(deep=True)
+
 questionaire_data = questionaire_data.reindex(biochemistry_data.index)
 txt.count_rows_with_nans(questionaire_data)
 
@@ -526,7 +561,7 @@ if True:
     #txt.headcounts(biochemistry_data)
 
 if True:
-    #Transform features
+    #Transform biochemistry features
 
     # Log(x+1) transform
     features = list(biochemistry_data.columns)
