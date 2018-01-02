@@ -42,7 +42,7 @@ for feat in demo_features:
     demographics_data[feat] = pd.to_numeric(demographics_data[feat], downcast='integer')
 
 
-txt.headcounts(demographics_data)
+# txt.headcounts(demographics_data)
 
 #Process alcohol consumption dataframe
 ######################################
@@ -57,7 +57,7 @@ alcohol_data.ALCOHOL_NUM.replace(to_replace=999, value=0, inplace=True)
 
 alcohol_features = ['ALCOHOL_NUM']
 
-txt.headcounts(alcohol_data)
+# txt.headcounts(alcohol_data)
 
 #Process smoking consumption dataframe
 ######################################
@@ -75,7 +75,7 @@ smoking_data.SMOKING.replace(to_replace=3, value=0, inplace=True)
 
 smoking_features = ['SMOKING']
 
-txt.headcounts(smoking_data)
+# txt.headcounts(smoking_data)
 
 #Process weight data
 ####################
@@ -98,7 +98,7 @@ weight_data.drop(['WHD010', 'WHD020'], axis=1, inplace=True)
 
 weight_features = ['BMI']
 
-txt.headcounts(weight_data)
+# txt.headcounts(weight_data)
 
 
 #Process nutrition data
@@ -127,7 +127,7 @@ nutrition_data['FAST_FOOD'] = nutrition_data['FAST_FOOD'].apply(lambda x: percen
 
 nutrition_features = ['NOTHOME_FOOD', 'FAST_FOOD']
 
-txt.headcounts(nutrition_data)
+# txt.headcounts(nutrition_data)
 
 
 #Process nutrition data
@@ -143,9 +143,9 @@ for val in [2,7,9]:
 
 insurance_features = ['INSURANCE']
 
-txt.headcounts(insurance_data)
-txt.get_feature_counts(insurance_data, ['INSURANCE'])
-txt.count_feature_nans(insurance_data, ['INSURANCE'])
+# txt.headcounts(insurance_data)
+# txt.get_feature_counts(insurance_data, ['INSURANCE'])
+# txt.count_feature_nans(insurance_data, ['INSURANCE'])
 
 
 #Process blood-pressure cholesterol text data
@@ -180,8 +180,8 @@ cholpressure_data.drop(['HYPERTENSION_1', 'HYPERTENSION_2', 'HYPERTENSION_3'], a
 
 cholpressure_features = ['HYPERTENSION_ONSET', 'HYPERTENSION', 'HIGHCHOL_ONSET', 'HIGHCHOL']
 
-txt.headcounts(cholpressure_data)
-txt.get_feature_counts(cholpressure_data, cholpressure_features)
+# txt.headcounts(cholpressure_data)
+# txt.get_feature_counts(cholpressure_data, cholpressure_features)
 
 
 #Process cardiovascular text data
@@ -202,7 +202,7 @@ for val in [2,7,9]:
     cardiovascular_data.replace(to_replace=val, value=0, inplace=True)
 
 
-txt.headcounts(cardiovascular_data)
+# txt.headcounts(cardiovascular_data)
 
 
 
@@ -234,7 +234,7 @@ for val in [2,7,9]:
     diabetes_data['DIAGNOSED_PREDIABETES'].replace(to_replace=val, value=0, inplace=True)
     diabetes_data['RISK_DIABETES'].replace(to_replace=val, value=0, inplace=True)
 
-txt.headcounts(diabetes_data)
+# txt.headcounts(diabetes_data)
 
 
 #REINDEX DATAFRAMES TO CONFORM TO DEMOGRAPHICS DATA SEQN INDEX
@@ -248,8 +248,8 @@ alcohol_data = alcohol_data.reindex(demographics_data.index) # reindex
 mean_alcohol = int(np.round(alcohol_data.mean())) #compute mean values of features
 alcohol_data.fillna(value=mean_alcohol, inplace=True) # impute mean values replacing nans
 
-txt.count_feature_nans(alcohol_data, alcohol_features)
-txt.headcounts(alcohol_data)
+# txt.count_feature_nans(alcohol_data, alcohol_features)
+# txt.headcounts(alcohol_data)
 
 # print(alcohol_data.loc[index_set_1])
 # print(demographics_data.AGE.loc[index_set_1])
@@ -259,8 +259,8 @@ txt.headcounts(alcohol_data)
 print("\nReindex smoking dataframe using indexes from alcohol dataframe")
 txt.bitwise_index_compare(alcohol_data, smoking_data)
 smoking_data = smoking_data.reindex(alcohol_data.index)
-txt.count_feature_nans(smoking_data, smoking_features)
-txt.headcounts(smoking_data)
+# txt.count_feature_nans(smoking_data, smoking_features)
+# txt.headcounts(smoking_data)
 
 #Process weight history dataframe
 #-------------------------------------
@@ -270,8 +270,8 @@ weight_data = weight_data.reindex(smoking_data.index)
 txt.count_feature_nans(weight_data,weight_features)
 mean_bmi = int(np.round(weight_data['BMI'].mean())) #compute mean values of features
 weight_data.fillna(value=mean_bmi, inplace=True)
-txt.count_feature_nans(weight_data,weight_features)
-txt.headcounts(weight_data,2)
+# txt.count_feature_nans(weight_data,weight_features)
+# txt.headcounts(weight_data,2)
 
 
 #Process nutrition dataframe
@@ -281,17 +281,17 @@ txt.bitwise_index_compare(weight_data,nutrition_data)
 
 nutrition_data = nutrition_data.reindex(weight_data.index)
 
-txt.count_feature_nans(nutrition_data, nutrition_features)
+#txt.count_feature_nans(nutrition_data, nutrition_features)
 
-txt.headcounts(nutrition_data)
+#txt.headcounts(nutrition_data)
 
 for feat in nutrition_features:
     mval = np.round(nutrition_data[feat].mean(),2)
     nutrition_data[feat].fillna(value=mval,inplace=True)
     print(mval)
 
-txt.headcounts(nutrition_data)
-txt.count_feature_nans(nutrition_data, nutrition_features)
+#txt.headcounts(nutrition_data)
+#txt.count_feature_nans(nutrition_data, nutrition_features)
 
 #Process blood-pressure cholesterol dataframe
 #--------------------------------------------
@@ -299,8 +299,8 @@ txt.count_feature_nans(nutrition_data, nutrition_features)
 print("\nReindex cholesterol blood-pressure dataframe using indexes from nutrition dataframe")
 txt.bitwise_index_compare(nutrition_data,cholpressure_data)
 cholpressure_data = cholpressure_data.reindex(nutrition_data.index)
-txt.headcounts(cholpressure_data)
-txt.count_feature_nans(cholpressure_data, cholpressure_features)
+#txt.headcounts(cholpressure_data)
+#txt.count_feature_nans(cholpressure_data, cholpressure_features)
 
 #Process cardiovascular dataframe
 #--------------------------------------------
@@ -308,22 +308,22 @@ print("\nReindex cardiovascular dataframe using indexes from cholpressure datafr
 txt.bitwise_index_compare(cholpressure_data,cardiovascular_data)
 cardiovascular_data = cardiovascular_data.reindex(cholpressure_data.index)
 
-txt.headcounts(cardiovascular_data)
-txt.count_feature_nans(cardiovascular_data, cardio_features)
+#txt.headcounts(cardiovascular_data)
+#txt.count_feature_nans(cardiovascular_data, cardio_features)
 
 for feat in cardio_features:
     val = 0
     cardiovascular_data[feat].fillna(value=val,inplace=True)
 
-txt.headcounts(cardiovascular_data)
-txt.count_feature_nans(cardiovascular_data, cardio_features)
+#txt.headcounts(cardiovascular_data)
+#txt.count_feature_nans(cardiovascular_data, cardio_features)
 
 #Process diabetes dataframe
 #--------------------------------------------
 print("\nReindex diabetes dataframe using indexes from cardiovascular dataframe")
 txt.bitwise_index_compare(cardiovascular_data, diabetes_data)
 diabetes_data = diabetes_data.reindex(demographics_data.index)
-txt.count_feature_nans(diabetes_data, diabetes_features)
+#txt.count_feature_nans(diabetes_data, diabetes_features)
 
 
 #CONCATENATE ALL DATAFRAMES
@@ -359,9 +359,19 @@ nhanes_2013_2014_df1.INCOME_LEVEL.replace(to_replace=15, value=12, inplace=True)
 #after this change, income level = 12 becomes max level
 
 
-print(nhanes_2013_2014_df1.INCOME_LEVEL.head())
-txt.count_feature_nans(nhanes_2013_2014_df1, ['INCOME_LEVEL'])
+#ONE-HOT ENCODING
 
+nhanes_2013_2014_df1 = pd.get_dummies(nhanes_2013_2014_df1, columns=['GENDER', 'ETHNICITY'])
+
+#MIN-MAX SCALING
+
+from sklearn.preprocessing import MinMaxScaler
+scaled_features = ['AGE', 'INCOME_LEVEL', 'ALCOHOL_NUM', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD']
+scaler = MinMaxScaler()  # default=(0, 1)
+nhanes_2013_2014_df1[scaled_features] = scaler.fit_transform(nhanes_2013_2014_df1[scaled_features])
+
+print(nhanes_2013_2014_df1.head())
+txt.count_feature_nans(nhanes_2013_2014_df1, list(nhanes_2013_2014_df1.columns))
 
 sys.exit()
 
