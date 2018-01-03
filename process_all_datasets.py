@@ -550,7 +550,7 @@ if False:
 
 #_____________________________________________ ANALYZE THIS STEP FURTHER _______________________
 #Turn to false to include all low_var features
-if True:
+if False:
 
     low_var_features = ['LBXSAL', 'LBXSC3SI', 'LBXSCA', 'LBXSCH', 'LBXSCLSI', 'LBXSGB', 'LBXSGL', 'LBXSKSI',
                         'LBXSLDSI', 'LBXSNASI', 'LBXSOSSI', 'LBXSPH', 'LBXSTP']
@@ -558,7 +558,7 @@ if True:
     biochemistry_data.drop(low_var_features, axis=1, inplace=True)
 
 #Turn to True to include all colinear features
-if True:
+if False:
     colinear_features = ['LBXSTB', 'LBXSASSI', 'LBXSCR', 'LBXSUA', 'LBXSAPSI']
     biochemistry_data.drop(colinear_features, axis=1, inplace=True)
 
@@ -633,6 +633,12 @@ if True:
     model_features = pd.concat([biochemistry_data, questionaire_data.BMI],axis=1)
     model_features = pd.concat([model_features, questionaire_data.AGE], axis=1)
     model_features = pd.concat([model_features, questionaire_data.SMOKING], axis=1)
+    model_features = pd.concat([model_features, questionaire_data.GENDER_Male], axis=1)
+    model_features = pd.concat([model_features, questionaire_data.GENDER_Female], axis=1)
+    model_features = pd.concat([model_features, questionaire_data.ETHNICITY_White], axis=1)
+    model_features = pd.concat([model_features, questionaire_data.ETHNICITY_Black], axis=1)
+    model_features = pd.concat([model_features, questionaire_data.ETHNICITY_Hispanic], axis=1)
+    model_features = pd.concat([model_features, questionaire_data.ETHNICITY_Asian], axis=1)
 
     #Target for prediction/classification
 
@@ -653,10 +659,13 @@ if True:
 
     from sklearn import tree
     from sklearn.metrics import fbeta_score
+    from sklearn.metrics import f1_score
     from sklearn.metrics import accuracy_score
 
     clf = tree.DecisionTreeClassifier(random_state=10, max_depth=32, max_features=None)
     clf = clf.fit(X_train, y_train)
+
+
     predictions_train = clf.predict(X_train)
     predictions_test = clf.predict(X_test)
 
@@ -665,11 +674,21 @@ if True:
 
     beta = 0.5
 
-    f_train = fbeta_score(y_train, predictions_train, beta=beta)
-    f_test = fbeta_score(y_test, predictions_test, beta=beta)
+    fb_train = fbeta_score(y_train, predictions_train, beta=beta)
+    fb_test = fbeta_score(y_test, predictions_test, beta=beta)
+
+    f1_train = f1_score(y_train, predictions_train)
+    f1_test = f1_score(y_test, predictions_test)
+
+    from sklearn.metrics import confusion_matrix
+    CM = confusion_matrix(y_test, predictions_test)
+    CML = np.array([['TN', 'FP'], ['FN', 'TP']])
 
     print("acc_train = {}, acc_test ={}".format(acc_train, acc_test))
-    print("f_train = {}, f_test ={}".format(f_train, f_test))
+    print("Confusion Matrix:\n{}\n\n {} \n".format(CML,CM))
+    print("f1_train = {}, f1_test ={}".format(f1_train, f1_test))
+    print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
+
 
 sys.exit()
 
