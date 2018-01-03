@@ -607,7 +607,7 @@ if True:
     biochemistry_data.to_csv('biochemistry_data.csv')
 
 
-if True:
+if False:
     import feather
 
     #Save Final stage merged dataframe
@@ -623,16 +623,53 @@ if True:
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 print("\n............... Modeling....................\n")
 
+from sklearn.metrics import fbeta_score
+from sklearn.metrics import accuracy_score
+
+
+
 if True:
-    model_df = pd.concat([biochemistry_data, questionaire_data.BMI],axis=1)
+    #Model input features
+    model_features = pd.concat([biochemistry_data, questionaire_data.BMI],axis=1)
+    model_features = pd.concat([model_features, questionaire_data.AGE], axis=1)
+    model_features = pd.concat([model_features, questionaire_data.SMOKING], axis=1)
 
-    # features = list(model_df.columns)
-    # txt.headcounts(model_df)
-    # txt.count_feature_nans(model_df, features)
+    #Target for prediction/classification
 
-    features = list(nhanes_2013_2014_full_data.columns)
-    txt.headcounts(nhanes_2013_2014_full_data)
-    txt.count_feature_nans(nhanes_2013_2014_full_data, features)
+    #model_targets = questionaire_data.DIAGNOSED_PREDIABETES
+    model_targets = questionaire_data.HIGHCHOL
+
+    if False:
+        features = list(model_features.columns)
+        txt.headcounts(model_features)
+        txt.count_feature_nans(model_features, features)
+
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(model_features,model_targets,test_size=0.35,random_state=0)
+
+    #Classifiers
+
+
+    from sklearn import tree
+    from sklearn.metrics import fbeta_score
+    from sklearn.metrics import accuracy_score
+
+    clf = tree.DecisionTreeClassifier(random_state=10, max_depth=32, max_features=None)
+    clf = clf.fit(X_train, y_train)
+    predictions_train = clf.predict(X_train)
+    predictions_test = clf.predict(X_test)
+
+    acc_train = accuracy_score(y_train, predictions_train)
+    acc_test = accuracy_score(y_test, predictions_test)
+
+    beta = 0.5
+
+    f_train = fbeta_score(y_train, predictions_train, beta=beta)
+    f_test = fbeta_score(y_test, predictions_test, beta=beta)
+
+    print("acc_train = {}, acc_test ={}".format(acc_train, acc_test))
+    print("f_train = {}, f_test ={}".format(f_train, f_test))
 
 sys.exit()
 
