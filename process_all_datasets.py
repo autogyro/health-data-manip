@@ -458,26 +458,36 @@ biochemistry_data = biochemistry_data.reindex(nhanes_2013_2014_df1.index)
 #Remove again records with missing alues after reindexing
 biochemistry_data.dropna(axis=0, how='any', inplace=True) #Remove all records with missing biochemistry data
 
-#txt.count_feature_nans(biochemistry_data,biochem_features)
-txt.count_rows_with_nans(biochemistry_data)
 
-lsn = txt.get_nanrows_indexes(biochemistry_data)
+if False:
+    #txt.count_feature_nans(biochemistry_data,biochem_features)
+    txt.count_rows_with_nans(biochemistry_data)
+    lsn = txt.get_nanrows_indexes(biochemistry_data)
+    print(biochemistry_data.head())
 
-print(biochemistry_data.head())
+
+if False:
+    #-------------------- MERGE QUESTIONAIRE AND BIOCHEMISTRY DATASETS -------------------------
+    ############################################################################################
+    questionaire_data = nhanes_2013_2014_df1.copy(deep=True)
+
+    questionaire_data = questionaire_data.reindex(biochemistry_data.index)
+    txt.count_rows_with_nans(questionaire_data)
+
+    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
+    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
-#-------------------- MERGE QUESTIONAIRE AND BIOCHEMISTRY DATASETS -------------------------
-############################################################################################
-questionaire_data = nhanes_2013_2014_df1.copy(deep=True)
+    #Check integrity of full data
+    if False:
+        features = list(nhanes_2013_2014_full_data.columns)
+        txt.headcounts(nhanes_2013_2014_full_data)
+        txt.count_feature_nans(nhanes_2013_2014_full_data, features)
 
-questionaire_data = questionaire_data.reindex(biochemistry_data.index)
-txt.count_rows_with_nans(questionaire_data)
 
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-if True:
+if False:
     old_bio_features = ['LBXSAL', 'LBXSAPSI', 'LBXSASSI', 'LBXSATSI',
                         'LBXSBU', 'LBXSC3SI', 'LBXSCA', 'LBXSCH',
                         'LBXSCK', 'LBXSCLSI', 'LBXSCR', 'LBXSGB',
@@ -526,16 +536,6 @@ if False:
     nhanes_full_test = nhanes_full_test.set_index('SEQN') #Restore the index saved during the export step
 
 
-#TEST VISUALS
-###############################################################################################
-
-#Principal components analysis
-
-#drop features which did not explain much of the variance of the data
-#see initial pca results on full biochem data (below)
-
-print("****** PCA ******")
-
 
 #First set of low-variance-carrying features
 if False:
@@ -576,17 +576,35 @@ if True:
     scaler = MinMaxScaler()  # default=(0, 1)
     biochemistry_data[features] = scaler.fit_transform(biochemistry_data[features])
 
-    txt.headcounts(biochemistry_data)
+    #txt.headcounts(biochemistry_data)
+    #txt.count_feature_nans(biochemistry_data, features)
 
-    txt.count_feature_nans(biochemistry_data, features)
+
+if True:
+    #-------------------- MERGE QUESTIONAIRE AND BIOCHEMISTRY DATASETS -------------------------
+    ############################################################################################
+    questionaire_data = nhanes_2013_2014_df1.copy(deep=True)
+
+    questionaire_data = questionaire_data.reindex(biochemistry_data.index)
+
+    if False:
+        txt.count_rows_with_nans(questionaire_data)
+
+    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
+    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
-questionaire_data = nhanes_2013_2014_df1.copy(deep=True)
-nhanes_2013_2014_full_data = pd.concat([biochemistry_data, questionaire_data],axis=1)
+    #Check integrity of full data
+    if False:
+        features = list(nhanes_2013_2014_full_data.columns)
+        txt.headcounts(nhanes_2013_2014_full_data)
+        txt.count_feature_nans(nhanes_2013_2014_full_data, features)
 
 #EXPORT DATASETS
 
-biochemistry_data.to_csv('biochemistry_data.csv')
+if True:
+    biochemistry_data.to_csv('biochemistry_data.csv')
 
 
 if True:
@@ -600,11 +618,26 @@ if True:
     nhanes_2013_2014_full_data.to_csv(csv_filename)
 
 
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initial models testing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+print("\n............... Modeling....................\n")
+
+if True:
+    model_df = pd.concat([biochemistry_data, questionaire_data.BMI],axis=1)
+
+    # features = list(model_df.columns)
+    # txt.headcounts(model_df)
+    # txt.count_feature_nans(model_df, features)
+
+    features = list(nhanes_2013_2014_full_data.columns)
+    txt.headcounts(nhanes_2013_2014_full_data)
+    txt.count_feature_nans(nhanes_2013_2014_full_data, features)
+
+sys.exit()
 
 
 ############################################# Initial Visual Tests #####################################################
-
-
 ########## ScatterMatrixPlot ##########
 
 
@@ -743,8 +776,6 @@ if False:
         feats.append(old_bio_features[m])
 
     data = biochemistry_data[feats]
-
-
 
 
     #sns.reset_orig()
