@@ -633,6 +633,8 @@ if True:
     model_features = pd.concat([biochemistry_data, questionaire_data.BMI],axis=1)
     model_features = pd.concat([model_features, questionaire_data.AGE], axis=1)
     model_features = pd.concat([model_features, questionaire_data.SMOKING], axis=1)
+    model_features = pd.concat([model_features, questionaire_data.ALCOHOL_NUM], axis=1)
+    model_features = pd.concat([model_features, questionaire_data.FAMILIAL_DIABETES], axis=1)
     model_features = pd.concat([model_features, questionaire_data.GENDER_Male], axis=1)
     model_features = pd.concat([model_features, questionaire_data.GENDER_Female], axis=1)
     model_features = pd.concat([model_features, questionaire_data.ETHNICITY_White], axis=1)
@@ -644,6 +646,10 @@ if True:
 
     #model_targets = questionaire_data.DIAGNOSED_PREDIABETES
     model_targets = questionaire_data.HIGHCHOL
+    #model_targets = questionaire_data.RISK_DIABETES
+    #model_targets = questionaire_data.HYPERTENSION
+
+
 
     if False:
         features = list(model_features.columns)
@@ -656,18 +662,26 @@ if True:
 
     #Classifiers
 
+    if False:
+        from sklearn import tree
+        clf = tree.DecisionTreeClassifier(random_state=10, max_depth=64, max_features=None)
+        clf = clf.fit(X_train, y_train)
 
-    from sklearn import tree
-    from sklearn.metrics import fbeta_score
-    from sklearn.metrics import f1_score
-    from sklearn.metrics import accuracy_score
-
-    clf = tree.DecisionTreeClassifier(random_state=10, max_depth=32, max_features=None)
-    clf = clf.fit(X_train, y_train)
+    if True:
+        from sklearn.ensemble import RandomForestClassifier
+        clf = RandomForestClassifier(random_state=0, max_depth=64, n_estimators=20, n_jobs=6, criterion='gini')
+        clf = clf.fit(X_train, y_train)
 
 
     predictions_train = clf.predict(X_train)
     predictions_test = clf.predict(X_test)
+
+    #Metrics
+
+    from sklearn.metrics import fbeta_score
+    from sklearn.metrics import f1_score
+    from sklearn.metrics import accuracy_score
+    from sklearn.metrics import roc_auc_score
 
     acc_train = accuracy_score(y_train, predictions_train)
     acc_test = accuracy_score(y_test, predictions_test)
@@ -680,6 +694,9 @@ if True:
     f1_train = f1_score(y_train, predictions_train)
     f1_test = f1_score(y_test, predictions_test)
 
+    roc_auc_train = roc_auc_score(y_train, predictions_train, average='micro')
+    roc_auc_test = roc_auc_score(y_test, predictions_test, average='micro')
+
     from sklearn.metrics import confusion_matrix
     CM = confusion_matrix(y_test, predictions_test)
     CML = np.array([['TN', 'FP'], ['FN', 'TP']])
@@ -688,6 +705,7 @@ if True:
     print("Confusion Matrix:\n{}\n\n {} \n".format(CML,CM))
     print("f1_train = {}, f1_test ={}".format(f1_train, f1_test))
     print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
+    print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
 
 
 sys.exit()
