@@ -621,12 +621,8 @@ if False:
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initial models testing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 print("\n............... Modeling....................\n")
-
-from sklearn.metrics import fbeta_score
-from sklearn.metrics import accuracy_score
-
-
 
 if True:
     #Model input features
@@ -642,6 +638,7 @@ if True:
     model_features = pd.concat([model_features, questionaire_data.ETHNICITY_Hispanic], axis=1)
     model_features = pd.concat([model_features, questionaire_data.ETHNICITY_Asian], axis=1)
 
+
     #Target for prediction/classification
 
     #model_targets = questionaire_data.DIAGNOSED_PREDIABETES
@@ -649,7 +646,49 @@ if True:
     #model_targets = questionaire_data.RISK_DIABETES
     #model_targets = questionaire_data.HYPERTENSION
 
+    features_num = len(model_features.columns)
+    print("Input features:\n")
+    print(model_features.columns)
+    print("No. of input features: {}".format(features_num))
 
+
+################################# Convolutional Neural Network Model ############################################
+
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
+
+
+
+# Baseline model (no predictions)
+if False:
+    def create_baseline():
+
+        model = Sequential()
+        model.add(Dense(features_num, input_dim=features_num, kernel_initializer='normal', activation='relu'))
+        model.add(Dense(1, kernel_initializer='normal', activation='sigmoid'))
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        return model
+
+    # Fix random seed for reproducibility
+    seed = 7
+    np.random.seed(seed)
+
+
+    estimator = KerasClassifier(build_fn=create_baseline, nb_epoch=100, batch_size=5, verbose=0)
+    kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
+    results = cross_val_score(estimator, model_features.values, model_targets.values, cv=kfold)
+
+    print("Results: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
+
+################################## Standard Classification Model #################################################
+if False:
 
     if False:
         features = list(model_features.columns)
@@ -660,8 +699,6 @@ if True:
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(model_features,model_targets,test_size=0.35,random_state=0)
 
-    #Classifiers
-
     if False:
         from sklearn import tree
         clf = tree.DecisionTreeClassifier(random_state=10, max_depth=64, max_features=None)
@@ -669,7 +706,7 @@ if True:
 
     if True:
         from sklearn.ensemble import RandomForestClassifier
-        clf = RandomForestClassifier(random_state=0, max_depth=64, n_estimators=20, n_jobs=6, criterion='gini')
+        clf = RandomForestClassifier(random_state=0, max_depth=64, n_estimators=20, n_jobs=6, criterion='gini',warm_start=True)
         clf = clf.fit(X_train, y_train)
 
 
