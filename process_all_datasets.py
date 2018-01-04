@@ -654,6 +654,7 @@ if True:
 
 ################################# Convolutional Neural Network Model ############################################
 
+import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
@@ -664,11 +665,38 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 
+# Basic Predictive Model
+if True:
 
+    np.random.seed(7)
+
+    X = model_features.values
+    Y = model_targets.values
+
+    model = Sequential()
+    model.add(Dense(64, input_dim=features_num, activation='relu'))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(16, activation='relu'))
+    model.add(Dense(8, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.fit(X, Y, epochs=100, batch_size=10)
+
+
+    scores = model.evaluate(X, Y)
+    print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+
+    predictions = model.predict(X)
+    rounded = [round(x[0]) for x in predictions]
+    pred_df = pd.concat([pd.DataFrame(predictions, columns=['PROB']), pd.DataFrame(rounded, columns=['Y_PRED'])], axis=1)
+    print(pred_df.head(100))
+
+    tf.Session().close()
 
 # Baseline model (no predictions)
 if False:
-    def create_baseline():
+    def create_baseline(features_num):
 
         model = Sequential()
         model.add(Dense(features_num, input_dim=features_num, kernel_initializer='normal', activation='relu'))
@@ -681,7 +709,7 @@ if False:
     np.random.seed(seed)
 
 
-    estimator = KerasClassifier(build_fn=create_baseline, nb_epoch=100, batch_size=5, verbose=0)
+    estimator = KerasClassifier(build_fn=create_baseline(features_num), nb_epoch=100, batch_size=5, verbose=0)
     kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
     results = cross_val_score(estimator, model_features.values, model_targets.values, cv=kfold)
 
