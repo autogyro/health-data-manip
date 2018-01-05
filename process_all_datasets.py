@@ -685,9 +685,7 @@ if True:
 
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-
-    model.fit(X_train, y_train, validation_data=(X_test,y_test), epochs=5, batch_size=10)
-
+    hm = model.fit(X_train, y_train, validation_data=(X_test,y_test), epochs=150, batch_size=10)
 
     scores = model.evaluate(X, Y)
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
@@ -734,6 +732,8 @@ if True:
     print("f1_train = {}, f1_test ={}".format(f1_train, f1_test))
     print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
     print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
+
+    gut.plot_KerasHistory_metrics(hm, 'nhanes_keras_model_metrics')
 
     tf.Session().close()
 
