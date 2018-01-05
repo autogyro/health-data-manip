@@ -665,13 +665,16 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 
-# Basic Predictive Model
+# ------------------------------ Basic Predictive CNN Model ----------------------------
 if True:
-
-    np.random.seed(7)
+    seed = 7
+    np.random.seed(seed)
 
     X = model_features.values
     Y = model_targets.values
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=seed)
 
     model = Sequential()
     model.add(Dense(64, input_dim=features_num, activation='relu'))
@@ -681,20 +684,63 @@ if True:
     model.add(Dense(1, activation='sigmoid'))
 
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X, Y, epochs=100, batch_size=10)
+
+
+    model.fit(X_train, y_train, validation_data=(X_test,y_test), epochs=5, batch_size=10)
 
 
     scores = model.evaluate(X, Y)
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
-    predictions = model.predict(X)
-    rounded = [round(x[0]) for x in predictions]
-    pred_df = pd.concat([pd.DataFrame(predictions, columns=['PROB']), pd.DataFrame(rounded, columns=['Y_PRED'])], axis=1)
-    print(pred_df.head(100))
+    prob_train = model.predict(X_train)
+    prob_test = model.predict(X_test)
+
+    predictions_train = [round(x[0]) for x in prob_train]
+    predictions_test = [round(x[0]) for x in prob_test]
+
+    pred_train_df = pd.concat([pd.DataFrame(prob_train, columns=['PROB']), pd.DataFrame(predictions_train, columns=['Y_PRED_TRAIN'])], axis=1)
+    pred_test_df  = pd.concat([pd.DataFrame(prob_test, columns=['PROB']), pd.DataFrame(predictions_test, columns=['Y_PRED_TEST'])], axis=1)
+
+    print("Predictions Preview:\n")
+    txt.headcounts(pred_train_df)
+    txt.headcounts(pred_test_df)
+
+    from sklearn.metrics import fbeta_score
+    from sklearn.metrics import f1_score
+    from sklearn.metrics import accuracy_score
+    from sklearn.metrics import roc_auc_score
+
+    acc_train = accuracy_score(y_train, predictions_train)
+    acc_test = accuracy_score(y_test, predictions_test)
+
+    beta = 0.5
+
+    fb_train = fbeta_score(y_train, predictions_train, beta=beta)
+    fb_test = fbeta_score(y_test, predictions_test, beta=beta)
+
+    f1_train = f1_score(y_train, predictions_train)
+    f1_test = f1_score(y_test, predictions_test)
+
+    roc_auc_train = roc_auc_score(y_train, predictions_train, average='micro')
+    roc_auc_test = roc_auc_score(y_test, predictions_test, average='micro')
+
+    from sklearn.metrics import confusion_matrix
+
+    CM = confusion_matrix(y_test, predictions_test)
+    CML = np.array([['TN', 'FP'], ['FN', 'TP']])
+
+    print("acc_train = {}, acc_test ={}".format(acc_train, acc_test))
+    print("Confusion Matrix:\n{}\n\n {} \n".format(CML, CM))
+    print("f1_train = {}, f1_test ={}".format(f1_train, f1_test))
+    print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
+    print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
 
     tf.Session().close()
 
-# Baseline model (no predictions)
+
+
+
+# ---------------------------------- Baseline CNN model (no predictions) ------------------------------------
 if False:
     def create_baseline(features_num):
 
