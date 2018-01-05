@@ -9,15 +9,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from sklearn.metrics import confusion_matrix
 
-d = {'y_true':[1,0,1,0,0,0,1,1], 'y_pred':[1,0,1,1,0,1,1,0]}
-df = pd.DataFrame(d)
 
-print(df)
-CM = confusion_matrix(df['y_true'], df['y_pred'])
-print("Confusion Matrix:\n {} \n".format(CM))
-print(np.array([['TN', 'FP'], ['FN', 'TP']]))
+if False:
+    from sklearn.metrics import confusion_matrix
+
+    d = {'y_true':[1,0,1,0,0,0,1,1], 'y_pred':[1,0,1,1,0,1,1,0]}
+    df = pd.DataFrame(d)
+
+    print(df)
+    CM = confusion_matrix(df['y_true'], df['y_pred'])
+    print("Confusion Matrix:\n {} \n".format(CM))
+    print(np.array([['TN', 'FP'], ['FN', 'TP']]))
 
 
 
@@ -784,8 +787,6 @@ if False:
     plt.text(-0.8,0.6,'Oncoming left', rotation='horizontal', fontsize='9')
 
 
-
-
 #Test1
 if False:
 
@@ -794,3 +795,114 @@ if False:
     
     plt.subplot(1,2,2)
     plotx('Super')
+
+
+#---------- CNN Multiclass classification example --------------------------------------------------
+#https://machinelearningmastery.com/multi-class-classification-tutorial-keras-deep-learning-library/
+
+if True:
+
+    from keras.models import Sequential
+    from keras.layers import Dense
+    from keras.wrappers.scikit_learn import KerasClassifier
+    from keras.utils import np_utils
+    from sklearn.model_selection import cross_val_score
+    from sklearn.model_selection import KFold
+    from sklearn.preprocessing import LabelEncoder
+    from sklearn.pipeline import Pipeline
+
+    dataset_path = '/Users/juanerolon/Desktop/'
+    df = pd.read_csv(dataset_path + "iris.csv", header=None)
+    dataset = df.values
+    X = dataset[:,0:4].astype(float)
+    Y = dataset[:,4]
+
+    if False:
+        print(df.columns)
+        print(df.head())
+        print("\nDataset:\n")
+        print(dataset)
+        print("\nY:\n")
+        print(Y)
+        print("\nX:\n")
+        print(X)
+
+    # encode column containing classes values as integers
+    encoder = LabelEncoder()
+    encoder.fit(Y)
+    encoded_Y = encoder.transform(Y)
+    # convert integers to dummy variables (i.e. one hot encoded)
+    dummy_y = np_utils.to_categorical(encoded_Y)# encode class values as integers
+
+    if False:
+        print(encoded_Y)
+        print("")
+        print(X)
+        print(dummy_y.shape[1])
+
+    if False:
+        #my version (shorter...)
+        dummy_df = pd.get_dummies(df[4])
+        my_dummy_y = dummy_df.values
+
+        if False:
+            print(dummy_df.head())
+            print(my_dummy_y)
+
+    """There is a KerasClassifier class in Keras that can be used as an Estimator in scikit-learn,
+    the base type of model in the library. The KerasClassifier takes the name of a function as an argument.
+    This function must return the constructed neural network model, ready for training."""
+
+    """Below is a function that will create a baseline neural network for the iris classification problem.
+    It creates a simple fully connected network with one hidden layer that contains 8 neurons.
+    The hidden layer uses a rectifier activation function which is a good practice.
+    Because we used a one-hot encoding for our iris dataset, the output layer must create 3 output values,
+    one for each class. The output value with the largest value will be taken as the class predicted by the model."""
+
+    num_features = X.shape[1]       # Get te number of columns features matrix
+    num_classes = dummy_y.shape[1]  # Get te number of columns in one-hot encoded matrix of classes
+
+    # Define baseline model
+
+    def baseline_model():
+        # Create model
+        model = Sequential()
+        num_neurons_hidden_1 = 8
+        model.add(Dense(num_neurons_hidden_1, input_dim=num_features, activation='relu'))
+        model.add(Dense(num_classes, activation='softmax'))
+        # Compile model
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        return model
+
+    estimator = KerasClassifier(build_fn=baseline_model, epochs=200, batch_size=5, verbose=0)
+    seed = 7
+    np.random.seed(seed)
+    kfold = KFold(n_splits=10, shuffle=True, random_state=seed)
+
+    results = cross_val_score(estimator, X, dummy_y, cv=kfold)
+    print("Baseline: %.2f%% (%.2f%%)" % (results.mean() * 100, results.std() * 100))
+
+
+
+
+
+
+
+
+
+
+if False:
+    dataset_path = '/Users/juanerolon/Desktop/'
+    df = pd.read_csv(dataset_path + "sonar.csv", header=None)
+
+    print(df.columns)
+    print(df.head())
+
+    dataset = df.values
+    Y = dataset[:, 60]
+    X = dataset[:, 0:60].astype(float)
+    print(dataset)
+    print("")
+    print(Y)
+    print("")
+    print(X)
