@@ -363,12 +363,23 @@ nhanes_2013_2014_df1.INCOME_LEVEL.replace(to_replace=15, value=12, inplace=True)
 
 nhanes_2013_2014_df1 = pd.get_dummies(nhanes_2013_2014_df1, columns=['GENDER', 'ETHNICITY'])
 
-#MIN-MAX SCALING
 
-from sklearn.preprocessing import MinMaxScaler
-scaled_features = ['AGE', 'INCOME_LEVEL', 'ALCOHOL_NUM', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD']
-scaler = MinMaxScaler()  # default=(0, 1)
-nhanes_2013_2014_df1[scaled_features] = scaler.fit_transform(nhanes_2013_2014_df1[scaled_features])
+##############################
+############################## MIN-MAX SCALING
+if True
+    from sklearn.preprocessing import MinMaxScaler
+    scaled_features = ['AGE', 'INCOME_LEVEL', 'ALCOHOL_NUM', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD']
+    scaler = MinMaxScaler()  # default=(0, 1)
+    nhanes_2013_2014_df1[scaled_features] = scaler.fit_transform(nhanes_2013_2014_df1[scaled_features])
+
+##############################
+############################## STANDARDIZATION
+
+if False:
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    scaled_features = ['AGE', 'INCOME_LEVEL', 'ALCOHOL_NUM', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD']
+    nhanes_2013_2014_df1[scaled_features] = scaler.fit_transform(nhanes_2013_2014_df1[scaled_features])
 
 print(nhanes_2013_2014_df1.head())
 #txt.count_feature_nans(nhanes_2013_2014_df1, list(nhanes_2013_2014_df1.columns))
@@ -571,13 +582,25 @@ if True:
     features = list(biochemistry_data.columns)
     biochemistry_data[features] = biochemistry_data[features ].apply(lambda x: np.log(x + 1))
 
-    from sklearn.preprocessing import MinMaxScaler
+    ##############################
+    ############################## MIN-MAX SCALING
+    if True:
+        from sklearn.preprocessing import MinMaxScaler
 
-    scaler = MinMaxScaler()  # default=(0, 1)
-    biochemistry_data[features] = scaler.fit_transform(biochemistry_data[features])
+        scaler = MinMaxScaler()  # default=(0, 1)
+        biochemistry_data[features] = scaler.fit_transform(biochemistry_data[features])
 
-    #txt.headcounts(biochemistry_data)
-    #txt.count_feature_nans(biochemistry_data, features)
+        #txt.headcounts(biochemistry_data)
+        #txt.count_feature_nans(biochemistry_data, features)
+
+    ##############################
+    ############################## STANDARDIZATION
+
+    if False:
+        from sklearn.preprocessing import StandardScaler
+
+        scaler = StandardScaler()
+        biochemistry_data[features] = scaler.fit_transform(biochemistry_data[features])
 
 
 if True:
@@ -616,6 +639,13 @@ if False:
 
     csv_filename = 'nhanes_2013_2014_full_data.csv'
     nhanes_2013_2014_full_data.to_csv(csv_filename)
+
+
+
+if False:
+    print(nhanes_2013_2014_full_data.head())
+    print(nhanes_2013_2014_full_data.describe())
+
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -686,6 +716,7 @@ if True:
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     hm = model.fit(X_train, y_train, validation_data=(X_test,y_test), epochs=150, batch_size=10)
+    gut.plot_KerasHistory_metrics(hm, 'nhanes_keras_model_metrics')
 
     scores = model.evaluate(X, Y)
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
@@ -733,7 +764,7 @@ if True:
     print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
     print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
 
-    gut.plot_KerasHistory_metrics(hm, 'nhanes_keras_model_metrics')
+
 
     tf.Session().close()
 
