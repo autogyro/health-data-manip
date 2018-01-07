@@ -364,9 +364,26 @@ nhanes_2013_2014_df1.INCOME_LEVEL.replace(to_replace=15, value=12, inplace=True)
 nhanes_2013_2014_df1 = pd.get_dummies(nhanes_2013_2014_df1, columns=['GENDER', 'ETHNICITY'])
 
 
+#############################
+############################# Log(x+1) TRANSFORM
+if True:
+    scaled_features = ['AGE', 'INCOME_LEVEL', 'ALCOHOL_NUM', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD']
+    nhanes_2013_2014_df1[scaled_features] = nhanes_2013_2014_df1[scaled_features] .apply(lambda x: np.log(x + 1))
+
+    #Box plot for outlier detection
+    if False:
+        plt.figure(1, figsize=(16, 7))
+        plt.subplot(1, 1, 1)
+        plt.title('Box plot scaled data - includes all outliers')
+        nhanes_2013_2014_df1[scaled_features].boxplot(showfliers=True)
+        plt.ylim(0, 6)
+        plt.show()
+        sys.exit()
+
+
 ##############################
 ############################## MIN-MAX SCALING
-if True
+if False:
     from sklearn.preprocessing import MinMaxScaler
     scaled_features = ['AGE', 'INCOME_LEVEL', 'ALCOHOL_NUM', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD']
     scaler = MinMaxScaler()  # default=(0, 1)
@@ -375,7 +392,7 @@ if True
 ##############################
 ############################## STANDARDIZATION
 
-if False:
+if True:
     from sklearn.preprocessing import StandardScaler
     scaler = StandardScaler()
     scaled_features = ['AGE', 'INCOME_LEVEL', 'ALCOHOL_NUM', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD']
@@ -578,13 +595,27 @@ if False:
 if True:
     #Transform biochemistry features
 
-    # Log(x+1) transform
+    #############################
+    ############################# Log(x+1) TRANSFORM
+
     features = list(biochemistry_data.columns)
     biochemistry_data[features] = biochemistry_data[features ].apply(lambda x: np.log(x + 1))
 
+    #Box plot for outlier detection
+    if True:
+        plt.rcParams.update({'font.size': 6})
+        plt.figure(1, figsize=(16, 7))
+        plt.subplot(1, 1, 1)
+        plt.title('Box plot scaled data - includes all outliers')
+        biochemistry_data[features].boxplot(showfliers=True)
+        plt.ylim(0, 6)
+        plt.show()
+        sys.exit()
+
+
     ##############################
     ############################## MIN-MAX SCALING
-    if True:
+    if False:
         from sklearn.preprocessing import MinMaxScaler
 
         scaler = MinMaxScaler()  # default=(0, 1)
@@ -596,7 +627,7 @@ if True:
     ##############################
     ############################## STANDARDIZATION
 
-    if False:
+    if True:
         from sklearn.preprocessing import StandardScaler
 
         scaler = StandardScaler()
@@ -684,19 +715,21 @@ if True:
 
 ################################# Convolutional Neural Network Model ############################################
 
-import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.model_selection import cross_val_score
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import StratifiedKFold
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
+if True:
+
+    import tensorflow as tf
+    from keras.models import Sequential
+    from keras.layers import Dense
+    from keras.wrappers.scikit_learn import KerasClassifier
+    from sklearn.model_selection import cross_val_score
+    from sklearn.preprocessing import LabelEncoder
+    from sklearn.model_selection import StratifiedKFold
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
 
 
 # ------------------------------ Basic Predictive CNN Model ----------------------------
-if True:
+if False:
     seed = 7
     np.random.seed(seed)
 
@@ -850,7 +883,7 @@ if False:
     print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
 
 
-sys.exit()
+#sys.exit()
 
 
 ############################################# Initial Visual Tests #####################################################
@@ -908,6 +941,7 @@ if False:
 
     data = biochemistry_data
     pca = PCA(n_components=data.shape[1])
+    #pca = PCA(n_components=2)
     pca.fit(data)
     pca_results = gut.pca_results(data, pca)
 
