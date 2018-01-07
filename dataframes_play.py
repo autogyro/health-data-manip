@@ -9,6 +9,34 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+def filter_outliers(input_data):
+    import collections
+
+    # For each feature find the data points with extreme high or low values
+    outliers = []
+    for feature in input_data.keys():
+        Q1 = np.percentile(input_data[feature], 25)
+        Q3 = np.percentile(input_data[feature], 75)
+        step = 1.5 * (Q3 - Q1)
+
+        feat_outliers = input_data[~((input_data[feature] >= Q1 - step) & (input_data[feature] <= Q3 + step))]
+        outliers += list(feat_outliers.index.values)
+
+    # Remove the outliers, if any were specified
+    outliers = list(np.unique(np.asarray(outliers)))
+    good_data = input_data.drop(input_data.index[outliers]).reset_index(drop=True)
+
+    return good_data
+
+
+d = {'x':[0.1, 0.2, 0.15, 0.25, 3.0, 5.0, 100.0], 'y':[0.1, 200.0, 0.15, 0.25, 3.0, 5.0, 0.1]}
+df = pd.DataFrame(d)
+print(df)
+
+rf = filter_outliers(df)
+
+print(rf)
+
 
 
 if False:
@@ -800,7 +828,7 @@ if False:
 #---------- CNN Multiclass classification example --------------------------------------------------
 #https://machinelearningmastery.com/multi-class-classification-tutorial-keras-deep-learning-library/
 
-if True:
+if False:
 
     from keras.models import Sequential
     from keras.layers import Dense
@@ -871,23 +899,21 @@ if True:
         model.add(Dense(num_neurons_hidden_1, input_dim=num_features, activation='relu'))
         model.add(Dense(num_classes, activation='softmax'))
         # Compile model
-        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], verbose=1)
         return model
 
-    estimator = KerasClassifier(build_fn=baseline_model, epochs=200, batch_size=5, verbose=0)
+    estimator = KerasClassifier(build_fn=baseline_model, epochs=1, batch_size=5, verbose=1)
     seed = 7
     np.random.seed(seed)
     kfold = KFold(n_splits=10, shuffle=True, random_state=seed)
-
     results = cross_val_score(estimator, X, dummy_y, cv=kfold)
     print("Baseline: %.2f%% (%.2f%%)" % (results.mean() * 100, results.std() * 100))
 
+    #Predictions
+    model = baseline_model()
+    preds = model.predict(X)
 
-
-
-
-
-
+    print(preds)
 
 
 
