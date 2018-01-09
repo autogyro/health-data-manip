@@ -9,33 +9,32 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-def filter_outliers(input_data):
-    import collections
 
-    # For each feature find the data points with extreme high or low values
-    outliers = []
-    for feature in input_data.keys():
-        Q1 = np.percentile(input_data[feature], 25)
-        Q3 = np.percentile(input_data[feature], 75)
-        step = 1.5 * (Q3 - Q1)
-
-        feat_outliers = input_data[~((input_data[feature] >= Q1 - step) & (input_data[feature] <= Q3 + step))]
-        outliers += list(feat_outliers.index.values)
-
-    # Remove the outliers, if any were specified
-    outliers = list(np.unique(np.asarray(outliers)))
-    good_data = input_data.drop(input_data.index[outliers]).reset_index(drop=True)
-
-    return good_data
-
-
-d = {'x':[0.1, 0.2, 0.15, 0.25, 3.0, 5.0, 100.0], 'y':[0.1, 200.0, 0.15, 0.25, 3.0, 5.0, 0.1]}
+#Test droping records corrresponding to specified indexes
+d = {'x': [0.1, 0.2, 0.15, 0.25], 'y': [0.1, 200.0, 0.15, 0.25], 'seqn':[300,301,302,303]}
 df = pd.DataFrame(d)
 print(df)
+print("")
+df.set_index('seqn', inplace=True)
+print(df)
+print("")
+df.drop([301, 302], inplace=True)
+print(df)
 
-rf = filter_outliers(df)
 
-print(rf)
+#Test filtering outliers the hard way
+if False:
+    from importlib.machinery import SourceFileLoader
+    mod_path = "/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/nhanes2013-2104/"
+    txt = SourceFileLoader("text_utils", mod_path+"text_utils.py").load_module()
+
+    d = {'x':[0.1, 0.2, 0.15, 0.25, 3.0, 5.0, 100.0], 'y':[0.1, 200.0, 0.15, 0.25, 3.0, 5.0, 0.1]}
+    df = pd.DataFrame(d)
+    print(df)
+
+    rf = txt.filter_outliers(df)
+
+    print(rf)
 
 
 
