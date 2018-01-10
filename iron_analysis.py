@@ -36,6 +36,10 @@ for m, case in enumerate(cases):
         print(feat)
         print(df[target].describe())
 
+        print("High iron cases " + feat)
+        df2 = df[df[target] > 160.0]
+        print(df2[target].describe())
+
 
 
 
