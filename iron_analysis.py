@@ -25,31 +25,21 @@ iron_data_a = full_data[['HYPERTENSION_ONSET', 'HIGHCHOL_ONSET', 'HIGHCHOL', 'HY
 if False: txt.headcounts(iron_data_a)
 
 
-print("\nPostive Cases\n")
-#@@@@@@@@@@@@@@ Positive cases
-iron_data_positive_chest = iron_data_a[iron_data_a['CHEST_PAIN_30MIN'] == 1]
-if False: txt.headcounts(iron_data_positive_chest)
-print(iron_data_positive_chest['LBXSIR'].describe())
+feat_list = ['CHEST_PAIN_30MIN', 'HYPERTENSION', 'HIGHCHOL']
+target = 'LBXSIR'
+cases = ['Negative cases', 'Positive cases']
 
-iron_data_positive_hyp = iron_data_a[iron_data_a['HYPERTENSION'] == 1]
-if False: txt.headcounts(iron_data_positive_hyp)
-print(iron_data_positive_hyp['LBXSIR'].describe())
+for m, case in enumerate(cases):
+    print(case)
+    for feat in feat_list:
+        df = full_data[full_data[feat]==m]
+        print(feat)
+        print(df[target].describe())
 
-iron_data_positive_chol = iron_data_a[iron_data_a['HIGHCHOL'] == 1]
-if False: txt.headcounts(iron_data_positive_chol)
-print(iron_data_positive_chol['LBXSIR'].describe())
 
-print("\nNegative Cases\n")
-#@@@@@@@@@@@@@@ Negative cases
-iron_data_negative_chest = iron_data_a[iron_data_a['CHEST_PAIN_30MIN'] == 0]
-if False: txt.headcounts(iron_data_negative_chest)
-print(iron_data_negative_chest['LBXSIR'].describe())
 
-iron_data_negative_hyp = iron_data_a[iron_data_a['HYPERTENSION'] == 0]
-if False: txt.headcounts(iron_data_negative_hyp)
-print(iron_data_negative_hyp['LBXSIR'].describe())
 
-iron_data_negative_chol = iron_data_a[iron_data_a['HIGHCHOL'] == 0]
-if False: txt.headcounts(iron_data_negative_chol)
-print(iron_data_negative_chol['LBXSIR'].describe())
+
+
+
 
