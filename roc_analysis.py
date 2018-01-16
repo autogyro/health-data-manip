@@ -157,6 +157,7 @@ if True:
     from sklearn.metrics import f1_score
     from sklearn.metrics import accuracy_score
     from sklearn.metrics import roc_auc_score
+    from sklearn.metrics import roc_curve, auc
 
     seed = 7
     np.random.seed(seed)
@@ -177,6 +178,13 @@ if True:
     predictions_prob_train = model.predict(X_train)
     predictions_train = [round(value) for value in predictions_prob_train]
 
+
+    fpr, tpr, _ = roc_curve(y_test, model.predict_proba(X_test)[:, 1])
+
+    # Calculate the AUC
+    roc_auc = auc(fpr, tpr)
+    print('ROC AUC: %0.2f' % roc_auc)
+
     accuracy = accuracy_score(y_test, predictions_test)
     print("Accuracy: %.2f%%" % (accuracy * 100.0))
 
@@ -184,8 +192,8 @@ if True:
     pred_test_df  = pd.concat([pd.DataFrame(predictions_prob_test, columns=['PROB']), pd.DataFrame(predictions_test, columns=['Y_PRED_TEST'])], axis=1)
 
     print("Predictions Preview:\n")
-    txt.headcounts(pred_train_df)
-    txt.headcounts(pred_test_df)
+    txt.headcounts(pred_train_df, 100)
+    txt.headcounts(pred_test_df,100)
 
     acc_train = accuracy_score(y_train, predictions_train)
     acc_test = accuracy_score(y_test, predictions_test)
@@ -211,3 +219,15 @@ if True:
     print("f1_train = {}, f1_test ={}".format(f1_train, f1_test))
     print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
     print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
+
+    # Plot of a ROC curve for a specific class
+    plt.figure()
+    plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve')
+    plt.legend(loc="lower right")
+    plt.show()
