@@ -363,6 +363,8 @@ nhanes_2013_2014_df1.INCOME_LEVEL.replace(to_replace=15, value=12, inplace=True)
 
 nhanes_2013_2014_df1 = pd.get_dummies(nhanes_2013_2014_df1, columns=['GENDER', 'ETHNICITY'])
 
+questionaire_data_raw = nhanes_2013_2014_df1.copy(deep=True)
+
 
 #############################
 ############################# Log(x+1) TRANSFORM
@@ -380,6 +382,11 @@ if True:
         plt.show()
         sys.exit()
 
+    if False:
+        dfx = txt.filter_outliers(nhanes_2013_2014_df1, 10.0, 90.0)
+        #print(dfx.describe())
+        sys.exit()
+
 
 ##############################
 ############################## MIN-MAX SCALING
@@ -392,18 +399,27 @@ if False:
 ##############################
 ############################## STANDARDIZATION
 
-if True:
+if False:
     from sklearn.preprocessing import StandardScaler
     scaler = StandardScaler()
+    scaled_features = ['AGE', 'INCOME_LEVEL', 'ALCOHOL_NUM', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD']
+    nhanes_2013_2014_df1[scaled_features] = scaler.fit_transform(nhanes_2013_2014_df1[scaled_features])
+
+##############################
+############################## ROBUST SCALING
+
+if True:
+    from sklearn.preprocessing import RobustScaler
+    scaler = RobustScaler()
     scaled_features = ['AGE', 'INCOME_LEVEL', 'ALCOHOL_NUM', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD']
     nhanes_2013_2014_df1[scaled_features] = scaler.fit_transform(nhanes_2013_2014_df1[scaled_features])
 
 print(nhanes_2013_2014_df1.head())
 #txt.count_feature_nans(nhanes_2013_2014_df1, list(nhanes_2013_2014_df1.columns))
 
-
-csv_filename_qdata = 'questionnaire_data.csv'
-nhanes_2013_2014_df1.to_csv(csv_filename_qdata)
+if False:
+    csv_filename_qdata = 'questionnaire_data.csv'
+    nhanes_2013_2014_df1.to_csv(csv_filename_qdata)
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -468,7 +484,7 @@ biochemistry_data = pd.read_sas(datasets_path + '__standard_biochem/BIOPRO_H.XPT
 #........ LBDSUASI - Uric acid (umol/L) ** D
 #
 
-#discard redundant features
+#possible redundant features
 bio_redundant_features = ['LBDSUASI', 'LBDSTRSI', 'LBDSTPSI', 'LBDSTBSI', 'LBDSPHSI', 'LBDSIRSI', 'LBDSGLSI', 'LBDSGBSI',
                           'LBDSCRSI', 'LBDSCHSI', 'LBDSCASI', 'LBDSBUSI', 'LBDSALSI']
 
@@ -592,6 +608,22 @@ if False:
 
     #txt.headcounts(biochemistry_data)
 
+#Merge into full dataframe all raw unscaled features
+print("\n\n Mergin raw features in full dataframe....... \n\n")
+biochemistry_data_raw = biochemistry_data.copy(deep=True)
+questionaire_data_raw = questionaire_data_raw.reindex(biochemistry_data_raw.index)
+full_data_raw = pd.concat([biochemistry_data_raw, questionaire_data_raw],axis=1)
+
+# Check integrity of full raw data
+if False:
+    features_raw = list(full_data_raw.columns)
+    txt.headcounts(full_data_raw)
+    txt.count_feature_nans(full_data_raw, features_raw)
+
+##Export raw unscaled dataframe
+full_data_raw.to_csv('full_data_raw.csv')
+
+
 if True:
     #Transform biochemistry features
 
@@ -602,7 +634,7 @@ if True:
     biochemistry_data[features] = biochemistry_data[features ].apply(lambda x: np.log(x + 1))
 
     #Box plot for outlier detection
-    if True:
+    if False:
         plt.rcParams.update({'font.size': 6})
         plt.figure(1, figsize=(16, 7))
         plt.subplot(1, 1, 1)
@@ -610,6 +642,11 @@ if True:
         biochemistry_data[features].boxplot(showfliers=True)
         plt.ylim(0, 6)
         plt.show()
+        sys.exit()
+
+    if False:
+        dfx = txt.filter_outliers(biochemistry_data, 25.0, 90.0)
+        print(dfx.describe())
         sys.exit()
 
 
@@ -627,10 +664,20 @@ if True:
     ##############################
     ############################## STANDARDIZATION
 
-    if True:
+    if False:
         from sklearn.preprocessing import StandardScaler
 
         scaler = StandardScaler()
+        biochemistry_data[features] = scaler.fit_transform(biochemistry_data[features])
+
+
+    ##############################
+    ############################## ROBUST SCALING
+
+    if True:
+        from sklearn.preprocessing import RobustScaler
+
+        scaler = RobustScaler()
         biochemistry_data[features] = scaler.fit_transform(biochemistry_data[features])
 
 
@@ -657,11 +704,11 @@ if True:
 
 #EXPORT DATASETS
 
-if True:
+if False:
     biochemistry_data.to_csv('biochemistry_data.csv')
 
 
-if False:
+if True:
     import feather
 
     #Save Final stage merged dataframe
@@ -715,7 +762,7 @@ if True:
 
 ################################# Convolutional Neural Network Model ############################################
 
-if True:
+if False:
 
     import tensorflow as tf
     from keras.models import Sequential
@@ -882,8 +929,6 @@ if False:
     print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
     print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
 
-
-#sys.exit()
 
 
 ############################################# Initial Visual Tests #####################################################
