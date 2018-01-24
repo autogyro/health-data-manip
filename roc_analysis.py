@@ -38,6 +38,7 @@ if True:
 
 
 if True:
+    ##################################### INPUT ###################################
     #Model input features
     model_features = pd.concat([biochemistry_data, full_data.BMI], axis=1)
     model_features = pd.concat([model_features, full_data.AGE], axis=1)
@@ -51,11 +52,11 @@ if True:
     model_features = pd.concat([model_features, full_data.ETHNICITY_Hispanic], axis=1)
     model_features = pd.concat([model_features, full_data.ETHNICITY_Asian], axis=1)
 
-
+    #################################### TARGET #####################################
     #Target for prediction/classification
 
-    #model_targets = full_data.DIAGNOSED_PREDIABETES
-    model_targets = full_data.HIGHCHOL
+    model_targets = full_data.DIAGNOSED_PREDIABETES
+    #model_targets = full_data.HIGHCHOL
     #model_targets = full_data.RISK_DIABETES
     #model_targets = full_data.HYPERTENSION
 
@@ -178,8 +179,11 @@ if True:
     predictions_prob_train = model.predict(X_train)
     predictions_train = [round(value) for value in predictions_prob_train]
 
+    ##################################################################
+    fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test)[:, 1])
 
-    fpr, tpr, _ = roc_curve(y_test, model.predict_proba(X_test)[:, 1])
+    rocxg_df = pd.DataFrame({'fpr':fpr, 'tpr': tpr, 'dash': dash})
+    rocxg_df.to_csv('roc_curve_xgboost.csv')
 
     # Calculate the AUC
     roc_auc = auc(fpr, tpr)
@@ -228,6 +232,6 @@ if True:
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title('ROC Curve')
+    plt.title('ROC Curve - Hypertension Risk Prediction')
     plt.legend(loc="lower right")
     plt.show()
