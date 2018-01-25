@@ -67,7 +67,7 @@ if True:
 
 
 ################################# Convolutional Neural Network Model ############################################
-if False:
+if True:
 
     import tensorflow as tf
     from keras.models import Sequential
@@ -79,6 +79,12 @@ if False:
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
 
+    from sklearn.metrics import fbeta_score
+    from sklearn.metrics import f1_score
+    from sklearn.metrics import accuracy_score
+    from sklearn.metrics import roc_auc_score
+    from sklearn.metrics import roc_curve, auc
+
     seed = 7
     np.random.seed(seed)
 
@@ -87,6 +93,8 @@ if False:
 
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=seed)
+
+
 
     model = Sequential()
     model.add(Dense(64, input_dim=features_num, activation='relu'))
@@ -97,29 +105,49 @@ if False:
 
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    hm = model.fit(X_train, y_train, validation_data=(X_test,y_test), epochs=150, batch_size=10)
+    num_epochs = 10
+    batch_size = 10
+
+    hm = model.fit(X_train, y_train, validation_data=(X_test,y_test), epochs=num_epochs, batch_size=batch_size)
     gut.plot_KerasHistory_metrics(hm, 'nhanes_keras_model_metrics')
 
     scores = model.evaluate(X, Y)
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
     prob_train = model.predict(X_train)
-    prob_test = model.predict(X_test)
-
     predictions_train = [round(x[0]) for x in prob_train]
+
+    prob_test = model.predict(X_test)
     predictions_test = [round(x[0]) for x in prob_test]
 
     pred_train_df = pd.concat([pd.DataFrame(prob_train, columns=['PROB']), pd.DataFrame(predictions_train, columns=['Y_PRED_TRAIN'])], axis=1)
     pred_test_df  = pd.concat([pd.DataFrame(prob_test, columns=['PROB']), pd.DataFrame(predictions_test, columns=['Y_PRED_TEST'])], axis=1)
 
-    print("Predictions Preview:\n")
-    txt.headcounts(pred_train_df)
-    txt.headcounts(pred_test_df)
 
-    from sklearn.metrics import fbeta_score
-    from sklearn.metrics import f1_score
-    from sklearn.metrics import accuracy_score
-    from sklearn.metrics import roc_auc_score
+    if False:
+        print(model.predict_proba(X_test))
+        print(model.predict_proba(X_test).shape)
+        sys.exit()
+
+
+    ################################# ROC_CURVE_CNN #############################################
+    fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test))
+    rocxg_df = pd.DataFrame({'fpr':fpr, 'tpr': tpr, 'dash': dash})
+    rocxg_df.to_csv('roc_curve_cnn.csv')
+    #############################################################################################
+
+    # Calculate the AUC
+    roc_auc = auc(fpr, tpr)
+    print('ROC AUC: %0.2f' % roc_auc)
+
+    accuracy = accuracy_score(y_test, predictions_test)
+    print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
+    if False:
+        print("Predictions Preview:\n")
+        txt.headcounts(pred_train_df)
+        txt.headcounts(pred_test_df)
+
 
     acc_train = accuracy_score(y_train, predictions_train)
     acc_test = accuracy_score(y_test, predictions_test)
@@ -146,12 +174,24 @@ if False:
     print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
     print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
 
+    # Plot of a ROC curve for a specific class
+    plt.figure()
+    plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve - Hypertension Risk Prediction')
+    plt.legend(loc="lower right")
+    plt.show()
+
     tf.Session().close()
 
 
 
 ################################# XGBOOST Model ############################################
-if True:
+if False:
     from xgboost import XGBClassifier
 
     from sklearn.metrics import fbeta_score
@@ -179,11 +219,17 @@ if True:
     predictions_prob_train = model.predict(X_train)
     predictions_train = [round(value) for value in predictions_prob_train]
 
-    ##################################################################
-    fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test)[:, 1])
+    #Short test compare to CNN case
+    if False:
+        print(model.predict_proba(X_test))
+        print(model.predict_proba(X_test).shape)
+        sys.exit()
 
+    ############################# ROC_CURVE_XGBOOST ############################################
+    fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test)[:, 1])
     rocxg_df = pd.DataFrame({'fpr':fpr, 'tpr': tpr, 'dash': dash})
     rocxg_df.to_csv('roc_curve_xgboost.csv')
+    ############################################################################################
 
     # Calculate the AUC
     roc_auc = auc(fpr, tpr)
