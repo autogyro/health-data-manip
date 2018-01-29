@@ -79,6 +79,11 @@ if True:
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
 
+    from keras.layers import Dropout
+    from keras.constraints import maxnorm
+    from keras.optimizers import SGD
+
+
     from sklearn.metrics import fbeta_score
     from sklearn.metrics import f1_score
     from sklearn.metrics import accuracy_score
@@ -95,18 +100,44 @@ if True:
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=seed)
 
 
+    #//////// NN Models ////////////////////////////////////////////////////////////////////////////////
 
-    model = Sequential()
-    model.add(Dense(64, input_dim=features_num, activation='relu'))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dense(16, activation='relu'))
-    model.add(Dense(8, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
 
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    def initial_model():
 
-    num_epochs = 10
-    batch_size = 10
+        model = Sequential()
+        model.add(Dense(64, input_dim=features_num, activation='relu'))
+        model.add(Dense(32, activation='relu'))
+        model.add(Dense(16, activation='relu'))
+        model.add(Dense(8, activation='relu'))
+        model.add(Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        return model
+
+
+    def second_model():
+        # create model
+        model = Sequential()
+        model.add(Dense(64, input_dim=features_num, kernel_initializer='normal', activation='relu', kernel_constraint=maxnorm(3)))
+        model.add(Dropout(0.2))
+        model.add(Dense(32, kernel_initializer='normal', activation='relu', kernel_constraint=maxnorm(3)))
+        #model.add(Dropout(0.2))
+        model.add(Dense(16, kernel_initializer='normal', activation='relu', kernel_constraint=maxnorm(3)))
+        #model.add(Dropout(0.2))
+        model.add(Dense(18, kernel_initializer='normal', activation='relu', kernel_constraint=maxnorm(3)))
+        #model.add(Dropout(0.2))
+        model.add(Dense(1, kernel_initializer='normal', activation='sigmoid'))
+        # Compile model
+        sgd = SGD(lr=0.1, momentum=0.9, decay=0.0, nesterov=False)
+        model.compile(loss='binary_crossentropy', optimizer=sgd, metrics=['accuracy'])
+        return model
+
+    #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    model = second_model()
+
+    num_epochs = 100
+    batch_size = 32
 
     hm = model.fit(X_train, y_train, validation_data=(X_test,y_test), epochs=num_epochs, batch_size=batch_size)
     gut.plot_KerasHistory_metrics(hm, 'nhanes_keras_model_metrics')
