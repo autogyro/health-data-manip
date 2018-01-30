@@ -136,27 +136,58 @@ if True:
 
     #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    model = second_model()
+    #Implement unoptimized models
+    #----------------------------
+    if False:
+        model = second_model()
 
-    num_epochs = 100
-    batch_size = 32
+        num_epochs = 100
+        batch_size = 32
 
-    hm = model.fit(X_train, y_train, validation_data=(X_test,y_test), epochs=num_epochs, batch_size=batch_size)
-    gut.plot_KerasHistory_metrics(hm, 'nhanes_keras_model_metrics')
+        hm = model.fit(X_train, y_train, validation_data=(X_test,y_test), epochs=num_epochs, batch_size=batch_size)
+        gut.plot_KerasHistory_metrics(hm, 'nhanes_keras_model_metrics')
 
-    scores = model.evaluate(X, Y)
-    print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+        scores = model.evaluate(X, Y)
+        print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
-    prob_train = model.predict(X_train)
-    predictions_train = [round(x[0]) for x in prob_train]
+        prob_train = model.predict(X_train)
+        predictions_train = [round(x[0]) for x in prob_train]
 
-    prob_test = model.predict(X_test)
-    predictions_test = [round(x[0]) for x in prob_test]
+        prob_test = model.predict(X_test)
+        predictions_test = [round(x[0]) for x in prob_test]
 
-    pred_train_df = pd.concat([pd.DataFrame(prob_train, columns=['PROB']), pd.DataFrame(predictions_train, columns=['Y_PRED_TRAIN'])], axis=1)
-    pred_test_df  = pd.concat([pd.DataFrame(prob_test, columns=['PROB']), pd.DataFrame(predictions_test, columns=['Y_PRED_TEST'])], axis=1)
+        pred_train_df = pd.concat([pd.DataFrame(prob_train, columns=['PROB']), pd.DataFrame(predictions_train, columns=['Y_PRED_TRAIN'])], axis=1)
+        pred_test_df  = pd.concat([pd.DataFrame(prob_test, columns=['PROB']), pd.DataFrame(predictions_test, columns=['Y_PRED_TEST'])], axis=1)
 
+    #---------------------------------------------------
+    #Perform GridSearchCV (Optimize Epochs, Batch Size)
+    #---------------------------------------------------
+    if True:
 
+        seed = 7
+        np.random.seed(seed)
+
+        #select one of the models defined above and insert it as hyperparameter
+        model = KerasClassifier(build_fn=second_model, verbose=0)
+
+        # define the grid search parameters
+        #batch_size = [10, 20, 40, 60, 80, 100]
+        #epochs = [10, 50, 100]
+
+        batch_size = [10, 20]
+        epochs = [10, 50]
+        param_grid = dict(batch_size=batch_size, epochs=epochs)
+        grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=-1)
+        grid_result = grid.fit(X, Y)
+
+        # summarize results
+        print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+        means = grid_result.cv_results_['mean_test_score']
+        stds = grid_result.cv_results_['std_test_score']
+        params = grid_result.cv_results_['params']
+
+        for mean, stdev, param in zip(means, stds, params):
+            print("%f (%f) with: %r" % (mean, stdev, param))
 
     #(optional) print preview of predictions arrays
     if False:
@@ -179,59 +210,61 @@ if True:
 
     #Performance metrics:
 
-    #Confusion matrix
-    if True:
-        from sklearn.metrics import confusion_matrix
-        CM = confusion_matrix(y_test, predictions_test)
-        CML = np.array([['TN', 'FP'], ['FN', 'TP']])
-        print("Confusion Matrix:\n{}\n\n {} \n".format(CML, CM))
-
-    #AUC score and accuracy
-    if True:
-        roc_auc = auc(fpr, tpr)
-        print('ROC AUC: %0.2f' % roc_auc)
-        accuracy = accuracy_score(y_test, predictions_test)
-        print("Accuracy: %.2f%%" % (accuracy * 100.0))
-
-    #accuracy score
-    if True:
-        acc_train = accuracy_score(y_train, predictions_train)
-        acc_test = accuracy_score(y_test, predictions_test)
-        print("acc_train = {}, acc_test ={}".format(acc_train, acc_test))
-
-
-    #beta score optional
     if False:
-        beta = 0.5
-        fb_train = fbeta_score(y_train, predictions_train, beta=beta)
-        fb_test = fbeta_score(y_test, predictions_test, beta=beta)
-        f1_train = f1_score(y_train, predictions_train)
-        f1_test = f1_score(y_test, predictions_test)
+        #Confusion matrix
+        if True:
+            from sklearn.metrics import confusion_matrix
+            CM = confusion_matrix(y_test, predictions_test)
+            CML = np.array([['TN', 'FP'], ['FN', 'TP']])
+            print("Confusion Matrix:\n{}\n\n {} \n".format(CML, CM))
 
-        print("f1_train = {}, f1_test ={}".format(f1_train, f1_test))
-        print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
+        #AUC score and accuracy
+        if True:
+            roc_auc = auc(fpr, tpr)
+            print('ROC AUC: %0.2f' % roc_auc)
+            accuracy = accuracy_score(y_test, predictions_test)
+            print("Accuracy: %.2f%%" % (accuracy * 100.0))
 
-    #roc auc (not confuese with auc)
-    if False:
-        roc_auc_train = roc_auc_score(y_train, predictions_train, average='micro')
-        roc_auc_test = roc_auc_score(y_test, predictions_test, average='micro')
-        print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
+        #accuracy score
+        if True:
+            acc_train = accuracy_score(y_train, predictions_train)
+            acc_test = accuracy_score(y_test, predictions_test)
+            print("acc_train = {}, acc_test ={}".format(acc_train, acc_test))
+
+
+        #beta score optional
+        if False:
+            beta = 0.5
+            fb_train = fbeta_score(y_train, predictions_train, beta=beta)
+            fb_test = fbeta_score(y_test, predictions_test, beta=beta)
+            f1_train = f1_score(y_train, predictions_train)
+            f1_test = f1_score(y_test, predictions_test)
+
+            print("f1_train = {}, f1_test ={}".format(f1_train, f1_test))
+            print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
+
+        #roc auc (not confuese with auc)
+        if False:
+            roc_auc_train = roc_auc_score(y_train, predictions_train, average='micro')
+            roc_auc_test = roc_auc_score(y_test, predictions_test, average='micro')
+            print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
 
 
 
     #--------------------------------------------------------------------
     # Plot of a ROC curve for a specific class
     #--------------------------------------------------------------------
-    plt.figure()
-    plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
-    plt.plot([0, 1], [0, 1], 'k--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('ROC Curve - Hypertension Risk Prediction')
-    plt.legend(loc="lower right")
-    plt.show()
+    if False:
+        plt.figure()
+        plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
+        plt.plot([0, 1], [0, 1], 'k--')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('ROC Curve - Hypertension Risk Prediction')
+        plt.legend(loc="lower right")
+        plt.show()
 
     tf.Session().close()
 
