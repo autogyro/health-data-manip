@@ -66,7 +66,9 @@ if True:
     print("No. of input features: {}".format(features_num))
 
 
+#################################################################################################################
 ################################# Convolutional Neural Network Model ############################################
+#################################################################################################################
 if True:
 
     import tensorflow as tf
@@ -155,57 +157,71 @@ if True:
     pred_test_df  = pd.concat([pd.DataFrame(prob_test, columns=['PROB']), pd.DataFrame(predictions_test, columns=['Y_PRED_TEST'])], axis=1)
 
 
+
+    #(optional) print preview of predictions arrays
+    if False:
+        print("Predictions Preview:\n")
+        txt.headcounts(pred_train_df)
+        txt.headcounts(pred_test_df)
+
+    #(optional) print predicted probabilites  on test set
     if False:
         print(model.predict_proba(X_test))
         print(model.predict_proba(X_test).shape)
         sys.exit()
 
 
-    ################################# ROC_CURVE_CNN #############################################
+    ################################# ROC_CURVE_ANN FILE OUT #############################################
     fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test))
     rocxg_df = pd.DataFrame({'fpr':fpr, 'tpr': tpr, 'dash': dash})
     rocxg_df.to_csv('roc_curve_cnn.csv')
-    #############################################################################################
+    ######################################################################################################
 
-    # Calculate the AUC
-    roc_auc = auc(fpr, tpr)
-    print('ROC AUC: %0.2f' % roc_auc)
+    #Performance metrics:
 
-    accuracy = accuracy_score(y_test, predictions_test)
-    print("Accuracy: %.2f%%" % (accuracy * 100.0))
+    #Confusion matrix
+    if True:
+        from sklearn.metrics import confusion_matrix
+        CM = confusion_matrix(y_test, predictions_test)
+        CML = np.array([['TN', 'FP'], ['FN', 'TP']])
+        print("Confusion Matrix:\n{}\n\n {} \n".format(CML, CM))
 
+    #AUC score and accuracy
+    if True:
+        roc_auc = auc(fpr, tpr)
+        print('ROC AUC: %0.2f' % roc_auc)
+        accuracy = accuracy_score(y_test, predictions_test)
+        print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
+    #accuracy score
+    if True:
+        acc_train = accuracy_score(y_train, predictions_train)
+        acc_test = accuracy_score(y_test, predictions_test)
+        print("acc_train = {}, acc_test ={}".format(acc_train, acc_test))
+
+
+    #beta score optional
     if False:
-        print("Predictions Preview:\n")
-        txt.headcounts(pred_train_df)
-        txt.headcounts(pred_test_df)
+        beta = 0.5
+        fb_train = fbeta_score(y_train, predictions_train, beta=beta)
+        fb_test = fbeta_score(y_test, predictions_test, beta=beta)
+        f1_train = f1_score(y_train, predictions_train)
+        f1_test = f1_score(y_test, predictions_test)
+
+        print("f1_train = {}, f1_test ={}".format(f1_train, f1_test))
+        print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
+
+    #roc auc (not confuese with auc)
+    if False:
+        roc_auc_train = roc_auc_score(y_train, predictions_train, average='micro')
+        roc_auc_test = roc_auc_score(y_test, predictions_test, average='micro')
+        print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
 
 
-    acc_train = accuracy_score(y_train, predictions_train)
-    acc_test = accuracy_score(y_test, predictions_test)
 
-    beta = 0.5
-
-    fb_train = fbeta_score(y_train, predictions_train, beta=beta)
-    fb_test = fbeta_score(y_test, predictions_test, beta=beta)
-
-    f1_train = f1_score(y_train, predictions_train)
-    f1_test = f1_score(y_test, predictions_test)
-
-    roc_auc_train = roc_auc_score(y_train, predictions_train, average='micro')
-    roc_auc_test = roc_auc_score(y_test, predictions_test, average='micro')
-
-    from sklearn.metrics import confusion_matrix
-
-    CM = confusion_matrix(y_test, predictions_test)
-    CML = np.array([['TN', 'FP'], ['FN', 'TP']])
-
-    print("acc_train = {}, acc_test ={}".format(acc_train, acc_test))
-    print("Confusion Matrix:\n{}\n\n {} \n".format(CML, CM))
-    print("f1_train = {}, f1_test ={}".format(f1_train, f1_test))
-    print("fbeta_train = {}, fbeta_test ={}".format(fb_train, fb_test))
-    print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
-
+    #--------------------------------------------------------------------
     # Plot of a ROC curve for a specific class
+    #--------------------------------------------------------------------
     plt.figure()
     plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
     plt.plot([0, 1], [0, 1], 'k--')
@@ -220,8 +236,10 @@ if True:
     tf.Session().close()
 
 
+######################################################################################################
+################################# XGBOOST Model ######################################################
+######################################################################################################
 
-################################# XGBOOST Model ############################################
 if False:
     from xgboost import XGBClassifier
 
