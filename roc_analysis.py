@@ -36,7 +36,6 @@ if True:
     print(biochemistry_data.describe())
 
 
-
 if True:
     ##################################### INPUT ###################################
     #Model input features
@@ -67,28 +66,9 @@ if True:
 
 
 
-
-
-
 #################################################################################################################
 ################################# Neural Network Model ############################################
 #################################################################################################################
-
-
-#------------ USER_DEFINED SCORING FUNCTIONS -------------
-#To be used in required subroutines below
-#---------------------------------------------------------
-
-def performance_metric_auc(y_true, X_true):
-    """ Calculates and returns the performance score between
-        true and predicted values based on the metric chosen. """
-
-    y_predict = model.predict_proba(X_true)
-    fpr, tpr, dash = roc_curve(y_true, y_predict)
-    score = auc(fpr, tpr)
-
-    return score
-
 
 
 if True:
@@ -116,6 +96,17 @@ if True:
     from sklearn.metrics import roc_auc_score
     from sklearn.metrics import roc_curve, auc
 
+    #------Keras custom metrics--------
+    import keras.backend as K
+
+    def k_custom_auc(y_true, y_pred):
+
+        fpr, tpr, dash = roc_curve(y_true, y_pred)
+        score = auc(fpr, tpr)
+        return  K.variable(score)
+
+    #----------------------------------
+
     seed = 7
     np.random.seed(seed)
 
@@ -138,7 +129,7 @@ if True:
         model.add(Dense(16, activation='relu'))
         model.add(Dense(8, activation='relu'))
         model.add(Dense(1, activation='sigmoid'))
-        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy',k_custom_auc])
         return model
 
 
@@ -160,6 +151,19 @@ if True:
         return model
 
     #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    # ------------ USER_DEFINED SKLEARN SCORING FUNCTIONS -------------
+    # To be used in required subroutines below
+    # ---------------------------------------------------------
+
+    def performance_metric_auc(y, y_pred):
+
+        fpr, tpr, dash = roc_curve(y, y_pred)
+        score = auc(fpr, tpr)
+
+        return score
+
+
 
     #Implement unoptimized models
     #----------------------------
@@ -205,9 +209,13 @@ if True:
 
         param_grid = dict(batch_size=batch_size, epochs=epochs)
 
-        scoring_function = make_scorer(performance_metric_auc)
+        #----------------- scoring functions
+        scoring_auc = make_scorer(performance_metric_auc, needs_proba=False)
+
+
         ######
-        grid = GridSearchCV(estimator=model, scoring="roc_auc", param_grid=param_grid, n_jobs=-1)
+        #grid = GridSearchCV(estimator=model, scoring="roc_auc", param_grid=param_grid, n_jobs=1)
+        grid = GridSearchCV(estimator=model, scoring=scoring_auc, param_grid=param_grid, n_jobs=1)
         ######
         grid_result = grid.fit(X, Y)
 
