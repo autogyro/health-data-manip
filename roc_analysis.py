@@ -66,8 +66,27 @@ if True:
     print("No. of input features: {}".format(features_num))
 
 
+
+#------------ USER_DEFINED SCORING FUNCTIONS -------------
+#To be used in required subroutines below
+#---------------------------------------------------------
+
+def performance_metric_auc(y_true, X_true):
+    """ Calculates and returns the performance score between
+        true and predicted values based on the metric chosen. """
+
+    y_predict = model.predict_proba(X_true)
+    fpr, tpr, dash = roc_curve(y_true, y_predict)
+    score = auc(fpr, tpr)
+
+    return score
+
+
+
+
+
 #################################################################################################################
-################################# Convolutional Neural Network Model ############################################
+################################# Neural Network Model ############################################
 #################################################################################################################
 if True:
 
@@ -84,6 +103,8 @@ if True:
     from keras.layers import Dropout
     from keras.constraints import maxnorm
     from keras.optimizers import SGD
+    from sklearn.metrics import make_scorer
+    from sklearn.model_selection import GridSearchCV
 
 
     from sklearn.metrics import fbeta_score
@@ -97,6 +118,7 @@ if True:
 
     X = model_features.values
     Y = model_targets.values
+
 
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=seed)
@@ -159,25 +181,31 @@ if True:
         pred_train_df = pd.concat([pd.DataFrame(prob_train, columns=['PROB']), pd.DataFrame(predictions_train, columns=['Y_PRED_TRAIN'])], axis=1)
         pred_test_df  = pd.concat([pd.DataFrame(prob_test, columns=['PROB']), pd.DataFrame(predictions_test, columns=['Y_PRED_TEST'])], axis=1)
 
-    #---------------------------------------------------
-    #Perform GridSearchCV (Optimize Epochs, Batch Size)
-    #---------------------------------------------------
+    #---------------------------------------------------------------------------------
+    ############## Perform GridSearchCV (Optimize Epochs, Batch Size) ################
+    #---------------------------------------------------------------------------------
     if True:
 
         seed = 7
         np.random.seed(seed)
 
+
+        #----------------------------------------------------------------------
         #select one of the models defined above and insert it as hyperparameter
         model = KerasClassifier(build_fn=second_model, verbose=0)
+        #-----------------------------------------------------------------------
 
         # define the grid search parameters
-        #batch_size = [10, 20, 40, 60, 80, 100]
-        #epochs = [10, 50, 100]
 
-        batch_size = [10, 20]
-        epochs = [10, 50]
+        batch_size = [10, 20]   #batch_size = [10, 20, 40, 60, 80, 100]
+        epochs = [10, 50]       #epochs = [10, 50, 100]
+
         param_grid = dict(batch_size=batch_size, epochs=epochs)
-        grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=-1)
+
+        scoring_function = make_scorer(performance_metric_auc)
+        ######
+        grid = GridSearchCV(estimator=model, scoring="roc_auc", param_grid=param_grid, n_jobs=-1)
+        ######
         grid_result = grid.fit(X, Y)
 
         # summarize results
@@ -201,14 +229,7 @@ if True:
         print(model.predict_proba(X_test).shape)
         sys.exit()
 
-
-    ################################# ROC_CURVE_ANN FILE OUT #############################################
-    fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test))
-    rocxg_df = pd.DataFrame({'fpr':fpr, 'tpr': tpr, 'dash': dash})
-    rocxg_df.to_csv('roc_curve_cnn.csv')
-    ######################################################################################################
-
-    #Performance metrics:
+    #Individual performance metrics:
 
     if False:
         #Confusion matrix
@@ -218,12 +239,22 @@ if True:
             CML = np.array([['TN', 'FP'], ['FN', 'TP']])
             print("Confusion Matrix:\n{}\n\n {} \n".format(CML, CM))
 
+
+        #Calculate false, true positive rates (fpr, tpr), and typing monkey roc line (dash)
+        #Optionally save the datapoints to csv
+        if False:
+            fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test))
+            if True:
+                rocxg_df = pd.DataFrame({'fpr': fpr, 'tpr': tpr, 'dash': dash})
+                rocxg_df.to_csv('roc_curve_cnn.csv')
+
         #AUC score and accuracy
         if True:
             roc_auc = auc(fpr, tpr)
             print('ROC AUC: %0.2f' % roc_auc)
             accuracy = accuracy_score(y_test, predictions_test)
             print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
 
         #accuracy score
         if True:
@@ -248,8 +279,6 @@ if True:
             roc_auc_train = roc_auc_score(y_train, predictions_train, average='micro')
             roc_auc_test = roc_auc_score(y_test, predictions_test, average='micro')
             print("ROC_AUC_train = {}, ROC_AUC_test ={}".format(roc_auc_train, roc_auc_test))
-
-
 
     #--------------------------------------------------------------------
     # Plot of a ROC curve for a specific class
@@ -313,9 +342,12 @@ if False:
     rocxg_df.to_csv('roc_curve_xgboost.csv')
     ############################################################################################
 
+
+    #--------------------------------------
     # Calculate the AUC
     roc_auc = auc(fpr, tpr)
     print('ROC AUC: %0.2f' % roc_auc)
+    #--------------------------------------
 
     accuracy = accuracy_score(y_test, predictions_test)
     print("Accuracy: %.2f%%" % (accuracy * 100.0))
