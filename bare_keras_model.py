@@ -89,7 +89,6 @@ from sklearn.metrics import roc_curve, auc
 
 from sklearn.model_selection import train_test_split
 
-
 def initial_model(neurons=20):
     model = Sequential()
     model.add(Dense(neurons, input_dim=features_num, activation='relu'))
@@ -102,37 +101,34 @@ def pf_metric_auc(y, y_pred):
     score = auc(fpr, tpr)
     return score
 
+scoring_auc = make_scorer(pf_metric_auc, needs_proba=False)
 
 seed = 7
 np.random.seed(seed)
+
 X = model_features.values
 Y = model_targets.values
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=seed)
 
+#-----Model selection-------------
+#Bare Keras
+if True:
+    Keras_model = initial_model(neurons=20)
+    scores = Keras_model.evaluate(X_test, y_test)
+    print("\n%s: %.2f%%" % (Keras_model.metrics_names[1], scores[1] * 100))
 
-model = KerasClassifier(build_fn=initial_model, neurons=20, verbose=0)
+    num_epochs = 20
+    batch_size = 10
+    hm = Keras_model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=num_epochs, batch_size=batch_size)
+    gut.plot_KerasHistory_metrics(hm, 'nhanes_keras_model_metrics')
+    plt.show()
 
-batch_size = [20]
-epochs = [10]
-neurons=[20,30]
+#SKLearn
+if False:
+    SKlearn_model = KerasClassifier(build_fn=initial_model, neurons=20, verbose=0)
+#-----End Model selection----------
 
-param_grid = dict(batch_size=batch_size, epochs=epochs,neurons=neurons)
-scoring_auc = make_scorer(pf_metric_auc, needs_proba=False)
 
-gs_start_time = time.time()
-grid = GridSearchCV(estimator=model, scoring=scoring_auc, param_grid=param_grid, n_jobs=4)
-grid_result = grid.fit(X, Y)
-gs_end_time = time.time()
-
-print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
-means = grid_result.cv_results_['mean_test_score']
-stds = grid_result.cv_results_['std_test_score']
-params = grid_result.cv_results_['params']
-
-for mean, stdev, param in zip(means, stds, params):
-    print("%f (%f) with: %r" % (mean, stdev, param))
-
-print(" GridSearch time %s seconds " % (gs_end_time - gs_start_time))
 
 
 tf.Session().close()
