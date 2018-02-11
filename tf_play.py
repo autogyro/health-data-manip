@@ -5,11 +5,16 @@ import tensorflow as tf
 
 from sklearn.metrics import roc_curve, auc
 
-labels = np.array([0, 0, 1, 1])
-probas = np.array([0.1, 0.4, 0.35, 0.8])
+labels = np.array([0, 0, 1, 1, 0])
+probas = np.array([0.1, 0.4, 0.35, 0.8, 0.3])
 
 
 import keras.backend as K
+
+def k_custom_auc(y_true, y_pred):
+    fpr, tpr, dash = roc_curve(y_true, y_pred)
+    score = auc(fpr, tpr)
+    return score
 
 
 def get_pred_array(probas):
@@ -47,12 +52,32 @@ def conf_matrix(y_true, y_pred):
 pred_array = get_pred_array(probas)
 print(pred_array)
 
+print("(FPR, TPR) Tuples")
+
+ROC_POINTS = []
 for pred_vec in pred_array:
-    print(conf_matrix(labels, pred_vec))
+    ROC_POINTS.append(conf_matrix(labels, pred_vec))
+
+L = []
+for k in reversed(ROC_POINTS):
+    L.append(k)
+
+ROC_POINTS = L
+print(ROC_POINTS)
+
+sum = 0.0
+for k in range(1, len(ROC_POINTS)):
+    sum += 0.5 * (ROC_POINTS[k][1] + ROC_POINTS[k - 1][1])*(ROC_POINTS[k][0] - ROC_POINTS[k-1][0])
+
+print("BY HAND AUC score:")
+print(sum)
 
 
+#Sum[(y[[k]] + y[[k - 1]])/2 (X[[k]] - X[[k - 1]]), {k, 2, dim}]
 
 
+print("\nSklearn AUC score:")
+print(k_custom_auc(labels,probas))
 
 
 
