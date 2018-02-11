@@ -14,9 +14,9 @@ def tflow_auc(labels, preds):
         sess.run(tf.local_variables_initializer())
         #print("tf auc: {}".format(sess.run([auc, update_op])))
         return sess.run([auc, update_op])
-
-print(tflow_auc(labels,preds))
-print(type(tflow_auc(labels,preds)))
+if False:
+    print(tflow_auc(labels,preds))
+    print(type(tflow_auc(labels,preds)))
 
 def k_custom_auc(y_true, y_pred):
     fpr, tpr, dash = roc_curve(y_true, y_pred)
@@ -37,26 +37,32 @@ def k_custom_auc3(y_true, y_pred):
 
     return score
 
+if False:
+    print(k_custom_auc(labels,preds))
+    print(type(k_custom_auc(labels,preds)))
 
-print(k_custom_auc(labels,preds))
-print(type(k_custom_auc(labels,preds)))
+    print(k_custom_auc2(labels,preds))
+    print(type(k_custom_auc2(labels,preds)))
 
-print(k_custom_auc2(labels,preds))
-print(type(k_custom_auc2(labels,preds)))
-
-print(k_custom_auc3(labels,preds))
-print(type(k_custom_auc3(labels,preds)))
+    print(k_custom_auc3(labels,preds))
+    print(type(k_custom_auc3(labels,preds)))
 
 
 import keras.backend as K
 
 def mean_pred(y_pred):
     y_pred = K.variable(y_pred)
+    print(y_pred)
+    print(K.get_value(y_pred))
     return K.mean(y_pred)
 
+#same as getting a tensorflow session
 sess = K.get_session()
+
 with sess.as_default():
-    print(mean_pred(labels))
+    x = mean_pred(labels)
+    y= K.get_value(x)
+    print(y)
 
 
 
