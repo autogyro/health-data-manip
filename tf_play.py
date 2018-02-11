@@ -6,22 +6,22 @@ import tensorflow as tf
 from sklearn.metrics import roc_curve, auc
 
 labels = np.array([0, 0, 1, 1])
-preds = np.array([0.1, 0.4, 0.35, 0.8])
+probas = np.array([0.1, 0.4, 0.35, 0.8])
 
 
 import keras.backend as K
 
-scores = np.sort(preds)
 
-dim = scores.shape[0]
+def get_pred_array(probas):
 
-vec_array = []
-for val in scores:
-    pred_thr = preds >= val
-    pred_thr = pred_thr.astype(int)
-    vec_array.append(pred_thr)
+    scores = np.sort(probas)
+    pred_array = []
+    for val in scores:
+        pred_thr = probas >= val
+        pred_thr = pred_thr.astype(int)
+        pred_array.append(pred_thr)
 
-print(vec_array)
+    return pred_array
 
 def conf_matrix(y_true, y_pred):
     TP, FP, TN, FN = 0,0,0,0
@@ -39,10 +39,16 @@ def conf_matrix(y_true, y_pred):
                             "Invalid confusion matrix conditions.\n "
                             "y_true, y_pred must be integers or booleans.")
 
-    return TN, FP, FN, TP
+    TPR = float(TP / (TP + FN))
+    FPR = float(FP / (FP + TN))
 
-for vec in vec_array:
-    print(conf_matrix(labels, vec))
+    return FPR, TPR
+
+pred_array = get_pred_array(probas)
+print(pred_array)
+
+for pred_vec in pred_array:
+    print(conf_matrix(labels, pred_vec))
 
 
 
