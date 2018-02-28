@@ -45,3 +45,20 @@ if True:
     print(questionnaire_data.columns)
 
 
+
+pair_df = pd.concat([biochemistry_data.LBXSTR, questionnaire_data.HYPERTENSION], axis=1)
+print(pair_df.describe())
+
+cols = list(pair_df.columns)
+corr_matrix = np.corrcoef(pair_df[cols].values.T)
+
+print("\nCorrelation matrix:")
+print(corr_matrix)
+
+from scipy.stats import pearsonr
+print("\nPearson's corr coeff:")
+print(pearsonr(biochemistry_data.LBXSTR,questionnaire_data.HYPERTENSION))
+
+from scipy.stats import pointbiserialr
+print("\nPoint biserial corr coeff:")
+print(pointbiserialr(biochemistry_data.LBXSTR,questionnaire_data.HYPERTENSION))
