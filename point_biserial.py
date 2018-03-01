@@ -38,27 +38,42 @@ if False:
     print(biochemistry_data.describe())
     print("\n---------------------------\n")
     print(questionnaire_data.describe())
-
+print("\nData columns:\n")
 if True:
+    print("\nBiochemistry Data\n")
     print(biochemistry_data.columns)
-    print("\n---------------------------\n")
+    print("\nQuestionnaire Data\n")
     print(questionnaire_data.columns)
 
 
 
-pair_df = pd.concat([biochemistry_data.LBXSTR, questionnaire_data.HYPERTENSION], axis=1)
-print(pair_df.describe())
+#Example: it proves that corrcoef, pearsonr and pointbiserial yields the same correlation
+#         coeff values between a continuous and a dichotomous variable
+if False:
 
-cols = list(pair_df.columns)
-corr_matrix = np.corrcoef(pair_df[cols].values.T)
+    pair_df = pd.concat([biochemistry_data.LBXSTR, questionnaire_data.HYPERTENSION], axis=1)
+    print(pair_df.describe())
 
-print("\nCorrelation matrix:")
-print(corr_matrix)
+    cols = list(pair_df.columns)
+    corr_matrix = np.corrcoef(pair_df[cols].values.T)
 
-from scipy.stats import pearsonr
-print("\nPearson's corr coeff:")
-print(pearsonr(biochemistry_data.LBXSTR,questionnaire_data.HYPERTENSION))
+    print("\nCorrelation matrix:")
+    print(corr_matrix)
 
-from scipy.stats import pointbiserialr
-print("\nPoint biserial corr coeff:")
-print(pointbiserialr(biochemistry_data.LBXSTR,questionnaire_data.HYPERTENSION))
+    from scipy.stats import pearsonr
+    print("\nPearson's corr coeff:")
+    print(pearsonr(biochemistry_data.LBXSTR,questionnaire_data.HYPERTENSION))
+
+    from scipy.stats import pointbiserialr
+    print("\nPoint biserial corr coeff:")
+    print(pointbiserialr(biochemistry_data.LBXSTR,questionnaire_data.HYPERTENSION))
+
+
+print("\nCorrelation coefficients:\n")
+
+from scipy.stats import pearsonr, spearmanr
+for feat in bio_cols:
+    print(feat)
+
+    print("Pearson's = {}".format(pearsonr(biochemistry_data[feat], questionnaire_data.HYPERTENSION)[0]))
+    print("Spearman's = {}".format(spearmanr(biochemistry_data[feat], questionnaire_data.HYPERTENSION)[0]))
