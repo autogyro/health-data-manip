@@ -71,9 +71,15 @@ if False:
 
 print("\nCorrelation coefficients:\n")
 
-from scipy.stats import pearsonr, spearmanr
+
+import dcor # E-statistics module
+from scipy.stats import pearsonr, spearmanr, kendalltau
 for feat in bio_cols:
     print(feat)
 
-    print("Pearson's = {}".format(pearsonr(biochemistry_data[feat], questionnaire_data.HYPERTENSION)[0]))
-    print("Spearman's = {}".format(spearmanr(biochemistry_data[feat], questionnaire_data.HYPERTENSION)[0]))
+    print("Pearson's = {}".format(pearsonr(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])[0]))
+    print("Spearman's = {}".format(spearmanr(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])[0]))
+    print("Kendall's Tau = {}\n".format(kendalltau(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])[0]))
+    print("Distance Correlation = {}\n".format(dcor.distance_correlation(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])))
+
+
