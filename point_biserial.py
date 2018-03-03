@@ -106,22 +106,46 @@ import dcor # E-statistics module
 import seaborn as sns
 cols = list(biochemistry_data.columns)
 
-distance_corr_matrix = np.zeros((len(cols), len(cols)))
-container = []
-for i, col_i in enumerate(cols):
-    for j, col_j in enumerate(cols):
-        container.append(dcor.distance_correlation(biochemistry_data[col_i], biochemistry_data[col_j]))
+#version 2
+if True:
+
+    container = len(cols)*len(cols)*[0.0]
+    for i in range(len(cols)):
+        for j in range(i, len(cols)):
+            m = i * len(cols) + j
+            n = j * len(cols) + i
+            container[m] = dcor.distance_correlation(biochemistry_data[cols[i]], biochemistry_data[cols[j]])
+            container[n] = container[m]
+
+    distance_corr_matrix = np.reshape(container, (-1, len(cols)))
+
+    plt.figure(1, figsize=(12, 18))
+    sns.set(font_scale=1.0)
+    heat_map = sns.heatmap(distance_corr_matrix, cbar=False, annot=True, square=True, fmt='.2f',
+                   annot_kws = {'size': 10}, yticklabels=cols, xticklabels=cols)
+    plt.xticks(rotation='vertical')
+    plt.yticks(rotation='horizontal')
+    plt.tight_layout()
+    plt.show()
+
+#version 1
+if False:
+    distance_corr_matrix = np.zeros((len(cols), len(cols)))
+    container = []
+    for i, col_i in enumerate(cols):
+        for j, col_j in enumerate(cols):
+            container.append(dcor.distance_correlation(biochemistry_data[col_i], biochemistry_data[col_j]))
 
 
-distance_corr_matrix = np.reshape(container, (-1, len(cols)))
+    distance_corr_matrix = np.reshape(container, (-1, len(cols)))
 
-plt.figure(1, figsize=(12, 18))
-sns.set(font_scale=1.0)
-heat_map = sns.heatmap(distance_corr_matrix, cbar=False, annot=True, square=True, fmt='.2f',
-               annot_kws = {'size': 10}, yticklabels=cols, xticklabels=cols)
-plt.xticks(rotation='vertical')
-plt.yticks(rotation='horizontal')
-plt.tight_layout()
-plt.show()
+    plt.figure(1, figsize=(12, 18))
+    sns.set(font_scale=1.0)
+    heat_map = sns.heatmap(distance_corr_matrix, cbar=False, annot=True, square=True, fmt='.2f',
+                   annot_kws = {'size': 10}, yticklabels=cols, xticklabels=cols)
+    plt.xticks(rotation='vertical')
+    plt.yticks(rotation='horizontal')
+    plt.tight_layout()
+    plt.show()
 
 
