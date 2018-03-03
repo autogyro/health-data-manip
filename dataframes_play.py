@@ -8,18 +8,39 @@ Created on Tue Sep 19 10:02:43 2017
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import sys
+#from xgboost import XGBClassifier #Test xgboost import
+
+
+
+
+#Build a symmetric matrix from linear array
+if False:
+    cols = ['a','b','c']
+    L = len(cols) * len(cols) * [0.0]
+    print(L)
+    for i in range(len(cols)):
+        for j in range(i, len(cols)):
+            m = i * len(cols) + j
+            n = j * len(cols) + i
+            L[m] = cols[i] + cols[j]
+            L[n] = L[m]
+
+    BB = np.reshape(L, (-1, len(cols)))
+    print(BB)
 
 
 #Test droping records corrresponding to specified indexes
-d = {'x': [0.1, 0.2, 0.15, 0.25], 'y': [0.1, 200.0, 0.15, 0.25], 'seqn':[300,301,302,303]}
-df = pd.DataFrame(d)
-print(df)
-print("")
-df.set_index('seqn', inplace=True)
-print(df)
-print("")
-df.drop([301, 302], inplace=True)
-print(df)
+if False:
+    d = {'x': [0.1, 0.2, 0.15, 0.25], 'y': [0.1, 200.0, 0.15, 0.25], 'seqn':[300,301,302,303]}
+    df = pd.DataFrame(d)
+    print(df)
+    print("")
+    df.set_index('seqn', inplace=True)
+    print(df)
+    print("")
+    df.drop([301, 302], inplace=True)
+    print(df)
 
 
 #Test filtering outliers the hard way
