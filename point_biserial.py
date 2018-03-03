@@ -69,17 +69,59 @@ if False:
     print(pointbiserialr(biochemistry_data.LBXSTR,questionnaire_data.HYPERTENSION))
 
 
-print("\nCorrelation coefficients:\n")
+
+#Correlation measures exploration
+if False:
+    print("\nCorrelation coefficients:\n")
+    import dcor # E-statistics module
+    from scipy.stats import pearsonr, spearmanr, kendalltau
+
+    for feat in bio_cols:
+        print(feat)
+
+        print("Pearson's = {}".format(pearsonr(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])[0]))
+        print("Spearman's = {}".format(spearmanr(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])[0]))
+        print("Kendall's Tau = {}\n".format(kendalltau(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])[0]))
+        print("Distance Correlation = {}".format(dcor.distance_correlation(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])))
+        print("Energy Distance = {}\n".format(dcor.energy_distance(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])))
+
+
+#Plot corr matrix heatmap
+if False:
+    import seaborn as sns
+    cols = list(biochemistry_data.columns)
+    corr_matrix = np.corrcoef(biochemistry_data[cols].values.T)
+    print(corr_matrix)
+    plt.figure(1, figsize=(12, 18))
+    sns.set(font_scale=1.0)
+    heat_map = sns.heatmap(corr_matrix, cbar=False, annot=True, square=True, fmt='.2f',
+                   annot_kws = {'size': 10}, yticklabels=cols, xticklabels=cols)
+    plt.xticks(rotation='vertical')
+    plt.yticks(rotation='horizontal')
+    plt.tight_layout()
+    plt.show()
 
 
 import dcor # E-statistics module
-from scipy.stats import pearsonr, spearmanr, kendalltau
-for feat in bio_cols:
-    print(feat)
+import seaborn as sns
+cols = list(biochemistry_data.columns)
 
-    print("Pearson's = {}".format(pearsonr(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])[0]))
-    print("Spearman's = {}".format(spearmanr(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])[0]))
-    print("Kendall's Tau = {}\n".format(kendalltau(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])[0]))
-    print("Distance Correlation = {}\n".format(dcor.distance_correlation(biochemistry_data[feat], questionnaire_data["HYPERTENSION"])))
+distance_corr_matrix = np.zeros((len(cols), len(cols)))
+container = []
+for i, col_i in enumerate(cols):
+    for j, col_j in enumerate(cols):
+        container.append(dcor.distance_correlation(biochemistry_data[col_i], biochemistry_data[col_j]))
+
+
+distance_corr_matrix = np.reshape(container, (-1, len(cols)))
+
+plt.figure(1, figsize=(12, 18))
+sns.set(font_scale=1.0)
+heat_map = sns.heatmap(distance_corr_matrix, cbar=False, annot=True, square=True, fmt='.2f',
+               annot_kws = {'size': 10}, yticklabels=cols, xticklabels=cols)
+plt.xticks(rotation='vertical')
+plt.yticks(rotation='horizontal')
+plt.tight_layout()
+plt.show()
 
 
