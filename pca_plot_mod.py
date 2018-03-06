@@ -33,38 +33,50 @@ for col in data_cols:
 biochemistry_data = full_data[bio_cols]
 questionnaire_data = full_data[que_cols]
 
+good_data = biochemistry_data[['LBXSATSI', 'LBXSBU','LBXSCK','LBXSGTSI','LBXSIR','LBXSTR']]
+
+from sklearn.decomposition import PCA
+pca = PCA(n_components=good_data.shape[1])
+pca.fit(good_data)
+
+# Dimension indexing
+dimensions = dimensions = ['Dimension {}'.format(i) for i in range(1, len(pca.components_) + 1)]
+
+# PCA components
+components = pd.DataFrame(np.round(pca.components_, 4), columns=good_data.keys())
+components.index = dimensions
+
+print("\nDimensions\n {}".format(dimensions))
+print("\nComponents DF\n {}".format(components))
 
 
-def pca_results(good_data, pca):
-	'''
-	Constructs barchart plots of principal components analysis of
-	the input dataframe "good_data" given the input pca object "pca".
-	'''
-
-	# Dimension indexing
-	dimensions = dimensions = ['Dimension {}'.format(i) for i in range(1,len(pca.components_)+1)]
-
-	# PCA components
-	components = pd.DataFrame(np.round(pca.components_, 4), columns = good_data.keys())
-	components.index = dimensions
-
-	# PCA explained variance
-	ratios = pca.explained_variance_ratio_.reshape(len(pca.components_), 1)
-	variance_ratios = pd.DataFrame(np.round(ratios, 4), columns = ['Explained Variance'])
-	variance_ratios.index = dimensions
-
-	# Create a bar plot visualization
-	fig, ax = plt.subplots(figsize = (14,8))
-
-	# Plot the feature weights as a function of the components
-	components.plot(ax = ax, kind = 'bar');
-	ax.set_ylabel("Feature Weights")
-	ax.set_xticklabels(dimensions, rotation=0)
+subcomponets_1 = components.ix[[0, 1]]
 
 
-	# Display the explained variance ratios
-	for i, ev in enumerate(pca.explained_variance_ratio_):
-		ax.text(i-0.40, ax.get_ylim()[1] + 0.05, "Explained Variance\n          %.4f"%(ev))
+# PCA explained variance
+ratios = pca.explained_variance_ratio_.reshape(len(pca.components_), 1)
+variance_ratios = pd.DataFrame(np.round(ratios, 4), columns=['Explained Variance'])
+variance_ratios.index = dimensions
 
-	# Return a concatenated DataFrame
-	return pd.concat([variance_ratios, components], axis = 1)
+print("\nBare Explained Variance Ratios\n {}".format(pca.explained_variance_ratio_))
+
+print("\nExplained Variance Ratios DF\n {}".format(variance_ratios))
+
+# Create a bar plot visualization
+fig, ax = plt.subplots(figsize=(14, 8))
+
+# Plot the feature weights as a function of the components
+components.plot(ax=ax, kind='bar');
+ax.set_ylabel("Feature Weights")
+ax.set_xticklabels(dimensions, rotation=0)
+
+# Display the explained variance ratios
+for i, ev in enumerate(pca.explained_variance_ratio_):
+    ax.text(i - 0.40, ax.get_ylim()[1] + 0.05, "Explained Variance\n          %.4f" % (ev))
+
+# Return a concatenated DataFrame
+pca_results_df =  pd.concat([variance_ratios, components], axis=1)
+print("\nPCA Results DF\n")
+print(pca_results_df)
+
+plt.show()
