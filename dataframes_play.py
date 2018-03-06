@@ -688,6 +688,8 @@ if False:
                                    edgecolor='black')
     plt.show()
 
+
+#Access record by specifying indexes
 if False:
 
     d = {'A':[1.0,2.5,3.0], 'B':[1.1, 2.2, 3.3], 'C':[3.5, 4.0, 1.0], 'D':[1,2,3]}
