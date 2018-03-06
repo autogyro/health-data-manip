@@ -50,7 +50,8 @@ print("\nDimensions\n {}".format(dimensions))
 print("\nComponents DF\n {}".format(components))
 
 
-subcomponets_1 = components.ix[[0, 1]]
+subcomponets_1 = components.loc[components.index[[0, 1]]]
+print("\nSubcomponents1 DF\n {}".format(subcomponets_1))
 
 
 # PCA explained variance
