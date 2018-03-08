@@ -37,7 +37,11 @@ print("Num. features in questionnaire data: {}".format(len(que_cols)))
 biochemistry_data = full_data[bio_cols]
 questionnaire_data = full_data[que_cols]
 
+
+
 good_data = biochemistry_data[['LBXSATSI', 'LBXSBU','LBXSCK','LBXSGTSI','LBXSIR','LBXSTR']]
+good_data = biochemistry_data[['LBXSAPSI','LBXSASSI','LBXSATSI','LBXSBU','LBXSCK','LBXSCR',
+                               'LBXSGTSI'	'LBXSIR', 'LBXSTB','LBXSTR','LBXSUA']]
 
 from sklearn.decomposition import PCA
 pca = PCA(n_components=good_data.shape[1])
@@ -58,21 +62,22 @@ ratios = bare_ratios.reshape(len(pca.components_), 1)
 variance_ratios = pd.DataFrame(np.round(ratios, 4), columns=['Explained Variance'])
 variance_ratios.index = dimensions
 
-print("\nBare Explained Variance Ratios\n {}".format(pca.explained_variance_ratio_))
-print("\nExplained Variance Ratios DF\n {}".format(variance_ratios))
-
-print("\nDimensions\n {}".format(dimensions))
-print("\nComponents DF\n {}".format(components))
+if False:
+    print("\nBare Explained Variance Ratios\n {}".format(pca.explained_variance_ratio_))
+    print("\nExplained Variance Ratios DF\n {}".format(variance_ratios))
+    print("\nDimensions\n {}".format(dimensions))
+    print("\nComponents DF\n {}".format(components))
 
 nplots = 3
 sub_components = []
 sub_dimensions = []
 sub_var_ratios = []
 
-#plt.figure(1, figsize=(12, 6))
 
 for i in range(nplots):
+
     fig, ax = plt.subplots(figsize=(14, 8))
+
     sc = components.loc[components.index[2*i:2*(i+1)]]
     vr = bare_ratios[2 * i:2 * (i + 1)]
     ix = sc.index
@@ -93,48 +98,4 @@ for i in range(nplots):
     for j, ev in enumerate(vr):
         ax.text(j - 0.40, ax.get_ylim()[1] + 0.05, "Explained Variance\n %.4f" % (ev))
 
-
-plt.show()
-
-sys.exit()
-# Create a bar plot visualization
-fig, ax = plt.subplots(figsize=(14, 8))
-
-# Plot the feature weights as a function of the components
-components.plot(ax=ax, kind='bar');
-ax.set_ylabel("Feature Weights")
-ax.set_xticklabels(dimensions, rotation=0)
-
-# Display the explained variance ratios
-for i, ev in enumerate(pca.explained_variance_ratio_):
-    ax.text(i - 0.40, ax.get_ylim()[1] + 0.05, "Explained Variance\n %.4f" % (ev))
-
-# Return a concatenated DataFrame
-pca_results_df =  pd.concat([variance_ratios, components], axis=1)
-print("\nPCA Results DF\n")
-print(pca_results_df)
-
-plt.show()
-
-if False:
-
-    plt.figure(1, figsize=(12, 6))
-
-    plt.subplot(1, 2, 1)
-    sns.set(font_scale=1.2)
-    heat_map = sns.heatmap(pca_matrix, cbar=True, annot=True, square=True, fmt='.4f',
-                           annot_kws={'size': 12}, yticklabels=rows, xticklabels=cols)
-    plt.title("Feature loadings correlation matrix")
-    plt.xticks(rotation='vertical')
-    plt.yticks(rotation='horizontal')
-
-    plt.subplot(1, 2, 2)
-    sns.set(font_scale=1.2)
-    heat_map = sns.heatmap(pca_squared_matrix, cmap="YlGnBu", cbar=True, annot=True, square=True, fmt='.4f',
-                           annot_kws={'size': 12}, yticklabels=rows, xticklabels=cols)
-    plt.title("Variance percentages explained by feature")
-    plt.xticks(rotation='vertical')
-    plt.yticks(rotation='horizontal')
-
-    plt.tight_layout()
     plt.show()
