@@ -40,62 +40,67 @@ questionnaire_data = full_data[que_cols]
 
 
 good_data = biochemistry_data[['LBXSATSI', 'LBXSBU','LBXSCK','LBXSGTSI','LBXSIR','LBXSTR']]
-good_data = biochemistry_data[['LBXSAPSI','LBXSASSI','LBXSATSI','LBXSBU','LBXSCK','LBXSCR',
-                               'LBXSGTSI'	'LBXSIR', 'LBXSTB','LBXSTR','LBXSUA']]
-
-from sklearn.decomposition import PCA
-pca = PCA(n_components=good_data.shape[1])
-pca.fit(good_data)
-
-# Dimension indexing
-dimensions = dimensions = ['Dimension {}'.format(i) for i in range(1, len(pca.components_) + 1)]
-
-# PCA components
-components = pd.DataFrame(np.round(pca.components_, 4), columns=good_data.keys())
-components.index = dimensions
 
 
-# PCA explained variance
-bare_ratios = pca.explained_variance_ratio_
-ratios = bare_ratios.reshape(len(pca.components_), 1)
+#good_data = biochemistry_data[['LBXSAPSI','LBXSASSI','LBXSATSI','LBXSBU','LBXSCK','LBXSCR',
+#                               'LBXSGTSI','LBXSIR', 'LBXSTB','LBXSTR','LBXSUA']]
 
-variance_ratios = pd.DataFrame(np.round(ratios, 4), columns=['Explained Variance'])
-variance_ratios.index = dimensions
+#Standard PCA decomposition
+if True:
 
-if False:
-    print("\nBare Explained Variance Ratios\n {}".format(pca.explained_variance_ratio_))
-    print("\nExplained Variance Ratios DF\n {}".format(variance_ratios))
-    print("\nDimensions\n {}".format(dimensions))
-    print("\nComponents DF\n {}".format(components))
+    from sklearn.decomposition import PCA
+    pca = PCA(n_components=good_data.shape[1])
+    pca.fit(good_data)
 
-nplots = 3
-sub_components = []
-sub_dimensions = []
-sub_var_ratios = []
+    # Dimension indexing
+    dimensions = dimensions = ['Dimension {}'.format(i) for i in range(1, len(pca.components_) + 1)]
+
+    # PCA components
+    components = pd.DataFrame(np.round(pca.components_, 4), columns=good_data.keys())
+    components.index = dimensions
 
 
-for i in range(nplots):
+    # PCA explained variance
+    bare_ratios = pca.explained_variance_ratio_
+    ratios = bare_ratios.reshape(len(pca.components_), 1)
 
-    fig, ax = plt.subplots(figsize=(14, 8))
-
-    sc = components.loc[components.index[2*i:2*(i+1)]]
-    vr = bare_ratios[2 * i:2 * (i + 1)]
-    ix = sc.index
-
-    sub_components.append(sc)
-    sub_var_ratios.append(vr)
-    sub_dimensions.append(ix)
+    variance_ratios = pd.DataFrame(np.round(ratios, 4), columns=['Explained Variance'])
+    variance_ratios.index = dimensions
 
     if False:
-        print("\nSubcomponent DF[{}]:\n {}".format(i,sc))
-        print("\nSub_var_ratios[{}]:\n {}".format(i,vr))
-        print("\nDF Subdimensions[{}]:\n {}".format(i, ix))
+        print("\nBare Explained Variance Ratios\n {}".format(pca.explained_variance_ratio_))
+        print("\nExplained Variance Ratios DF\n {}".format(variance_ratios))
+        print("\nDimensions\n {}".format(dimensions))
+        print("\nComponents DF\n {}".format(components))
 
-    sc.plot(ax=ax, kind='bar');
-    ax.set_ylabel("Feature Weights")
-    ax.set_xticklabels(sc.index, rotation=0)
+    nplots = 3
+    sub_components = []
+    sub_dimensions = []
+    sub_var_ratios = []
 
-    for j, ev in enumerate(vr):
-        ax.text(j - 0.40, ax.get_ylim()[1] + 0.05, "Explained Variance\n %.4f" % (ev))
 
-    plt.show()
+    for i in range(nplots):
+
+        fig, ax = plt.subplots(figsize=(14, 8))
+
+        sc = components.loc[components.index[2*i:2*(i+1)]]
+        vr = bare_ratios[2 * i:2 * (i + 1)]
+        ix = sc.index
+
+        sub_components.append(sc)
+        sub_var_ratios.append(vr)
+        sub_dimensions.append(ix)
+
+        if False:
+            print("\nSubcomponent DF[{}]:\n {}".format(i,sc))
+            print("\nSub_var_ratios[{}]:\n {}".format(i,vr))
+            print("\nDF Subdimensions[{}]:\n {}".format(i, ix))
+
+        sc.plot(ax=ax, kind='bar');
+        ax.set_ylabel("Feature Weights")
+        ax.set_xticklabels(sc.index, rotation=0)
+
+        for j, ev in enumerate(vr):
+            ax.text(j - 0.40, ax.get_ylim()[1] + 0.05, "Explained Variance\n %.4f" % (ev))
+
+        plt.show()
