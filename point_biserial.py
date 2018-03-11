@@ -159,16 +159,15 @@ if False:
 
 
 
-cardio_features = ['HYPERTENSION_ONSET', 'HIGHCHOL_ONSET', 'HIGHCHOL','HYPERTENSION', 'CHEST_DISCOMFORT', 'CHEST_PAIN_30MIN',
-       'BREATH_SHORTNESS', 'DIAGNOSED_DIABETES','DIAGNOSED_PREDIABETES', 'RISK_DIABETES']
-
-cardio_biochem_df = pd.concat([questionnaire_data[cardio_features], biochemistry_data], axis=1)
-
-print(cardio_biochem_df.describe())
 
 
+if False:
 
-if True:
+    cardio_features = ['HYPERTENSION_ONSET', 'HIGHCHOL_ONSET', 'HIGHCHOL', 'HYPERTENSION', 'CHEST_DISCOMFORT',
+                       'CHEST_PAIN_30MIN',
+                       'BREATH_SHORTNESS', 'DIAGNOSED_DIABETES', 'DIAGNOSED_PREDIABETES', 'RISK_DIABETES']
+
+    cardio_biochem_df = pd.concat([questionnaire_data[cardio_features], biochemistry_data], axis=1)
 
     from scipy.stats import pointbiserialr
 
@@ -184,6 +183,41 @@ if True:
             m = i * len(cols_bis) + j
             n = j * len(cols_bis) + i
             container_bis[m] = pointbiserialr(cardio_biochem_df[cols_bis[i]], cardio_biochem_df[cols_bis[j]])[0]
+            container_bis[n] = container_bis[m]
+
+    biserial_corr_matrix = np.reshape(container_bis, (-1, len(cols_bis)))
+
+    plt.figure(1, figsize=(10, 8))
+    sns.set(font_scale=0.7)
+    heat_map_bis = sns.heatmap(biserial_corr_matrix, cbar=False, annot=True, square=True, fmt='.2f',
+                    annot_kws = {'size': 6}, yticklabels=cols_bis, xticklabels=cols_bis)
+    plt.xticks(rotation='vertical')
+    plt.yticks(rotation='horizontal')
+    plt.tight_layout()
+    plt.show()
+
+
+if True:
+
+    non_cardio_features = ['AGE', 'ALCOHOL_NUM', 'SMOKING', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD', 'GENDER_Female',
+                           'GENDER_Male']
+
+    non_cardio_biochem_df = pd.concat([questionnaire_data[non_cardio_features], biochemistry_data], axis=1)
+
+    from scipy.stats import pointbiserialr
+
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    sns.reset_orig()
+
+    cols_bis = list(non_cardio_biochem_df.columns)
+
+    container_bis = len(cols_bis)*len(cols_bis)*[0.0]
+    for i in range(len(cols_bis)):
+        for j in range(i, len(cols_bis)):
+            m = i * len(cols_bis) + j
+            n = j * len(cols_bis) + i
+            container_bis[m] = pointbiserialr(non_cardio_biochem_df[cols_bis[i]], non_cardio_biochem_df[cols_bis[j]])[0]
             container_bis[n] = container_bis[m]
 
     biserial_corr_matrix = np.reshape(container_bis, (-1, len(cols_bis)))
