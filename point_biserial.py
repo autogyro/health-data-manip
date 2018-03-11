@@ -160,7 +160,7 @@ if False:
 
 
 
-
+#Plot correlation map between cardiovasculare related features and biochemistry data
 if False:
 
     cardio_features = ['HYPERTENSION_ONSET', 'HIGHCHOL_ONSET', 'HIGHCHOL', 'HYPERTENSION', 'CHEST_DISCOMFORT',
@@ -197,7 +197,8 @@ if False:
     plt.show()
 
 
-if True:
+#Plot correlation map between selected NON-cardiovasculare related features and biochemistry data
+if False:
 
     non_cardio_features = ['AGE', 'ALCOHOL_NUM', 'SMOKING', 'BMI', 'NOTHOME_FOOD', 'FAST_FOOD', 'GENDER_Female',
                            'GENDER_Male']
@@ -232,3 +233,64 @@ if True:
     plt.show()
 
 
+#Plot correlation map between questionnaire related features
+if False:
+    from scipy.stats import pointbiserialr
+
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    sns.reset_orig()
+
+    cols_bis = list(questionnaire_data.columns)
+
+    container_bis = len(cols_bis) * len(cols_bis) * [0.0]
+    for i in range(len(cols_bis)):
+        for j in range(i, len(cols_bis)):
+            m = i * len(cols_bis) + j
+            n = j * len(cols_bis) + i
+            container_bis[m] = pointbiserialr(questionnaire_data[cols_bis[i]], questionnaire_data[cols_bis[j]])[0]
+            container_bis[n] = container_bis[m]
+
+    biserial_corr_matrix = np.reshape(container_bis, (-1, len(cols_bis)))
+
+    plt.figure(1, figsize=(10, 8))
+    sns.set(font_scale=0.7)
+    heat_map_bis = sns.heatmap(biserial_corr_matrix, cbar=False, annot=True, square=True, fmt='.2f',
+                               annot_kws={'size': 6}, yticklabels=cols_bis, xticklabels=cols_bis)
+    plt.xticks(rotation='vertical')
+    plt.yticks(rotation='horizontal')
+    plt.tight_layout()
+    plt.show()
+
+
+df = pd.concat([questionnaire_data['DIAGNOSED_DIABETES'], biochemistry_data['LBXSGL']], axis=1)
+dflm_p = df[(df['DIAGNOSED_DIABETES'] == 1)]
+dflm_n = df[(df['DIAGNOSED_DIABETES'] == 0)]
+
+plt.figure(1, figsize=(10, 8))
+
+plt.subplot(2, 2, 1)
+dflm_p['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
+
+plt.subplot(2, 2, 2)
+dflm_p['LBXSGL'].plot(kind='kde')
+plt.axvline(dflm_p['LBXSGL'].mean(), color='r', linestyle='dashed', linewidth=1);
+
+plt.subplot(2, 2, 3)
+dflm_n['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
+
+plt.subplot(2, 2, 4)
+dflm_n['LBXSGL'].plot(kind='kde')
+plt.axvline(dflm_n['LBXSGL'].mean(), color='r', linestyle='dashed', linewidth=1);
+
+plt.show()
+
+
+
+
+
+#dflm['LBXSGL'].plot(kind='hist', stacked=False, bins=50)
+#dflm['LBXSGL'].plot(kind='kde')
+
+#dflm_n['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50);
