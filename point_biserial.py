@@ -270,23 +270,34 @@ dflm_n = df[(df['DIAGNOSED_DIABETES'] == 0)]
 
 plt.figure(1, figsize=(10, 8))
 
+#plt.suptitle('Glucose Level Statistics for Patients with/without Diagnosed Diabetes', fontsize=12)
+
 plt.subplot(2, 2, 1)
+plt.title('Patients with diagnosed diabetes', fontsize=10)
 dflm_p['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
+#plt.xlabel('LBXSGL - Glucose (mg/dL)')
 
 plt.subplot(2, 2, 2)
-dflm_p['LBXSGL'].plot(kind='kde')
-plt.axvline(dflm_p['LBXSGL'].mean(), color='r', linestyle='dashed', linewidth=1);
-
-plt.subplot(2, 2, 3)
+plt.title('Patients NOT diagnosed with diabetes', fontsize=10)
+#plt.xlabel('LBXSGL - Glucose (mg/dL)')
 dflm_n['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
 
+plt.subplot(2, 2, 3)
+#plt.title('Patients with diagnosed diabetes', fontsize=10)
+dflm_p['LBXSGL'].plot(kind='kde')
+plt.xlabel('LBXSGL - Glucose (mg/dL)')
+plt.axvline(dflm_p['LBXSGL'].mean(), color='r', linestyle='dashed', linewidth=1);
+
 plt.subplot(2, 2, 4)
+#plt.title('Patients NOT diagnosed with diabetes', fontsize=10)
 dflm_n['LBXSGL'].plot(kind='kde')
+plt.xlabel('LBXSGL - Glucose (mg/dL)')
 plt.axvline(dflm_n['LBXSGL'].mean(), color='r', linestyle='dashed', linewidth=1);
 
+plt.tight_layout()
 plt.show()
 
-
+#
 
 
 
