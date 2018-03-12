@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 #import local modules
 from importlib.machinery import SourceFileLoader
-mod_path = "/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/nhanes2013-2104/"
+mod_path = "/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/report/development/utilities/"
 txt = SourceFileLoader("text_utils", mod_path+"text_utils.py").load_module()
 gut = SourceFileLoader("graph_utils", mod_path+"graph_utils.py").load_module()
 
@@ -302,7 +302,7 @@ if False:
     plt.show()
 
 # Histogram and density plots of LBXSOSSI - Osmolality  levels prevalence in patients diagnosed/not-diagnosed with diabetes
-if True:
+if False:
     df = pd.concat([questionnaire_data['DIAGNOSED_DIABETES'], biochemistry_data['LBXSOSSI']], axis=1)
     dflm_p = df[(df['DIAGNOSED_DIABETES'] == 1)]
     dflm_n = df[(df['DIAGNOSED_DIABETES'] == 0)]
@@ -335,3 +335,7 @@ if True:
 
     plt.tight_layout()
     plt.show()
+
+
+#Test external function defined in gut module
+gut.hist_density_plots_bc(questionnaire_data,biochemistry_data, 'DIAGNOSED_DIABETES', 'LBXSOSSI', 'Osmolality (n.u.)')
