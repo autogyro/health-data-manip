@@ -264,44 +264,74 @@ if False:
     plt.show()
 
 
-df = pd.concat([questionnaire_data['DIAGNOSED_DIABETES'], biochemistry_data['LBXSGL']], axis=1)
-dflm_p = df[(df['DIAGNOSED_DIABETES'] == 1)]
-dflm_n = df[(df['DIAGNOSED_DIABETES'] == 0)]
 
-plt.figure(1, figsize=(10, 8))
+#Histogram and density plots of LBXSGL glucose levels prevalence in patients diagnosed/not-diagnosed with diabetes
+if False:
 
-#plt.suptitle('Glucose Level Statistics for Patients with/without Diagnosed Diabetes', fontsize=12)
+    df = pd.concat([questionnaire_data['DIAGNOSED_DIABETES'], biochemistry_data['LBXSGL']], axis=1)
+    dflm_p = df[(df['DIAGNOSED_DIABETES'] == 1)]
+    dflm_n = df[(df['DIAGNOSED_DIABETES'] == 0)]
 
-plt.subplot(2, 2, 1)
-plt.title('Patients with diagnosed diabetes', fontsize=10)
-dflm_p['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
-#plt.xlabel('LBXSGL - Glucose (mg/dL)')
+    plt.figure(1, figsize=(10, 8))
 
-plt.subplot(2, 2, 2)
-plt.title('Patients NOT diagnosed with diabetes', fontsize=10)
-#plt.xlabel('LBXSGL - Glucose (mg/dL)')
-dflm_n['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
+    #plt.suptitle('Glucose Level Statistics for Patients with/without Diagnosed Diabetes', fontsize=12)
 
-plt.subplot(2, 2, 3)
-#plt.title('Patients with diagnosed diabetes', fontsize=10)
-dflm_p['LBXSGL'].plot(kind='kde')
-plt.xlabel('LBXSGL - Glucose (mg/dL)')
-plt.axvline(dflm_p['LBXSGL'].mean(), color='r', linestyle='dashed', linewidth=1);
+    plt.subplot(2, 2, 1)
+    plt.title('Patients with diagnosed diabetes', fontsize=10)
+    dflm_p['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
+    #plt.xlabel('LBXSGL - Glucose (mg/dL)')
 
-plt.subplot(2, 2, 4)
-#plt.title('Patients NOT diagnosed with diabetes', fontsize=10)
-dflm_n['LBXSGL'].plot(kind='kde')
-plt.xlabel('LBXSGL - Glucose (mg/dL)')
-plt.axvline(dflm_n['LBXSGL'].mean(), color='r', linestyle='dashed', linewidth=1);
+    plt.subplot(2, 2, 2)
+    plt.title('Patients NOT diagnosed with diabetes', fontsize=10)
+    #plt.xlabel('LBXSGL - Glucose (mg/dL)')
+    dflm_n['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
 
-plt.tight_layout()
-plt.show()
+    plt.subplot(2, 2, 3)
+    #plt.title('Patients with diagnosed diabetes', fontsize=10)
+    dflm_p['LBXSGL'].plot(kind='kde')
+    plt.xlabel('LBXSGL - Glucose (mg/dL)')
+    plt.axvline(dflm_p['LBXSGL'].mean(), color='r', linestyle='dashed', linewidth=1);
 
-#
+    plt.subplot(2, 2, 4)
+    #plt.title('Patients NOT diagnosed with diabetes', fontsize=10)
+    dflm_n['LBXSGL'].plot(kind='kde')
+    plt.xlabel('LBXSGL - Glucose (mg/dL)')
+    plt.axvline(dflm_n['LBXSGL'].mean(), color='r', linestyle='dashed', linewidth=1);
 
+    plt.tight_layout()
+    plt.show()
 
+# Histogram and density plots of LBXSOSSI - Osmolality  levels prevalence in patients diagnosed/not-diagnosed with diabetes
+if True:
+    df = pd.concat([questionnaire_data['DIAGNOSED_DIABETES'], biochemistry_data['LBXSOSSI']], axis=1)
+    dflm_p = df[(df['DIAGNOSED_DIABETES'] == 1)]
+    dflm_n = df[(df['DIAGNOSED_DIABETES'] == 0)]
 
-#dflm['LBXSGL'].plot(kind='hist', stacked=False, bins=50)
-#dflm['LBXSGL'].plot(kind='kde')
+    plt.figure(1, figsize=(10, 8))
 
-#dflm_n['LBXSGL'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50);
+    # plt.suptitle('Osmolality Level Statistics for Patients with/without Diagnosed Diabetes', fontsize=12)
+
+    plt.subplot(2, 2, 1)
+    plt.title('Patients with diagnosed diabetes', fontsize=10)
+    dflm_p['LBXSOSSI'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
+    # plt.xlabel('LBXSOSSI - Osmolality (mmol/Kg)')
+
+    plt.subplot(2, 2, 2)
+    plt.title('Patients NOT diagnosed with diabetes', fontsize=10)
+    # plt.xlabel('LBXSOSSI - Osmolality (mmol/Kg)')
+    dflm_n['LBXSOSSI'].plot(kind='hist', histtype='stepfilled', alpha=0.5, bins=50)
+
+    plt.subplot(2, 2, 3)
+    # plt.title('Patients with diagnosed diabetes', fontsize=10)
+    dflm_p['LBXSOSSI'].plot(kind='kde')
+    plt.xlabel('LBXSOSSI - Osmolality (mmol/Kg)')
+    plt.axvline(dflm_p['LBXSOSSI'].mean(), color='r', linestyle='dashed', linewidth=1);
+
+    plt.subplot(2, 2, 4)
+    # plt.title('Patients NOT diagnosed with diabetes', fontsize=10)
+    dflm_n['LBXSOSSI'].plot(kind='kde')
+    plt.xlabel('LBXSOSSI - Osmolality (mmol/Kg)')
+    plt.axvline(dflm_n['LBXSOSSI'].mean(), color='r', linestyle='dashed', linewidth=1);
+
+    plt.tight_layout()
+    plt.show()
