@@ -336,6 +336,19 @@ if False:
     plt.tight_layout()
     plt.show()
 
+# Test external function defined in gut module
+if False:
+    gut.hist_density_plots_bc(questionnaire_data,biochemistry_data, 'DIAGNOSED_DIABETES', 'LBXSOSSI', 'Osmolality (n.u.)')
 
-#Test external function defined in gut module
-gut.hist_density_plots_bc(questionnaire_data,biochemistry_data, 'DIAGNOSED_DIABETES', 'LBXSOSSI', 'Osmolality (n.u.)')
+
+#Generate a 2Dimensional histogram using two continuous features
+if False:
+    plt.hist2d(biochemistry_data['LBXSATSI'], biochemistry_data['LBXSASSI'], bins=60, cmap='Spectral')
+    cb = plt.colorbar()
+    cb.set_label('counts in bin')
+    plt.show()
+
+#Generate a scatter plot using two continuous features
+if True:
+    biochemistry_data.plot(kind='scatter', x='LBXSATSI', y='LBXSASSI');
+    plt.show()
