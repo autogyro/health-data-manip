@@ -11,8 +11,40 @@ import pandas as pd
 import sys
 #from xgboost import XGBClassifier #Test xgboost import
 
+d = {'disease':[1,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0], 'indicator':[0.12,1.2,0.54,0.05,1.03,0.43,1.15,0.1,0.2,0.8,0.5,0.2,0.1,1.1,0.23,0.7]}
+health_df = pd.DataFrame(d)
+
+print(health_df)
+
+print("Positive Cases")
+df1_p = health_df[(health_df['disease'] == 1)]
+print(df1_p)
+df2_p = df1_p[(df1_p['indicator'] <= 0.3)]
+print(df2_p)
+df3_p = df1_p[(df1_p['indicator'] >= 0.6)]
+print(df3_p)
+print("Negative Cases")
+df1_n = health_df[(health_df['disease'] == 0)]
+print(df1_n)
+df2_n = df1_n[(df1_n['indicator'] <= 0.3)]
+print(df2_n)
+df3_n = df1_n[(df1_n['indicator'] >= 0.6)]
+print(df3_n)
 
 
+
+#the purpose is to develo risk ratio for disease when levels are below normal and above normal,
+#i.e. when levels are out of normal range
+#function prototype to compute relative risk (for developing disease) ratio
+
+def get_risk_ratios(input_df, disease_feature, level_feature, below_normal_level, above_normal_level):
+    postive_cases = input_df[disease_feature == 1]
+    upper_positive_df = postive_cases[(positive_cases[level_feature] >= above_normal_level)]
+
+    print(upper_positive_df.describe())
+
+
+#get_risk_ratios(health_df, 'disease', 'indicator', 0.3, 0.6)
 
 #Build a symmetric matrix from linear array
 if False:
@@ -41,6 +73,7 @@ if False:
     print("")
     df.drop([301, 302], inplace=True)
     print(df)
+    print("\nNo. Keys in {}: {}\n".format(df.keys(), len(df.keys())))
 
 
 #Test filtering outliers the hard way
