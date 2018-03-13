@@ -350,7 +350,7 @@ if False:
 
 
 #Test plotting two scatter plots together
-if False
+if False:
     plt.figure(1, figsize=(12, 6))
 
     plt.subplot(1, 2, 1)
@@ -360,4 +360,19 @@ if False
     plt.subplot(1, 2, 2)
     plt.scatter(biochemistry_data['LBXSATSI'].values, biochemistry_data['LBXSCK'].values, c='green',
                 alpha=0.08, edgecolors='yellow')
+    plt.show()
+
+
+#Test plotting scatter and 2dhistogram together
+if True:
+    plt.figure(1, figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.scatter(biochemistry_data['LBXSATSI'].values, biochemistry_data['LBXSASSI'].values, c='orange',
+                alpha=0.3, edgecolors='brown')
+
+    plt.subplot(1, 2, 2)
+    plt.hist2d(biochemistry_data['LBXSATSI'], biochemistry_data['LBXSASSI'], bins=60, cmap='hot')
+    cb = plt.colorbar()
+    cb.set_label('counts in bin')
     plt.show()
