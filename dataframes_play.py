@@ -14,22 +14,76 @@ import sys
 d = {'disease':[1,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0], 'indicator':[0.12,1.2,0.54,0.05,1.03,0.43,1.15,0.1,0.2,0.8,0.5,0.2,0.1,1.1,0.23,0.7]}
 health_df = pd.DataFrame(d)
 
+print("Health Data")
 print(health_df)
 
 print("Positive Cases")
 df1_p = health_df[(health_df['disease'] == 1)]
 print(df1_p)
-df2_p = df1_p[(df1_p['indicator'] <= 0.3)]
+
+print("Positive below normal")
+df2_p = df1_p[(df1_p['indicator'] < 0.3)]
 print(df2_p)
-df3_p = df1_p[(df1_p['indicator'] >= 0.6)]
+
+a_below = df2_p['indicator'].count()
+
+
+print("Positive above normal")
+df3_p = df1_p[(df1_p['indicator'] > 0.6)]
 print(df3_p)
+
+a_above = df3_p['indicator'].count()
+
+print("Normal Positives")
+normal_p = df1_p[(df1_p['indicator'] >= 0.3)]
+normal_p = normal_p[normal_p['indicator'] <= 0.6]
+print(normal_p)
+
+c = normal_p['indicator'].count()
+
 print("Negative Cases")
 df1_n = health_df[(health_df['disease'] == 0)]
 print(df1_n)
-df2_n = df1_n[(df1_n['indicator'] <= 0.3)]
+
+print("Negative below normal")
+df2_n = df1_n[(df1_n['indicator'] < 0.3)]
 print(df2_n)
-df3_n = df1_n[(df1_n['indicator'] >= 0.6)]
+
+b_below = df2_n['indicator'].count()
+
+print("Negative above normal")
+df3_n = df1_n[(df1_n['indicator'] > 0.6)]
 print(df3_n)
+
+b_above = df3_n['indicator'].count()
+
+print("Normal Negatives")
+normal_n = df1_n[(df1_n['indicator'] >= 0.3)]
+normal_n = normal_n[normal_n['indicator'] <= 0.6]
+print(normal_n)
+
+d =  normal_n['indicator'].count()
+
+print("Contingency Table Elements Above Threshold\n")
+
+print("a = {}".format(a_above))
+print("b = {}".format(b_above))
+print("c = {}".format(c))
+print("d = {}".format(d))
+
+print("Contingency Table Elements Below Threshold\n")
+
+print("a = {}".format(a_below))
+print("b = {}".format(b_below))
+print("c = {}".format(c))
+print("d = {}".format(d))
+
+print("Contingency Table Elements Outside Normal Range\n")
+
+print("a = {}".format(a_above + a_below))
+print("b = {}".format(b_above + b_below))
+print("c = {}".format(c))
+print("d = {}".format(d))
 
 
 
