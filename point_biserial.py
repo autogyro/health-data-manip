@@ -47,6 +47,74 @@ if True:
 
 
 
+strong_biofeatures = ['LBXSGL', 'LBXSTR', 'LBXSOSSI', 'LBXSBU', 'LBXSGTSI', 'LBXSCR', 'LBXSUA', 'LBXSLDSI', 'LBXSCH',
+                      'LBXSATSI', 'LBXSGB', 'LBXSAPSI']
+
+strong_qfeatures = ['HIGHCHOL', 'HYPERTENSION', 'CHEST_DISCOMFORT', 'CHEST_PAIN_30MIN', 'DIAGNOSED_DIABETES']
+
+
+from scipy.stats import pointbiserialr
+import operator
+
+max_corrs = []
+for q_feat in strong_qfeatures:
+    d={}
+    for b_feat in strong_biofeatures:
+        corr = pointbiserialr(questionnaire_data[q_feat], biochemistry_data[b_feat])[0]
+        if (corr >= 0.1):
+            d[b_feat] = np.round(corr,2)
+
+    sorted_d = sorted(d.items(), key=operator.itemgetter(1))
+
+    if (len(sorted_d) == 0):
+        max_assoc = None
+    else:
+        max_assoc = sorted_d[-1]
+
+    t= (q_feat, max_assoc)
+    max_corrs.append(t)
+
+print(max_corrs)
+
+
+
+
+
+
+# Compute point biserial correlation among all biochemistry features and one questionnaire features
+if False:
+
+    from scipy.stats import pointbiserialr
+
+    d = {}
+
+    #q_feat = 'HIGHCHOL'
+    #q_feat = 'HIGHCHOL_ONSET'
+    #q_feat = 'HYPERTENSION'
+    #q_feat = 'CHEST_DISCOMFORT'
+    #q_feat = 'CHEST_PAIN_30MIN'
+    q_feat = 'DIAGNOSED_DIABETES'
+
+    for b_feat in biochemistry_data.columns:
+        corr = pointbiserialr(questionnaire_data[q_feat], biochemistry_data[b_feat])[0]
+        if (corr >= 0.1):
+            d[b_feat] = np.round(corr,2)
+
+    print("..")
+    print(d)
+
+    import operator
+    sorted_d = sorted(d.items(), key=operator.itemgetter(1))
+    print("..")
+    print(sorted_d)
+
+
+    print("\nMax and Minimum:\n")
+    print(sorted_d[0])
+    print(sorted_d[-1])
+
+
+
 #Example: it proves that corrcoef, pearsonr and pointbiserial yields the same correlation
 #         coeff values between a continuous and a dichotomous variable
 if False:
@@ -159,8 +227,22 @@ if False:
 
 
 
+################################################################################################################
 
-#Plot correlation map between cardiovasculare related features and biochemistry data
+
+
+
+
+if False:
+
+    from scipy.stats import pointbiserialr
+    corr = pointbiserialr(questionnaire_data['HIGHCHOL'], biochemistry_data['LBXSGL'])[0]
+    corr = np.round(bi_corr, 2)
+    print(corr)
+
+
+
+#Plot correlation map between cardiovascular-related features and biochemistry data
 if False:
 
     cardio_features = ['HYPERTENSION_ONSET', 'HIGHCHOL_ONSET', 'HIGHCHOL', 'HYPERTENSION', 'CHEST_DISCOMFORT',
@@ -301,6 +383,58 @@ if False:
     plt.tight_layout()
     plt.show()
 
+
+#Test difference between means, different sample sizes
+if False:
+
+    #LBXSOSSI
+
+    df = pd.concat([questionnaire_data['DIAGNOSED_DIABETES'], biochemistry_data['LBXSOSSI']], axis=1)
+    dflm_p = df[(df['DIAGNOSED_DIABETES'] == 1)]
+    dflm_n = df[(df['DIAGNOSED_DIABETES'] == 0)]
+
+
+    from scipy.stats import normaltest
+
+    k2, pval = normaltest(dflm_p['LBXSOSSI'].values)
+    alpha = 0.05
+
+    if pval < alpha:
+        print("The population in {} is not normally distributed".format('LBXSOSSI'))
+    else:
+        print("The population is normally distributed")
+
+
+    print("Median of {} in Positive Group".format(dflm_p['LBXSOSSI'].median()))
+    print("Median of {} in Negative Group".format(dflm_n['LBXSOSSI'].median()))
+
+    from scipy.stats import kruskal
+
+    H_stat, kpval= kruskal(dflm_p['LBXSOSSI'].values, dflm_n['LBXSOSSI'].values)
+
+    print(H_stat, kpval)
+
+
+    #LBXSATSI
+    if False:
+
+        df = pd.concat([questionnaire_data['DIAGNOSED_DIABETES'], biochemistry_data['LBXSATSI']], axis=1)
+        dflm_p = df[(df['DIAGNOSED_DIABETES'] == 1)]
+        dflm_n = df[(df['DIAGNOSED_DIABETES'] == 0)]
+
+        k2, pval = normaltest(dflm_p['LBXSATSI'].values)
+        alpha = 0.05
+
+        if pval < alpha:
+            print("The population in {} is not normally distributed".format('LBXSATSI'))
+        else:
+            print("The population is normally distributed")
+
+
+
+
+
+
 # Histogram and density plots of LBXSOSSI - Osmolality  levels prevalence in patients diagnosed/not-diagnosed with diabetes
 if False:
     df = pd.concat([questionnaire_data['DIAGNOSED_DIABETES'], biochemistry_data['LBXSOSSI']], axis=1)
@@ -336,10 +470,14 @@ if False:
     plt.tight_layout()
     plt.show()
 
+
+
+
+
 # Test external function defined in gut module
 if False:
-    gut.hist_density_plots_bc(questionnaire_data,biochemistry_data, 'DIAGNOSED_DIABETES', 'LBXSOSSI', 'Osmolality (n.u.)')
-
+    gut.hist_density_plots_bc(questionnaire_data,biochemistry_data, 'DIAGNOSED_DIABETES', 'LBXSOSSI', 'Osmolality (n.u.)',
+                              mean_mark=False)
 
 #Generate a 2Dimensional histogram using two continuous features
 if False:
@@ -364,7 +502,7 @@ if False:
 
 
 #Test plotting scatter and 2dhistogram together
-if True:
+if False:
     plt.figure(1, figsize=(12, 6))
 
     plt.subplot(1, 2, 1)
