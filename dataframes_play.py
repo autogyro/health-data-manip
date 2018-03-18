@@ -11,79 +11,93 @@ import pandas as pd
 import sys
 #from xgboost import XGBClassifier #Test xgboost import
 
-d = {'disease':[1,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0], 'indicator':[0.12,1.2,0.54,0.05,1.03,0.43,1.15,0.1,0.2,0.8,0.5,0.2,0.1,1.1,0.23,0.7]}
-health_df = pd.DataFrame(d)
-
-print("Health Data")
-print(health_df)
-
-print("Positive Cases")
-df1_p = health_df[(health_df['disease'] == 1)]
-print(df1_p)
-
-print("Positive below normal")
-df2_p = df1_p[(df1_p['indicator'] < 0.3)]
-print(df2_p)
-
-a_below = df2_p['indicator'].count()
 
 
-print("Positive above normal")
-df3_p = df1_p[(df1_p['indicator'] > 0.6)]
-print(df3_p)
 
-a_above = df3_p['indicator'].count()
+if False:
+    d = {'disease':[1,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0], 'indicator':[0.12,1.2,0.54,0.05,1.03,0.43,1.15,0.1,0.2,0.8,0.5,0.2,0.1,1.1,0.23,0.7]}
+    health_df = pd.DataFrame(d)
 
-print("Normal Positives")
-normal_p = df1_p[(df1_p['indicator'] >= 0.3)]
-normal_p = normal_p[normal_p['indicator'] <= 0.6]
-print(normal_p)
+    print("Health Data")
+    print(health_df)
 
-c = normal_p['indicator'].count()
+    print("Positive Cases")
+    df1_p = health_df[(health_df['disease'] == 1)]
+    print(df1_p)
 
-print("Negative Cases")
-df1_n = health_df[(health_df['disease'] == 0)]
-print(df1_n)
+    print("Positive below normal")
+    df2_p = df1_p[(df1_p['indicator'] < 0.3)]
+    print(df2_p)
 
-print("Negative below normal")
-df2_n = df1_n[(df1_n['indicator'] < 0.3)]
-print(df2_n)
+    a_below = df2_p['indicator'].count()
 
-b_below = df2_n['indicator'].count()
 
-print("Negative above normal")
-df3_n = df1_n[(df1_n['indicator'] > 0.6)]
-print(df3_n)
+    print("Positive above normal")
+    df3_p = df1_p[(df1_p['indicator'] > 0.6)]
+    print(df3_p)
 
-b_above = df3_n['indicator'].count()
+    a_above = df3_p['indicator'].count()
 
-print("Normal Negatives")
-normal_n = df1_n[(df1_n['indicator'] >= 0.3)]
-normal_n = normal_n[normal_n['indicator'] <= 0.6]
-print(normal_n)
+    print("Normal Positives")
+    normal_p = df1_p[(df1_p['indicator'] >= 0.3)]
+    normal_p = normal_p[normal_p['indicator'] <= 0.6]
+    print(normal_p)
 
-d =  normal_n['indicator'].count()
+    c = normal_p['indicator'].count()
+    if c==0:
+        c=1
 
-print("Contingency Table Elements Above Threshold\n")
+    print("Negative Cases")
+    df1_n = health_df[(health_df['disease'] == 0)]
+    print(df1_n)
 
-print("a = {}".format(a_above))
-print("b = {}".format(b_above))
-print("c = {}".format(c))
-print("d = {}".format(d))
+    print("Negative below normal")
+    df2_n = df1_n[(df1_n['indicator'] < 0.3)]
+    print(df2_n)
 
-print("Contingency Table Elements Below Threshold\n")
+    b_below = df2_n['indicator'].count()
 
-print("a = {}".format(a_below))
-print("b = {}".format(b_below))
-print("c = {}".format(c))
-print("d = {}".format(d))
+    print("Negative above normal")
+    df3_n = df1_n[(df1_n['indicator'] > 0.6)]
+    print(df3_n)
 
-print("Contingency Table Elements Outside Normal Range\n")
+    b_above = df3_n['indicator'].count()
 
-print("a = {}".format(a_above + a_below))
-print("b = {}".format(b_above + b_below))
-print("c = {}".format(c))
-print("d = {}".format(d))
+    print("Normal Negatives")
+    normal_n = df1_n[(df1_n['indicator'] >= 0.3)]
+    normal_n = normal_n[normal_n['indicator'] <= 0.6]
+    print(normal_n)
+
+    d =  normal_n['indicator'].count()
+
+    print("Contingency Table Elements Above Threshold\n")
+
+    print("a = {}".format(a_above))
+    print("b = {}".format(b_above))
+    print("c = {}".format(c))
+    print("d = {}".format(d))
+    RR = (a_above/(a_above+b_above))/(c/(c+d))
+    print("Risk Ratio = {}".format(RR))
+
+    print("Contingency Table Elements Below Threshold\n")
+
+    print("a = {}".format(a_below))
+    print("b = {}".format(b_below))
+    print("c = {}".format(c))
+    print("d = {}".format(d))
+    RR = (a_below/(a_below+b_below))/(c/(c+d))
+    print("Risk Ratio = {}".format(RR))
+
+    print("Contingency Table Elements Outside Normal Range\n")
+
+    print("a = {}".format(a_above + a_below))
+    print("b = {}".format(b_above + b_below))
+    print("c = {}".format(c))
+    print("d = {}".format(d))
+    a = a_above + a_below
+    b = b_above + b_below
+    RR = (a/(a+b))/(c/(c+d))
+    print("Risk Ratio = {}".format(RR))
 
 
 
