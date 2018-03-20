@@ -17,15 +17,6 @@ df = pd.DataFrame(d)
 
 print(df)
 
-def binarize(value,cutoff):
-
-    if (value < cutoff):
-        return 0
-    else:
-        return 1
-
-
-
 from sklearn.preprocessing import binarize
 
 binarize(df, threshold=0.5, copy=False)
