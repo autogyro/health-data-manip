@@ -12,22 +12,50 @@ import sys
 #from xgboost import XGBClassifier #Test xgboost import
 
 
-d = {'A':[0.1, 0.2, 0.6, 0.3, 0.9, 0.45]}
-df = pd.DataFrame(d)
-df2 = df.copy(deep=True)
 
-print(df)
+if False:
 
 from sklearn.preprocessing import binarize
 
-binarize(df, threshold=0.5, copy=False)
+    d = {'A':[0.1, 0.2, 0.6, 0.3, 0.9, 0.45], 'B':[0.7, 0.8, 0.1, 0.3, 0.9, 0.45]}
+    thr_values = {'A':0.5, 'B':0.3}
 
-df3 = pd.concat([df2['A'], df['A']], axis=1, keys=['AO', 'AB'])
+    df = pd.DataFrame(d)
+
+    print(df)
+
+    df_copy = df.copy(deep=True)
+
+    for feat in df.columns:
+        binarize(df[feat].values.reshape(-1,1), threshold=thr_values[feat], copy=False)
+        df[feat] = pd.to_numeric(df[feat], downcast='integer')
+
+    print(df)
+    print(type(df['A'].values[0]))
 
 
-print(df)
-print(df2)
-print(df3)
+
+
+
+if False:
+    d = {'A':[0.1, 0.2, 0.6, 0.3, 0.9, 0.45], 'B':[0.7, 0.8, 0.1, 0.3, 0.9, 0.45]}
+    df = pd.DataFrame(d)
+    df2 = df.copy(deep=True)
+
+    print(df)
+
+    from sklearn.preprocessing import binarize
+
+    binarize(df, threshold=0.5, copy=False)
+
+    df3 = pd.concat([df2['A'], df['A']], axis=1, keys=['AO', 'AB'])
+
+    print(df)
+    print(df2)
+    print(df3)
+
+
+
 
 
 if False:
