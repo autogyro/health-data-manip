@@ -12,10 +12,53 @@ import sys
 #from xgboost import XGBClassifier #Test xgboost import
 
 
+def create_binarized_df(input_df, features, thresholds, full_binarization=True):
+    """
+    :param input_df: dataframe containing the features to be binarized
+    :param features: list of features to be binarized
+    :param thresholds: threshold values to be passed to sklearn's binarize preprocessing method
+    :param full_binarization: boolean value that sets whether we return a version of input_df with all its features
+    binarized (True) or a partial dataframe containing the binarized version of the specified
+    features in the features list (False).
+    :return:
+    """
+    from sklearn.preprocessing import binarize
+
+    if full_binarization:
+        if (len(features) < len(input_df.columns)):
+            raise Exception("The list of input features must contain all features in dataframe"
+                            "e.g. input_df.columns.")
+        if (len(features) > len(input_df.columns)):
+            raise Exception("The number of features in features list must be less than or equal to"
+                            "the number of all features in input dataframe.")
+
+
+        frame = input_df.copy(deep=True)
+    else:
+        if (len(features) > len(input_df.columns)):
+            raise Exception("The number of features in features list must be less than or equal to"
+                            "the number of all features in input dataframe.")
+        frame = input_df[features]
+
+    for feat in features:
+        binarize(frame[feat].values.reshape(-1,1), threshold=thresholds[feat], copy=False)
+        frame[feat] = pd.to_numeric(frame[feat], downcast='integer')
+
+    return frame
+
+
+d = {'A': [0.1, 0.2, 0.6, 0.3, 0.9, 0.45], 'B': [0.7, 0.8, 0.1, 0.3, 0.9, 0.45], 'C': [0.7, 0.8, 0.1, 0.3, 0.9, 0.45]}
+df = pd.DataFrame(d)
+
+thr_values = {'A': 0.5, 'B': 0.3, 'C':0.7}
+
+mydf = create_binarized_df(df,['A','B'],thr_values,full_binarization=False)
+
+print(mydf)
 
 if False:
 
-from sklearn.preprocessing import binarize
+    from sklearn.preprocessing import binarize
 
     d = {'A':[0.1, 0.2, 0.6, 0.3, 0.9, 0.45], 'B':[0.7, 0.8, 0.1, 0.3, 0.9, 0.45]}
     thr_values = {'A':0.5, 'B':0.3}
