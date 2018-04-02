@@ -47,14 +47,20 @@ def create_binarized_df(input_df, features, thresholds, full_binarization=True):
     return frame
 
 
-d = {'A': [0.1, 0.2, 0.6, 0.3, 0.9, 0.45], 'B': [0.7, 0.8, 0.1, 0.3, 0.9, 0.45], 'C': [0.7, 0.8, 0.1, 0.3, 0.9, 0.45]}
-df = pd.DataFrame(d)
+#######################################
+## Test create_binarized_df function ##
+#######################################
 
-thr_values = {'A': 0.5, 'B': 0.3, 'C':0.7}
+if False:
 
-mydf = create_binarized_df(df,['A','B'],thr_values,full_binarization=False)
+    d = {'A': [0.1, 0.2, 0.6, 0.3, 0.9, 0.45], 'B': [0.7, 0.8, 0.1, 0.3, 0.9, 0.45], 'C': [0.7, 0.8, 0.1, 0.3, 0.9, 0.45]}
+    df = pd.DataFrame(d)
 
-print(mydf)
+    thr_values = {'A': 0.5, 'B': 0.3, 'C':0.7}
+
+    mydf = create_binarized_df(df,['A','B'],thr_values,full_binarization=False)
+
+    print(mydf)
 
 if False:
 
@@ -77,9 +83,6 @@ if False:
     print(type(df['A'].values[0]))
 
 
-
-
-
 if False:
     d = {'A':[0.1, 0.2, 0.6, 0.3, 0.9, 0.45], 'B':[0.7, 0.8, 0.1, 0.3, 0.9, 0.45]}
     df = pd.DataFrame(d)
@@ -96,6 +99,75 @@ if False:
     print(df)
     print(df2)
     print(df3)
+
+
+#=======================================================================================================================
+#
+#Computing Risk and Odds Ratios
+#===============================
+
+if True:
+    d = {'disease':[1,1,0,0,1,0,1], 'exposure':[1,0,0,1,1,1,0]}
+    health_df = pd.DataFrame(d)
+
+    print(health_df)
+
+    #dataframe containing all records of individuals having the disease
+    positve_df = health_df[health_df['disease']==1]
+
+    # dataframe containing all records of individuals NOT having the disease
+    negative_df = health_df[health_df['disease'] == 0]
+
+    # Number of positive cases (having disease) exposed to risk
+    a = positve_df[positve_df['exposure']==1]['exposure'].count()
+
+    # Number of negative cases (NOT having disease) exposed to risk
+    b = negative_df[negative_df['exposure'] == 1]['exposure'].count()
+
+    # Number of positive cases (having disease) not exposed to risk
+    c = positve_df[positve_df['exposure'] == 0]['exposure'].count()
+
+    # Number of negative cases (NOT having disease) not exposed to risk
+    d = negative_df[negative_df['exposure'] == 0]['exposure'].count()
+
+    njp = a + b           #Marginal frequency for exposed group
+    njm = c + d           #Marginal frequency for the unexposed group
+
+    nj = njp + njm        #Total number of individuals
+    DJP = a + c           #Marginal frequency for the diseased group
+    DJM = b + d           #Marginal frequency for the non-diseased group
+
+    RE = a /njp           #Risk for the exposed group
+    RU = c /njm           #Risk for the unexposed group
+
+    RR = RE / RU          #Relative Risk
+    AR = (RR-1.0)/RR      #Attributable Risk [0,1] (multiply by 100 to get pct)
+    NNT = 1.0/AR          #Number Needed to Treat
+
+    #Mantel–Haenszel estimated relative risk confidence interval:
+
+    RR_SE = np.sqrt(((1/a)+(1/c)) - ((1/(a+b)) + (1/(c+d))))
+
+    xlci = np.log(RR) - 1.96*RR_SE
+    xuci = np.log(RR) + 1.96*RR_SE
+
+    lci = round(np.exp(xlci), 2)
+    uci = round(np.exp(xuci), 2)
+
+    RR_CI = (lci, uci)
+
+    print("RR = {}, RRCI = {}".format(RR, RR_CI))
+
+
+
+
+
+
+
+
+
+
+
 
 
 
