@@ -106,6 +106,19 @@ if False:
 #Computing Risk and Odds Ratios
 #===============================
 
+
+#Mantel–Haenszel estimated relative risk confidence interval:
+def confidence_interval(ratio, serror):
+    xlci = np.log(ratio) - 1.96*serror
+    xuci = np.log(ratio) + 1.96*serror
+
+    lci = round(np.exp(xlci), 2)
+    uci = round(np.exp(xuci), 2)
+
+    return (lci, uci)
+
+
+
 if True:
     d = {'disease':[1,1,0,0,1,0,1], 'exposure':[1,0,0,1,1,1,0]}
     health_df = pd.DataFrame(d)
@@ -130,6 +143,14 @@ if True:
     # Number of negative cases (NOT having disease) not exposed to risk
     d = negative_df[negative_df['exposure'] == 0]['exposure'].count()
 
+    #Test with data on notebook. This test confirms the correctness of the formulae set below
+    #see http://sphweb.bumc.bu.edu/otlt/MPH-Modules/BS/BS704_Confidence_Intervals/BS704_Confidence_Intervals8.html
+    if True:
+        a = 9
+        b = 41
+        c = 20
+        d = 29
+
     njp = a + b           #Marginal frequency for exposed group
     njm = c + d           #Marginal frequency for the unexposed group
 
@@ -140,23 +161,24 @@ if True:
     RE = a /njp           #Risk for the exposed group
     RU = c /njm           #Risk for the unexposed group
 
-    RR = RE / RU          #Relative Risk
-    AR = (RR-1.0)/RR      #Attributable Risk [0,1] (multiply by 100 to get pct)
-    NNT = 1.0/AR          #Number Needed to Treat
+    RR = RE / RU                                              #Relative Risk
+    RR = np.round(RR, 2)
+    RR_SE = np.sqrt(((1/a)+(1/c)) - ((1/(a+b)) + (1/(c+d))))  #Relative Risk Standard Error
+    RR_CI = confidence_interval(RR, RR_SE)                    #Relative Risk Confidence Interval
 
-    #Mantel–Haenszel estimated relative risk confidence interval:
+    AR = (RR-1.0)/RR                                          #Attributable Risk [0,1] (multiply by 100 to get pct)
+    NNT = 1.0/AR                                              #Number Needed to Treat
 
-    RR_SE = np.sqrt(((1/a)+(1/c)) - ((1/(a+b)) + (1/(c+d))))
+    OR = (a*d)/(b*c)                            #Odds Ratio
+    OR = np.round(OR, 2)
+    OR_SE = np.sqrt((1/a)+(1/b)+(1/c)+(1/d))    #Odds Ratio Standard Error
+    OR_CI = confidence_interval(OR, OR_SE)      #Odds Ratio Confidence Interval
 
-    xlci = np.log(RR) - 1.96*RR_SE
-    xuci = np.log(RR) + 1.96*RR_SE
+    print("RR = {}, RR_CI = {}".format(RR, RR_CI))
+    print("OR = {}, OR_CI = {}".format(OR, OR_CI))
 
-    lci = round(np.exp(xlci), 2)
-    uci = round(np.exp(xuci), 2)
 
-    RR_CI = (lci, uci)
 
-    print("RR = {}, RRCI = {}".format(RR, RR_CI))
 
 
 
