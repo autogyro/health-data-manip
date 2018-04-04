@@ -122,7 +122,7 @@ def relativeRisk(df, disease, exposure):
     :param df: dataframe containing both disease and exposure (risk factors) records
     :param disease: string: label of the disease feature in dataframe
     :param exposure: string: label of the exposure feature in dataframe
-    :return: dictionary containing relative risk and its confidence interval
+    :return: dictionary containing relative risk and its confidence interval, plus other info.
     {'Number of Records':nj, 'Number of Exposed Individuals':njp ,
     'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
     'Number of Not Diseased Individuals':DJM, 'Exposed Individuals Risk':RE,
@@ -169,6 +169,51 @@ def relativeRisk(df, disease, exposure):
             'UnexposedRisk':RU, 'RelativeRisk':RR, 'RR_CI':RR_CI}
 
 
+def oddsRatio(df, disease, exposure):
+    """
+    :param df: dataframe containing both disease and exposure (risk factors) records
+    :param disease: string: label of the disease feature in dataframe
+    :param exposure: string: label of the exposure feature in dataframe
+    :return: dictionary containing odds ratio and its confidence interval plus other info
+    {'Number of Records':nj, 'Number of Exposed Individuals':njp ,
+    'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
+    'Number of Not Diseased Individuals':DJM, 'Odds Ratio':OR, 'Confidence Interval':OR_CI}
+    """
+
+    #dataframe containing all records of individuals having the disease
+    positve_df = df[df[disease]==1]
+
+    # dataframe containing all records of individuals NOT having the disease
+    negative_df = df[df[disease] == 0]
+
+    # Number of positive cases (having disease) exposed to risk
+    a = positve_df[positve_df[exposure]==1][exposure].count()
+
+    # Number of negative cases (NOT having disease) exposed to risk
+    b = negative_df[negative_df[exposure] == 1][exposure].count()
+
+    # Number of positive cases (having disease) not exposed to risk
+    c = positve_df[positve_df[exposure] == 0][exposure].count()
+
+    # Number of negative cases (NOT having disease) not exposed to risk
+    d = negative_df[negative_df[exposure] == 0][exposure].count()
+
+    njp = a + b           #Marginal frequency for exposed group
+    njm = c + d           #Marginal frequency for the unexposed group
+
+    nj = njp + njm        #Total number of individuals
+    DJP = a + c           #Marginal frequency for the diseased group
+    DJM = b + d           #Marginal frequency for the non-diseased group
+
+    _OR = (a * d) / (b * c)                                  # Odds Ratio
+    OR = np.round(_OR, 2)
+    _OR_SE = np.sqrt((1 / a) + (1 / b) + (1 / c) + (1 / d))  # Odds Ratio Standard Error
+    OR_SE = np.round(_OR_SE,2)
+    OR_CI = confidence_interval(OR, OR_SE)                  # Odds Ratio Confidence Interval
+
+    return {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM, 'OddsRatio':OR, 'OR_CI':OR_CI}
+
+
 if True:
     d = {'disease': [1, 1, 0, 0, 1, 0, 1], 'exposure': [1, 0, 0, 1, 1, 1, 0]}
     health_df = pd.DataFrame(d)
@@ -176,6 +221,10 @@ if True:
     RRD = relativeRisk(health_df,'disease', 'exposure')
     print(RRD['RelativeRisk'], RRD['RR_CI'])
 
+    ORD = oddsRatio(health_df,'disease', 'exposure')
+    print(ORD['OddsRatio'], ORD['OR_CI'])
+
+print("")
 
 if True:
     d = {'disease':[1,1,0,0,1,0,1], 'exposure':[1,0,0,1,1,1,0]}
