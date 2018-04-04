@@ -117,6 +117,64 @@ def confidence_interval(ratio, serror):
 
     return (lci, uci)
 
+def relativeRisk(df, disease, exposure):
+    """
+    :param df: dataframe containing both disease and exposure (risk factors) records
+    :param disease: string: label of the disease feature in dataframe
+    :param exposure: string: label of the exposure feature in dataframe
+    :return: dictionary containing relative risk and its confidence interval
+    {'Number of Records':nj, 'Number of Exposed Individuals':njp ,
+    'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
+    'Number of Not Diseased Individuals':DJM, 'Exposed Individuals Risk':RE,
+            'Unexposed Individuals Risk':RU, 'Relative Risk':RR, 'Confidence Interval':RR_CI}
+    """
+
+    #dataframe containing all records of individuals having the disease
+    positve_df = df[df[disease]==1]
+
+    # dataframe containing all records of individuals NOT having the disease
+    negative_df = df[df[disease] == 0]
+
+    # Number of positive cases (having disease) exposed to risk
+    a = positve_df[positve_df[exposure]==1][exposure].count()
+
+    # Number of negative cases (NOT having disease) exposed to risk
+    b = negative_df[negative_df[exposure] == 1][exposure].count()
+
+    # Number of positive cases (having disease) not exposed to risk
+    c = positve_df[positve_df[exposure] == 0][exposure].count()
+
+    # Number of negative cases (NOT having disease) not exposed to risk
+    d = negative_df[negative_df[exposure] == 0][exposure].count()
+
+    njp = a + b           #Marginal frequency for exposed group
+    njm = c + d           #Marginal frequency for the unexposed group
+
+    nj = njp + njm        #Total number of individuals
+    DJP = a + c           #Marginal frequency for the diseased group
+    DJM = b + d           #Marginal frequency for the non-diseased group
+
+    _RE = a /njp           #Risk for the exposed group
+    RE = np.round(_RE,2)
+    _RU = c /njm           #Risk for the unexposed group
+    RU = np.round(_RU, 2)
+
+    _RR = _RE / _RU                                              #Relative Risk
+    RR = np.round(_RR, 2)
+    _RR_SE = np.sqrt(((1/a)+(1/c)) - ((1/(a+b)) + (1/(c+d))))  #Relative Risk Standard Error
+    RR_SE = np.round(_RR_SE,2)
+    RR_CI = confidence_interval(RR, RR_SE)                    #Relative Risk Confidence Interval
+
+    return {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM, 'ExposedRisk':RE,
+            'UnexposedRisk':RU, 'RelativeRisk':RR, 'RR_CI':RR_CI}
+
+
+if True:
+    d = {'disease': [1, 1, 0, 0, 1, 0, 1], 'exposure': [1, 0, 0, 1, 1, 1, 0]}
+    health_df = pd.DataFrame(d)
+
+    RRD = relativeRisk(health_df,'disease', 'exposure')
+    print(RRD['RelativeRisk'], RRD['RR_CI'])
 
 
 if True:
@@ -145,7 +203,7 @@ if True:
 
     #Test with data on notebook. This test confirms the correctness of the formulae set below
     #see http://sphweb.bumc.bu.edu/otlt/MPH-Modules/BS/BS704_Confidence_Intervals/BS704_Confidence_Intervals8.html
-    if True:
+    if False:
         a = 9
         b = 41
         c = 20
