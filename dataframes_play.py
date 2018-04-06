@@ -127,7 +127,7 @@ def relativeRisk(df, disease, exposure, table=False):
     {'Number of Records':nj, 'Number of Exposed Individuals':njp ,
     'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
     'Number of Not Diseased Individuals':DJM, 'Exposed Individuals Risk':RE,
-            'Unexposed Individuals Risk':RU, 'Relative Risk':RR, 'Confidence Interval':RR_CI}
+            'Unexposed Individuals Risk':RU, 'Relative Risk':RR, 'Confidence Interval':RR_CI, 'Contingency table':ct}
     """
 
     if table:
@@ -158,6 +158,12 @@ def relativeRisk(df, disease, exposure, table=False):
             d = negative_df[negative_df[exposure] == 0][exposure].count()
         except:
             raise Exception("Make sure first argument input corresponds to disease-exposure dataframe")
+
+    #Backup contingency table ct for output
+    s = (2, 2)
+    ct = np.zeros(s)
+    ct[0, 0], ct[0,1], ct[1,0], ct[1,1] = a, b, c, d
+
 
     njp = a + b           #Marginal frequency for exposed group
     njm = c + d           #Marginal frequency for the unexposed group
@@ -178,7 +184,7 @@ def relativeRisk(df, disease, exposure, table=False):
     RR_CI = confidence_interval(RR, RR_SE)                    #Relative Risk Confidence Interval
 
     return {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM, 'ExposedRisk':RE,
-            'UnexposedRisk':RU, 'RelativeRisk':RR, 'RR_CI':RR_CI}
+            'UnexposedRisk':RU, 'RelativeRisk':RR, 'RR_CI':RR_CI, 'CTable':ct}
 
 
 def oddsRatio(df, disease, exposure,table=False):
@@ -190,7 +196,7 @@ def oddsRatio(df, disease, exposure,table=False):
     :return: dictionary containing odds ratio and its confidence interval plus other info
     {'Number of Records':nj, 'Number of Exposed Individuals':njp ,
     'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
-    'Number of Not Diseased Individuals':DJM, 'Odds Ratio':OR, 'Confidence Interval':OR_CI}
+    'Number of Not Diseased Individuals':DJM, 'Odds Ratio':OR, 'Confidence Interval':OR_CI, 'Contingency table':ct}
     """
 
     if table:
@@ -221,6 +227,11 @@ def oddsRatio(df, disease, exposure,table=False):
             d = negative_df[negative_df[exposure] == 0][exposure].count()
         except:
             raise Exception("Make sure first argument input corresponds to disease-exposure dataframe")
+
+    #Backup contingency table ct for output
+    s = (2, 2)
+    ct = np.zeros(s)
+    ct[0, 0], ct[0,1], ct[1,0], ct[1,1] = a, b, c, d
 
     njp = a + b           #Marginal frequency for exposed group
     njm = c + d           #Marginal frequency for the unexposed group
@@ -235,7 +246,8 @@ def oddsRatio(df, disease, exposure,table=False):
     OR_SE = np.round(_OR_SE,2)
     OR_CI = confidence_interval(OR, OR_SE)                  # Odds Ratio Confidence Interval
 
-    return {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM, 'OddsRatio':OR, 'OR_CI':OR_CI}
+    return {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM,
+            'OddsRatio':OR, 'OR_CI':OR_CI, 'CTable':ct}
 
 
 def attributableRisk(df, disease, exposure, table=False):
@@ -249,7 +261,7 @@ def attributableRisk(df, disease, exposure, table=False):
     'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
     'Number of Not Diseased Individuals':DJM, {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM,
             'AttribRisk':np.round(ar,2), 'AR_CI':np.round(ar_ci,2), 'AttribRiskPct':np.round(arp,2), 'ARP_CI':np.round(arp_ci,2),
-            'PopultationAR':np.round(par,2), 'PARP_CI':np.round(parp,2)}
+            'PopultationAR':np.round(par,2), 'PARP_CI':np.round(parp,2), 'Contingency table':ct}
     """
 
     if table:
@@ -280,6 +292,11 @@ def attributableRisk(df, disease, exposure, table=False):
             d = negative_df[negative_df[exposure] == 0][exposure].count()
         except:
             raise Exception("Make sure first argument input corresponds to disease-exposure dataframe")
+
+    #Backup contingency table ct for output
+    s = (2, 2)
+    ct = np.zeros(s)
+    ct[0, 0], ct[0,1], ct[1,0], ct[1,1] = a, b, c, d
 
     njp = a + b           #Marginal frequency for exposed group
     njm = c + d           #Marginal frequency for the unexposed group
@@ -296,6 +313,7 @@ def attributableRisk(df, disease, exposure, table=False):
     N = njm
 
     ar = (a/(a+b))-(c/(c+d))                                           #Attributable Risk
+    nnt = 1.0 / ar                                                     #Number of individuals needed to treat
     ar_se = np.sqrt(((a+c)/N)*(1-((a+c)/N))*((1/(a+b))+(1/(c+d))))     #Attributable Risk Standard Error
     ar_ci = (round(ar-(1.96*ar_se), 2), round(ar+(1.96*ar_se), 2))     #Attributable Risk Confidence Interval
 
@@ -307,26 +325,47 @@ def attributableRisk(df, disease, exposure, table=False):
     par = ((a+c)/N) - (c/(c+d))     #Population attributable risk
     parp = 100*(par/(((a+c)/N)))    #Population attributable risk percent
 
+
+
     return {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM,
-            'AttribRisk':np.round(ar,2), 'AR_CI':np.round(ar_ci,2), 'AttribRiskPct':np.round(arp,2), 'ARP_CI':np.round(arp_ci,2),
-            'PopultationAR':np.round(par,2), 'PARP_CI':np.round(parp,2)}
+            'AttRisk':np.round(ar,2), 'AR_CI':np.round(ar_ci,2), 'AttRiskPct':np.round(arp,2), 'ARP_CI':np.round(arp_ci,2),
+            'PopultationAR':np.round(par,2), 'PARP_CI':np.round(parp,2), 'NNT':np.ceil(nnt),'CTable':ct}
 
 
 
 
 if True:
-    d = {'disease': [1, 1, 0, 0, 1, 0, 1], 'exposure': [1, 0, 0, 1, 1, 1, 0]}
-    health_df = pd.DataFrame(d)
 
-    RRD = relativeRisk(health_df,'disease', 'exposure')
+    if False:
+        d = {'disease': [1, 1, 0, 0, 1, 0, 1], 'exposure': [1, 0, 0, 1, 1, 1, 0]}
+        health_df = pd.DataFrame(d)
+
+    if True:
+        health_df = [350, 1200, 200, 1900]
+
+    print("RRD:\n")
+    RRD = relativeRisk(health_df,'disease', 'exposure',table=True)
     print(RRD['RelativeRisk'], RRD['RR_CI'])
 
-    ORD = oddsRatio(health_df,'disease', 'exposure')
+    print("ORD:\n")
+    ORD = oddsRatio(health_df,'disease', 'exposure',table=True)
     print(ORD['OddsRatio'], ORD['OR_CI'])
+
+
+    print("ATR:\n")
+    ATR = attributableRisk(health_df,'disease', 'exposure',table=True)
+    print(ATR['AttRisk'], ATR['AttRiskPct'], ATR['ARP_CI'], ATR['NNT'])
+
+
+
 
 print("")
 
-if True:
+
+#--------------------------------------------------------------
+
+
+if False:
     d = {'disease':[1,1,0,0,1,0,1], 'exposure':[1,0,0,1,1,1,0]}
     health_df = pd.DataFrame(d)
 
@@ -384,21 +423,6 @@ if True:
 
     print("RR = {}, RR_CI = {}".format(RR, RR_CI))
     print("OR = {}, OR_CI = {}".format(OR, OR_CI))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
