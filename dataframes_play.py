@@ -117,11 +117,12 @@ def confidence_interval(ratio, serror):
 
     return (lci, uci)
 
-def relativeRisk(df, disease, exposure):
+def relativeRisk(df, disease, exposure, table=False):
     """
     :param df: dataframe containing both disease and exposure (risk factors) records
     :param disease: string: label of the disease feature in dataframe
     :param exposure: string: label of the exposure feature in dataframe
+    :param table: boolean: if True use contingency table matrix elements as input; otherwise use disease-exposure df
     :return: dictionary containing relative risk and its confidence interval, plus other info.
     {'Number of Records':nj, 'Number of Exposed Individuals':njp ,
     'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
@@ -129,23 +130,34 @@ def relativeRisk(df, disease, exposure):
             'Unexposed Individuals Risk':RU, 'Relative Risk':RR, 'Confidence Interval':RR_CI}
     """
 
-    #dataframe containing all records of individuals having the disease
-    positve_df = df[df[disease]==1]
+    if table:
+        try:
+            a, b, c, d = df[0], df[1], df[2], df[3]
+        except:
+            raise Exception("Make sure first argument input corresponds to contingency table or tuple")
 
-    # dataframe containing all records of individuals NOT having the disease
-    negative_df = df[df[disease] == 0]
+    if not table:
 
-    # Number of positive cases (having disease) exposed to risk
-    a = positve_df[positve_df[exposure]==1][exposure].count()
+        try:
+            #dataframe containing all records of individuals having the disease
+            positve_df = df[df[disease]==1]
 
-    # Number of negative cases (NOT having disease) exposed to risk
-    b = negative_df[negative_df[exposure] == 1][exposure].count()
+            # dataframe containing all records of individuals NOT having the disease
+            negative_df = df[df[disease] == 0]
 
-    # Number of positive cases (having disease) not exposed to risk
-    c = positve_df[positve_df[exposure] == 0][exposure].count()
+            # Number of positive cases (having disease) exposed to risk
+            a = positve_df[positve_df[exposure]==1][exposure].count()
 
-    # Number of negative cases (NOT having disease) not exposed to risk
-    d = negative_df[negative_df[exposure] == 0][exposure].count()
+            # Number of negative cases (NOT having disease) exposed to risk
+            b = negative_df[negative_df[exposure] == 1][exposure].count()
+
+            # Number of positive cases (having disease) not exposed to risk
+            c = positve_df[positve_df[exposure] == 0][exposure].count()
+
+            # Number of negative cases (NOT having disease) not exposed to risk
+            d = negative_df[negative_df[exposure] == 0][exposure].count()
+        except:
+            raise Exception("Make sure first argument input corresponds to disease-exposure dataframe")
 
     njp = a + b           #Marginal frequency for exposed group
     njm = c + d           #Marginal frequency for the unexposed group
@@ -169,34 +181,46 @@ def relativeRisk(df, disease, exposure):
             'UnexposedRisk':RU, 'RelativeRisk':RR, 'RR_CI':RR_CI}
 
 
-def oddsRatio(df, disease, exposure):
+def oddsRatio(df, disease, exposure,table=False):
     """
     :param df: dataframe containing both disease and exposure (risk factors) records
     :param disease: string: label of the disease feature in dataframe
     :param exposure: string: label of the exposure feature in dataframe
+    :param table: boolean: if True use contingency table matrix elements as input; otherwise use disease-exposure df
     :return: dictionary containing odds ratio and its confidence interval plus other info
     {'Number of Records':nj, 'Number of Exposed Individuals':njp ,
     'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
     'Number of Not Diseased Individuals':DJM, 'Odds Ratio':OR, 'Confidence Interval':OR_CI}
     """
 
-    #dataframe containing all records of individuals having the disease
-    positve_df = df[df[disease]==1]
+    if table:
+        try:
+            a, b, c, d = df[0], df[1], df[2], df[3]
+        except:
+            raise Exception("Make sure first argument input corresponds to contingency table or tuple")
 
-    # dataframe containing all records of individuals NOT having the disease
-    negative_df = df[df[disease] == 0]
+    if not table:
 
-    # Number of positive cases (having disease) exposed to risk
-    a = positve_df[positve_df[exposure]==1][exposure].count()
+        try:
+            #dataframe containing all records of individuals having the disease
+            positve_df = df[df[disease]==1]
 
-    # Number of negative cases (NOT having disease) exposed to risk
-    b = negative_df[negative_df[exposure] == 1][exposure].count()
+            # dataframe containing all records of individuals NOT having the disease
+            negative_df = df[df[disease] == 0]
 
-    # Number of positive cases (having disease) not exposed to risk
-    c = positve_df[positve_df[exposure] == 0][exposure].count()
+            # Number of positive cases (having disease) exposed to risk
+            a = positve_df[positve_df[exposure]==1][exposure].count()
 
-    # Number of negative cases (NOT having disease) not exposed to risk
-    d = negative_df[negative_df[exposure] == 0][exposure].count()
+            # Number of negative cases (NOT having disease) exposed to risk
+            b = negative_df[negative_df[exposure] == 1][exposure].count()
+
+            # Number of positive cases (having disease) not exposed to risk
+            c = positve_df[positve_df[exposure] == 0][exposure].count()
+
+            # Number of negative cases (NOT having disease) not exposed to risk
+            d = negative_df[negative_df[exposure] == 0][exposure].count()
+        except:
+            raise Exception("Make sure first argument input corresponds to disease-exposure dataframe")
 
     njp = a + b           #Marginal frequency for exposed group
     njm = c + d           #Marginal frequency for the unexposed group
@@ -212,6 +236,82 @@ def oddsRatio(df, disease, exposure):
     OR_CI = confidence_interval(OR, OR_SE)                  # Odds Ratio Confidence Interval
 
     return {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM, 'OddsRatio':OR, 'OR_CI':OR_CI}
+
+
+def attributableRisk(df, disease, exposure, table=False):
+    """
+    :param df: dataframe containing both disease and exposure (risk factors) records
+    :param disease: string: label of the disease feature in dataframe
+    :param exposure: string: label of the exposure feature in dataframe
+    :param table: boolean: if True use contingency table matrix elements as input; otherwise use disease-exposure df
+    :return: dictionary containing attributable risks and their confidence intervals, plus other info
+    {'Number of Records':nj, 'Number of Exposed Individuals':njp ,
+    'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
+    'Number of Not Diseased Individuals':DJM, {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM,
+            'AttribRisk':np.round(ar,2), 'AR_CI':np.round(ar_ci,2), 'AttribRiskPct':np.round(arp,2), 'ARP_CI':np.round(arp_ci,2),
+            'PopultationAR':np.round(par,2), 'PARP_CI':np.round(parp,2)}
+    """
+
+    if table:
+        try:
+            a, b, c, d = df[0], df[1], df[2], df[3]
+        except:
+            raise Exception("Make sure first argument input corresponds to contingency table or tuple")
+
+    if not table:
+
+        try:
+            #dataframe containing all records of individuals having the disease
+            positve_df = df[df[disease]==1]
+
+            # dataframe containing all records of individuals NOT having the disease
+            negative_df = df[df[disease] == 0]
+
+            # Number of positive cases (having disease) exposed to risk
+            a = positve_df[positve_df[exposure]==1][exposure].count()
+
+            # Number of negative cases (NOT having disease) exposed to risk
+            b = negative_df[negative_df[exposure] == 1][exposure].count()
+
+            # Number of positive cases (having disease) not exposed to risk
+            c = positve_df[positve_df[exposure] == 0][exposure].count()
+
+            # Number of negative cases (NOT having disease) not exposed to risk
+            d = negative_df[negative_df[exposure] == 0][exposure].count()
+        except:
+            raise Exception("Make sure first argument input corresponds to disease-exposure dataframe")
+
+    njp = a + b           #Marginal frequency for exposed group
+    njm = c + d           #Marginal frequency for the unexposed group
+
+    nj = njp + njm        #Total number of individuals
+    DJP = a + c           #Marginal frequency for the diseased group
+    DJM = b + d           #Marginal frequency for the non-diseased group
+
+
+    _RE = a /njp          #Risk for the exposed group
+    _RU = c /njm          #Risk for the unexposed group
+    _RR = _RE / _RU       #Relative Risk
+
+    N = njm
+
+    ar = (a/(a+b))-(c/(c+d))                                           #Attributable Risk
+    ar_se = np.sqrt(((a+c)/N)*(1-((a+c)/N))*((1/(a+b))+(1/(c+d))))     #Attributable Risk Standard Error
+    ar_ci = (round(ar-(1.96*ar_se), 2), round(ar+(1.96*ar_se), 2))     #Attributable Risk Confidence Interval
+
+
+    arp = 100*((_RR-1)/(_RR))                                   #Attributable risk percentage
+    arp_se = (1.96*ar_se)/ar                                    #Attributable risk percentage standard error
+    arp_ci = (round(arp-arp_se, 2), round(arp+arp_se, 3))       #Attributable risk percentage confidence interval
+
+    par = ((a+c)/N) - (c/(c+d))     #Population attributable risk
+    parp = 100*(par/(((a+c)/N)))    #Population attributable risk percent
+
+    return {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM,
+            'AttribRisk':np.round(ar,2), 'AR_CI':np.round(ar_ci,2), 'AttribRiskPct':np.round(arp,2), 'ARP_CI':np.round(arp_ci,2),
+            'PopultationAR':np.round(par,2), 'PARP_CI':np.round(parp,2)}
+
+
 
 
 if True:
@@ -274,6 +374,7 @@ if True:
     RR_CI = confidence_interval(RR, RR_SE)                    #Relative Risk Confidence Interval
 
     AR = (RR-1.0)/RR                                          #Attributable Risk [0,1] (multiply by 100 to get pct)
+    ARP = 100.0*(RR - 1.0) / RR  # Attributable Risk [0,1] (multiply by 100 to get pct)
     NNT = 1.0/AR                                              #Number Needed to Treat
 
     OR = (a*d)/(b*c)                            #Odds Ratio
