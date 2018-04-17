@@ -12,7 +12,7 @@ import sys
 #from xgboost import XGBClassifier #Test xgboost import
 
 
-#Oversampling test
+#Oversampling test 1
 
 from imblearn.over_sampling import SMOTE
 
@@ -25,13 +25,32 @@ X = df[['X1','X2']]
 y = df.y
 
 print("Original df counts:\n")
-print("Minority y class count: {}".format(df.y.sum()))
-print("Majority y class count: {}".format(df.y.count()-df.y.sum()))
+minc = df.y.sum()
+majc =df.y.count()-df.y.sum()
+imbratio = np.round(minc/majc,2)
+print("Minority y class count: {}".format(minc))
+print("Majority y class count: {}".format(majc))
+print("Balancing Ratio: {}".format(imbratio))
 
 X_resampled, y_resampled = SMOTE(ratio='minority').fit_sample(X, y)
 
 Xr = pd.DataFrame(X_resampled)
 yr = pd.DataFrame(y_resampled)
+
+Xdefault_labels = Xr.columns
+Xnew_labels = ['X1', 'X2']
+
+# Rename dataframe labels
+for n, new_name in enumerate(Xnew_labels):
+    Xr.rename(columns={Xdefault_labels[n]: new_name}, inplace=True)
+
+Ydefault_labels = yr.columns
+Ynew_labels = ['y']
+
+# Rename dataframe labels
+for n, new_name in enumerate(Ynew_labels):
+    yr.rename(columns={Ydefault_labels[n]: new_name}, inplace=True)
+
 
 dft = pd.concat([Xr, yr],axis=1)
 print(dft)
@@ -51,8 +70,13 @@ print(dfp)
 print("")
 
 print("Oversampled counts:\n")
-print("Minority y class count: {}".format(dfp.y.sum()))
-print("Majority y class count: {}".format(dfp.y.count()-df.y.sum()))
+
+minc = dfp.y.sum()
+majc =dfp.y.count()-dfp.y.sum()
+imbratio = np.round(minc/majc,2)
+print("Minority y class count: {}".format(minc))
+print("Majority y class count: {}".format(majc))
+print("Balancing Ratio: {}".format(imbratio))
 
 sys.exit()
 
