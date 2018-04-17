@@ -12,6 +12,52 @@ import sys
 #from xgboost import XGBClassifier #Test xgboost import
 
 
+#Oversampling test
+
+from imblearn.over_sampling import SMOTE
+
+d = {'X1':[0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0],
+     'X2':[0,0,1,1,0,0,1,0,0,1,0,0,0,0,0,1,0,1,1,0,0], 'y':[1,1,0,1,0,0,0,0,0,1,0,0,1,1,0,1,0,0,0,0,1]}
+df = pd.DataFrame(d)
+print(df)
+print("")
+X = df[['X1','X2']]
+y = df.y
+
+print("Original df counts:\n")
+print("Minority y class count: {}".format(df.y.sum()))
+print("Majority y class count: {}".format(df.y.count()-df.y.sum()))
+
+X_resampled, y_resampled = SMOTE(ratio='minority').fit_sample(X, y)
+
+Xr = pd.DataFrame(X_resampled)
+yr = pd.DataFrame(y_resampled)
+
+dft = pd.concat([Xr, yr],axis=1)
+print(dft)
+print("")
+
+for col in Xr.columns:
+    Xr[col] = np.round(Xr[col],0)
+    Xr[col] = pd.to_numeric(Xr[col], downcast='integer')
+
+for col in yr.columns:
+    yr[col] = np.round(yr[col],0)
+    yr[col] = pd.to_numeric(yr[col], downcast='integer')
+
+dfp = pd.concat([Xr, yr],axis=1)
+
+print(dfp)
+print("")
+
+print("Oversampled counts:\n")
+print("Minority y class count: {}".format(dfp.y.sum()))
+print("Majority y class count: {}".format(dfp.y.count()-df.y.sum()))
+
+sys.exit()
+
+
+
 def create_binarized_df(input_df, features, thresholds, full_binarization=True):
     """
     :param input_df: dataframe containing the features to be binarized
@@ -261,7 +307,7 @@ def attributableRisk(df, disease, exposure, table=False):
     'Number of Unexposed Individuals':njm, 'Number of Diseased Individuals':DJP,
     'Number of Not Diseased Individuals':DJM, {'Records':nj, 'Exposed':njp ,'Unexposed':njm, 'Diseased':DJP, 'NotDiseased':DJM,
             'AttribRisk':np.round(ar,2), 'AR_CI':np.round(ar_ci,2), 'AttribRiskPct':np.round(arp,2), 'ARP_CI':np.round(arp_ci,2),
-            'PopultationAR':np.round(par,2), 'PARP_CI':np.round(parp,2), 'Contingency table':ct}
+            'PopultationAR':np.round(par,2), 'PARP_CI':np.round(parp,2), 'Number needed to treat': nnt, 'Contingency table':ct}
     """
 
     if table:
