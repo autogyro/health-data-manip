@@ -37,8 +37,9 @@ if False:
 
 #Selected column labels (see heat maps associations)
 
-bio_cols = ['LBXSGL']
-#bio_cols = ['LBXSGL', 'LBXSOSSI']
+#bio_cols = ['LBXSGL']
+bio_cols = ['LBXSGL', 'LBXSOSSI']
+#bio_cols = ['LBXSOSSI', 'LBXSGL']
 
 
 biochemistry_data = full_data[bio_cols]
@@ -172,7 +173,17 @@ if True:
 
     print("Confusion Matrix:\n{}\n\n {} \n".format(CML, CM))
 
-    #Print and plot feature importances
+    #Print feature importances
+    print(model.feature_importances_)
+
+    #Bar plot of feature importances
+    if True:
+        from xgboost import plot_importance
+        plot_importance(model)
+        plt.show()
+
+        #output: f0, f1, f2..... refer to the first, second, third.... feature in the df.columns list
+        #in that same order
 
     #Plot of a ROC curve for a specific class
     if False:
