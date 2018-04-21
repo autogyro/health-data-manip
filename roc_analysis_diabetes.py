@@ -74,6 +74,8 @@ if True:
 
 
     model_targets = full_data.DIAGNOSED_DIABETES
+    model_targets = pd.DataFrame(data=model_targets, columns=['DIAGNOSED_DIABETES'])
+
     #model_targets = full_data.DIAGNOSED_PREDIABETES
     #model_targets = full_data.HIGHCHOL
     #model_targets = full_data.RISK_DIABETES
@@ -90,7 +92,6 @@ if True:
 ######################################################################################################
 
 if True:
-    from xgboost import XGBClassifier
 
     from sklearn.metrics import fbeta_score
     from sklearn.metrics import f1_score
@@ -98,35 +99,46 @@ if True:
     from sklearn.metrics import roc_auc_score
     from sklearn.metrics import roc_curve, auc
 
+    import xgboost as xgb
+
     seed = 7
     np.random.seed(seed)
 
-    X0 = model_features.values
-    Y0 = model_targets.values
-
     from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(X0, Y0, test_size=0.33, random_state=seed)
+
+    #Split on dataframes
+    if True:
+        X_train, X_test, y_train, y_test = train_test_split(
+            model_features, model_targets, test_size=0.33, random_state=seed)
+
+    #Split on numpy arrays
+    if False:
+        X_train, X_test, y_train, y_test = train_test_split(
+            model_features.values, model_targets.values, test_size=0.33, random_state=seed)
+
 
     #=============================================================
     #-------------------- Oversampling step ----------------------
-
-    from imblearn.over_sampling import SMOTE
-    from imblearn.over_sampling import RandomOverSampler
-
-    #Oversampling over entire dataset
     if False:
-        X, Y = SMOTE(ratio='minority').fit_sample(X0, Y0)
 
-    # SMOTE Oversampling over the training dataset
-    if False:
-        X_train, y_train = SMOTE(ratio='minority',kind='regular',k_neighbors=3).fit_sample(X_train, y_train)
+        from imblearn.over_sampling import SMOTE
+        from imblearn.over_sampling import RandomOverSampler
 
-    # Random Oversampling over the training dataset
-    if False:
-        X_train, y_train = RandomOverSampler(ratio='minority',random_state=0).fit_sample(X_train, y_train)
+        # SMOTE Oversampling over the training dataset
+        if True:
+            X_train, y_train = SMOTE(ratio='minority',kind='regular',k_neighbors=3).fit_sample(X_train, y_train)
 
+        # Random Oversampling over the training dataset
+        if False:
+            X_train, y_train = RandomOverSampler(ratio='minority',random_state=0).fit_sample(X_train, y_train)
 
-    model = XGBClassifier()
+        #Necessary step as smote removes label names
+        X_train = pd.DataFrame(data=X_train, columns=model_features.columns)
+        y_train = pd.DataFrame(data=y_train, columns=model_targets.columns)
+
+    #XGBOOST Training Phase
+
+    model = xgb.XGBClassifier()
     model.fit(X_train, y_train)
 
     predictions_prob_test  = model.predict(X_test)
@@ -173,13 +185,13 @@ if True:
 
     print("Confusion Matrix:\n{}\n\n {} \n".format(CML, CM))
 
+    #==================================== Feature importances ======================================
     #Print feature importances
     print(model.feature_importances_)
 
     #Bar plot of feature importances
     if True:
-        from xgboost import plot_importance
-        plot_importance(model)
+        xgb.plot_importance(model,grid=False)
         plt.show()
 
         #output: f0, f1, f2..... refer to the first, second, third.... feature in the df.columns list
