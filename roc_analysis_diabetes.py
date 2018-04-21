@@ -191,7 +191,8 @@ if True:
 
     #Bar plot of feature importances
     if True:
-        xgb.plot_importance(model,grid=False)
+        ax = xgb.plot_importance(model,grid=False)
+        plt.yticks(fontsize=8)
         plt.show()
 
         #output: f0, f1, f2..... refer to the first, second, third.... feature in the df.columns list
