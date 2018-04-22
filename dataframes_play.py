@@ -9,76 +9,110 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import sys
-#from xgboost import XGBClassifier #Test xgboost import
 
 
-#Oversampling test 1
+#Combinations itertools testing
 
-from imblearn.over_sampling import SMOTE
+from itertools import combinations
 
-d = {'X1':[0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0],
-     'X2':[0,0,1,1,0,0,1,0,0,1,0,0,0,0,0,1,0,1,1,0,0], 'y':[1,1,0,1,0,0,0,0,0,1,0,0,1,1,0,1,0,0,0,0,1]}
-df = pd.DataFrame(d)
-print(df)
-print("")
-X = df[['X1','X2']]
-y = df.y
+#assume "A", "B",... are features; we decide to find all possible combinations of two distinct features
+combs = combinations(iterable=["A", "B", "C", "D"], r=2)
 
-print("Original df counts:\n")
-minc = df.y.sum()
-majc =df.y.count()-df.y.sum()
-imbratio = np.round(minc/majc,2)
-print("Minority y class count: {}".format(minc))
-print("Majority y class count: {}".format(majc))
-print("Balancing Ratio: {}".format(imbratio))
+feat_sets = []
+for el in combs:
+    feat_sets.append(list(el))
 
-X_resampled, y_resampled = SMOTE(ratio='minority').fit_sample(X, y)
-
-Xr = pd.DataFrame(X_resampled)
-yr = pd.DataFrame(y_resampled)
-
-Xdefault_labels = Xr.columns
-Xnew_labels = ['X1', 'X2']
-
-# Rename dataframe labels
-for n, new_name in enumerate(Xnew_labels):
-    Xr.rename(columns={Xdefault_labels[n]: new_name}, inplace=True)
-
-Ydefault_labels = yr.columns
-Ynew_labels = ['y']
-
-# Rename dataframe labels
-for n, new_name in enumerate(Ynew_labels):
-    yr.rename(columns={Ydefault_labels[n]: new_name}, inplace=True)
+print(feat_sets)
 
 
-dft = pd.concat([Xr, yr],axis=1)
-print(dft)
-print("")
+#XGBoost Dmatrix Test
+if False:
+    import xgboost as xgb
 
-for col in Xr.columns:
-    Xr[col] = np.round(Xr[col],0)
-    Xr[col] = pd.to_numeric(Xr[col], downcast='integer')
+    #create a dataframe
+    d = {'X1':[0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0],
+         'X2':[0,0,1,1,0,0,1,0,0,1,0,0,0,0,0,1,0,1,1,0,0], 'y':[0,1,0,1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,1]}
 
-for col in yr.columns:
-    yr[col] = np.round(yr[col],0)
-    yr[col] = pd.to_numeric(yr[col], downcast='integer')
+    df = pd.DataFrame(d)
 
-dfp = pd.concat([Xr, yr],axis=1)
+    #convert dataframe to dmatrix data structure
+    dtrain = xgb.DMatrix(df)
 
-print(dfp)
-print("")
+    #get the features/label names
+    print(dtrain.feature_names)
+    #get the types of the data in label/feature columns
+    print(dtrain.feature_types)
 
-print("Oversampled counts:\n")
 
-minc = dfp.y.sum()
-majc =dfp.y.count()-dfp.y.sum()
-imbratio = np.round(minc/majc,2)
-print("Minority y class count: {}".format(minc))
-print("Majority y class count: {}".format(majc))
-print("Balancing Ratio: {}".format(imbratio))
 
-sys.exit()
+# Oversampling testing
+if False:
+
+    from imblearn.over_sampling import SMOTE
+
+    d = {'X1':[0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0],
+         'X2':[0,0,1,1,0,0,1,0,0,1,0,0,0,0,0,1,0,1,1,0,0], 'y':[0,1,0,1,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,1]}
+    df = pd.DataFrame(d)
+    print(df)
+    print("")
+    X = df[['X1','X2']]
+    y = df.y
+
+    print("Original df counts:\n")
+    minc = df.y.sum()
+    majc = df.y.count()-df.y.sum()
+    imbratio = np.round(minc/majc,2)
+    print("Minority y class count: {}".format(minc))
+    print("Majority y class count: {}".format(majc))
+    print("Balancing Ratio: {}".format(imbratio))
+
+    X_resampled, y_resampled = SMOTE(ratio='minority').fit_sample(X, y)
+
+    Xr = pd.DataFrame(X_resampled)
+    yr = pd.DataFrame(y_resampled)
+
+    Xdefault_labels = Xr.columns
+    Xnew_labels = ['X1', 'X2']
+
+    # Rename dataframe labels
+    for n, new_name in enumerate(Xnew_labels):
+        Xr.rename(columns={Xdefault_labels[n]: new_name}, inplace=True)
+
+    Ydefault_labels = yr.columns
+    Ynew_labels = ['y']
+
+    # Rename dataframe labels
+    for n, new_name in enumerate(Ynew_labels):
+        yr.rename(columns={Ydefault_labels[n]: new_name}, inplace=True)
+
+
+    dft = pd.concat([Xr, yr],axis=1)
+    print(dft)
+    print("")
+
+    for col in Xr.columns:
+        Xr[col] = np.round(Xr[col],0)
+        Xr[col] = pd.to_numeric(Xr[col], downcast='integer')
+
+    for col in yr.columns:
+        yr[col] = np.round(yr[col],0)
+        yr[col] = pd.to_numeric(yr[col], downcast='integer')
+
+    dfp = pd.concat([Xr, yr],axis=1)
+
+    print(dfp)
+    print("")
+
+    print("Oversampled counts:\n")
+
+    minc = dfp.y.sum()
+    majc =dfp.y.count()-dfp.y.sum()
+    imbratio = np.round(minc/majc,2)
+    print("Minority y class count: {}".format(minc))
+    print("Majority y class count: {}".format(majc))
+    print("Balancing Ratio: {}".format(imbratio))
+
+
 
 
 
@@ -404,7 +438,7 @@ def attributableRisk(df, disease, exposure, table=False):
 
 
 
-if True:
+if False:
 
     if False:
         d = {'disease': [1, 1, 0, 0, 1, 0, 1], 'exposure': [1, 0, 0, 1, 1, 1, 0]}
