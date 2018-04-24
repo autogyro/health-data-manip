@@ -121,10 +121,16 @@ def testPerformance(full_data, features_list, targets_list, oversample=False):
     return (features_list, roc_auc, acc_pctg)
 
 
-start = time.time()
+feat_sets = []
 for m in range(10):
-    rs = testPerformance(full_data, feature_sets[m], ['DIAGNOSED_DIABETES'])
-end = time.time()
-print("Exec time = {}".format(end-start))
+    feat_sets.append(feature_sets[m])
 
+import multiprocessing as mp
 
+star_time = time.time()
+pool = mp.Pool()
+results = [pool.apply(testPerformance, args=(full_data, x, targets_list )) for x in feat_sets]
+end_time = time.time()
+for rs in results:
+    print(rs)
+print("Execution_time = {}".format(end_time-star_time))
