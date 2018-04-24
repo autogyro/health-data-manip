@@ -127,10 +127,31 @@ for m in range(10):
 
 import multiprocessing as mp
 
-star_time = time.time()
-pool = mp.Pool()
-results = [pool.apply(testPerformance, args=(full_data, x, targets_list )) for x in feat_sets]
-end_time = time.time()
-for rs in results:
-    print(rs)
-print("Execution_time = {}".format(end_time-star_time))
+#Synchronus thread execution
+if False:
+    star_time = time.time()
+    pool = mp.Pool()
+    results = [pool.apply(testPerformance, args=(full_data, x, targets_list )) for x in feat_sets]
+    end_time = time.time()
+    for rs in results:
+        print(rs)
+    print("Synchronus Execution_time = {}".format(end_time-star_time))
+
+#Asynchronus thread execution (321 times faster!)
+if True:
+    star_time = time.time()
+    pool = mp.Pool()
+    results = [pool.apply_async(testPerformance, args=(full_data, x, targets_list )) for x in feat_sets]
+    end_time = time.time()
+    output = [p.get() for p in results]
+    for rs in output:
+        print(rs)
+    print("Asynchronus Execution_time = {}".format(end_time-star_time))
+
+
+
+
+
+
+
+
