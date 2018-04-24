@@ -81,7 +81,8 @@ print("Number of feature combination sets = {}".format(len(feature_sets)))
 def testPerformance(full_data, features_list, targets_list, oversample=False):
 
     # Select model features
-    features_df = full_data.drop(targets_list, axis=1, inplace=False)
+    features_df = full_data[features_list]
+    features_df = pd.DataFrame(data=features_df, columns=features_list)
 
     # Select model targets
     targets_df = full_data[targets_list]
