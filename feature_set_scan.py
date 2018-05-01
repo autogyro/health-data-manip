@@ -18,18 +18,31 @@ from imblearn.over_sampling import SMOTE
 
 import time
 
+#Specify whether working on local or remote instance
+local = False
+
+if local:
+    mod_path = "/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/nhanes2013-2104/"
+    txt = SourceFileLoader("text_utils", mod_path+"text_utils.py").load_module()
+    gut = SourceFileLoader("graph_utils", mod_path+"graph_utils.py").load_module()
+
+    #Path to datasets folders
+
+    datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/'
+    project_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/'
+else:
+
+    mod_path = "/home/aind2/capstone/gits/NHANES-2013-2014/"
+    txt = SourceFileLoader("text_utils", mod_path + "text_utils.py").load_module()
+    gut = SourceFileLoader("graph_utils", mod_path + "graph_utils.py").load_module()
+
+    # Path to datasets folders
+
+    datasets_path = '/home/aind2/capstone/gits/health-data-manip/datasets/'
+    project_path = '/home/aind2/capstone/gits/health-data-manip/'
 
 
-
-
-mod_path = "/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/nhanes2013-2104/"
-txt = SourceFileLoader("text_utils", mod_path+"text_utils.py").load_module()
-gut = SourceFileLoader("graph_utils", mod_path+"graph_utils.py").load_module()
-
-#Path to datasets folders
-
-datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/'
-project_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/'
+#------------------------------------------------------------------------------------------------------------------------
 
 full_data = pd.read_csv(project_path + 'nhanes_2013_2014_full_data.csv',index_col=0)
 
@@ -148,11 +161,4 @@ if True:
     for rs in output:
         print(rs)
     print("Asynchronus Execution_time = {}".format(end_time-star_time))
-
-
-
-
-
-
-
 
