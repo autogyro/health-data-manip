@@ -52,8 +52,15 @@ full_data.drop(['ETHNICITY_Other', 'GENDER_Male', 'GENDER_Female','DIAGNOSED_PRE
                 'FAST_FOOD', 'NOTHOME_FOOD', 'INCOME_LEVEL','ETHNICITY_White', 'ETHNICITY_Black',
                 'ETHNICITY_Hispanic', 'ETHNICITY_Asian', 'SMOKING'], axis = 1, inplace=True)
 
-full_data.drop(['LBXSTP', 'LBXSPH', 'LBXSC3SI', 'LBXSCA', 'LBXSLDSI', 'LBXSCK',
-                'LBXSCH', 'LBXSUA', 'LBXSASSI', 'LBXSIR'], axis = 1, inplace=True)
+#Select the biofeatures to drop; the less you drop the more combinations will be calculated
+if False:
+    full_data.drop(['LBXSTP', 'LBXSPH', 'LBXSC3SI', 'LBXSCA', 'LBXSLDSI', 'LBXSCK',
+                    'LBXSCH', 'LBXSUA', 'LBXSASSI', 'LBXSIR'], axis = 1, inplace=True)
+
+if True:
+    full_data.drop(['LBXSTP', 'LBXSPH', 'LBXSC3SI', 'LBXSCA', 'LBXSLDSI',
+                    'LBXSCH', 'LBXSASSI', 'LBXSIR'], axis = 1, inplace=True)
+
 
 targets_list = ['DIAGNOSED_DIABETES']
 
