@@ -18,19 +18,30 @@ from imblearn.over_sampling import SMOTE
 
 import time
 
-#Specify whether working on local or remote instance
-local = False
 
-if local:
+
+#Specify whether working on local or remote instance
+local = 1
+
+if (local ==1):
     mod_path = "/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/nhanes2013-2104/"
     txt = SourceFileLoader("text_utils", mod_path+"text_utils.py").load_module()
     gut = SourceFileLoader("graph_utils", mod_path+"graph_utils.py").load_module()
 
-    #Path to datasets folders
 
+    #Path to datasets folders
     datasets_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/datasets/'
     project_path = '/Users/juanerolon/Dropbox/_machine_learning/udacity_projects/capstone/gits/health-data-manip/'
-else:
+elif (local == 2):
+    mod_path = "D:\\Dropbox\\Dropbox\\_machine_learning\\udacity_projects\\capstone\\gits\\nhanes2013-2104\\"
+    txt = SourceFileLoader("text_utils", mod_path+"text_utils.py").load_module()
+    gut = SourceFileLoader("graph_utils", mod_path+"graph_utils.py").load_module()
+
+    #Path to datasets folders
+    datasets_path = "D:\\Dropbox\\Dropbox\\_machine_learning\\udacity_projects\\capstone\\gits\\health-data-manip\\datasets\\"
+    project_path = "D:\\Dropbox\\Dropbox\\_machine_learning\\udacity_projects\\capstone\\gits\\health-data-manip\\"
+
+elif (local == 3):
 
     mod_path = "/home/aind2/capstone/gits/NHANES-2013-2014/"
     txt = SourceFileLoader("text_utils", mod_path + "text_utils.py").load_module()
@@ -40,6 +51,10 @@ else:
 
     datasets_path = '/home/aind2/capstone/gits/health-data-manip/datasets/'
     project_path = '/home/aind2/capstone/gits/health-data-manip/'
+
+else:
+    raise Exception("Invalid local folder selection")
+
 
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -142,8 +157,9 @@ def testPerformance(full_data, features_list, targets_list, oversample=False):
     return (features_list, roc_auc, acc_pctg)
 
 
+number_of_test_sets = 10
 feat_sets = []
-for m in range(10):
+for m in range(number_of_test_sets):
     feat_sets.append(feature_sets[m])
 
 import multiprocessing as mp
