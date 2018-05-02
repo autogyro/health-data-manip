@@ -11,19 +11,42 @@ import pandas as pd
 import sys
 
 
+d = {'FEATURES':[], "ROC":[], "ACC":[]}
+df = pd.DataFrame(d)
+
+tmp = (['A', 'B'], 80.0, 3.0)
+
+df = df.append(pd.DataFrame({"FEATURES":[tmp[0]], "ROC":[tmp[1]], "ACC":[tmp[2]]}))
+
+print(df)
+
+
+
+
 #Combinations itertools testing
+if False:
+    from itertools import combinations
 
-from itertools import combinations
+    #assume "A", "B",... are features; we decide to find all possible combinations of two distinct features
+    combs = combinations(iterable=["A", "B", "C", "D"], r=2)
 
-#assume "A", "B",... are features; we decide to find all possible combinations of two distinct features
-combs = combinations(iterable=["A", "B", "C", "D"], r=2)
+    feat_sets = []
+    for el in combs:
+        feat_sets.append(list(el))
 
-feat_sets = []
-for el in combs:
-    feat_sets.append(list(el))
+    print(feat_sets)
 
-print(feat_sets)
+    #Combinations itertools testing 2
+    l =[]
+    for i in range(21):
+        l.append(i)
+    combs = combinations(iterable=l, r=7)
+    combs = list(combs)
 
+    #print(combs)
+    print(len(combs))
+
+#print(combs[0], combs[30045010],combs[10045010])
 
 #XGBoost Dmatrix Test
 if False:
@@ -647,7 +670,7 @@ if False:
     print(BB)
 
 
-#Test droping records corrresponding to specified indexes
+#Test droping records corresponding to specified indexes
 if False:
     d = {'x': [0.1, 0.2, 0.15, 0.25], 'y': [0.1, 200.0, 0.15, 0.25], 'seqn':[300,301,302,303]}
     df = pd.DataFrame(d)
