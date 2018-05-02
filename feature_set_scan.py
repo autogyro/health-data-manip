@@ -104,12 +104,12 @@ print("Target features description:\n")
 print(full_data[targets_list].describe())
 
 
+#feature_sets definition
+#Compute before hand the number of possible combinations of features used for training
 feature_combinatons = combinations(iterable=feat_cols, r=7)
 feature_sets = []
-
 for el in feature_combinatons:
     feature_sets.append(list(el))
-
 print("Number of feature combination sets = {}".format(len(feature_sets)))
 
 
@@ -156,8 +156,9 @@ def testPerformance(full_data, features_list, targets_list, oversample=False):
 
     return (features_list, roc_auc, acc_pctg)
 
-
-number_of_test_sets = 10
+#feat_sets defintion
+#Subselection of feature sets
+number_of_test_sets = 20
 feat_sets = []
 for m in range(number_of_test_sets):
     feat_sets.append(feature_sets[m])
@@ -176,12 +177,22 @@ if False:
 
 #Asynchronus thread execution (321 times faster!)
 if True:
+    stored_results = []
     star_time = time.time()
     pool = mp.Pool()
     results = [pool.apply_async(testPerformance, args=(full_data, x, targets_list )) for x in feat_sets]
     end_time = time.time()
     output = [p.get() for p in results]
     for rs in output:
+        stored_results.append(rs)
         print(rs)
+
     print("Asynchronus Execution_time = {}".format(end_time-star_time))
 
+resd = {'FEATURES':[], "ROC":[], "ACC":[]}
+resdf = pd.DataFrame(resd)
+
+for tmp in stored_results:
+    resdf = resdf.append(pd.DataFrame({"FEATURES":[tmp[0]], "ROC":[tmp[1]], "ACC":[tmp[2]]}))
+
+print(resdf)
