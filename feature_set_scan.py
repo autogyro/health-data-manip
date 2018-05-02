@@ -195,4 +195,9 @@ resdf = pd.DataFrame(resd)
 for tmp in stored_results:
     resdf = resdf.append(pd.DataFrame({"FEATURES":[tmp[0]], "ROC":[tmp[1]], "ACC":[tmp[2]]}))
 
-print(resdf)
+resdf.reset_index(level='int', inplace=True)
+
+print("\nMaximum ROC value in data:\n")
+max_record = resdf.loc[resdf['ROC'].idxmax()]
+print(max_record)
+print(max_record["FEATURES"])
