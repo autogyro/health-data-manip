@@ -1,5 +1,4 @@
 
-
 import sys
 
 import pandas as pd
@@ -106,7 +105,7 @@ print(full_data[targets_list].describe())
 
 #feature_sets definition
 #Compute before hand the number of possible combinations of features used for training
-feature_combinatons = combinations(iterable=feat_cols, r=7)
+feature_combinatons = combinations(iterable=feat_cols, r=10)
 feature_sets = []
 for el in feature_combinatons:
     feature_sets.append(list(el))
@@ -158,10 +157,17 @@ def testPerformance(full_data, features_list, targets_list, oversample=False):
 
 #feat_sets defintion
 #Subselection of feature sets
-number_of_test_sets = 20
+if False:
+    number_of_test_sets = 10
+if True:
+    number_of_test_sets = 20
+if False:
+    number_of_test_sets = len(feature_sets)
+
 feat_sets = []
 for m in range(number_of_test_sets):
     feat_sets.append(feature_sets[m])
+
 
 import multiprocessing as mp
 
@@ -185,7 +191,8 @@ if True:
     output = [p.get() for p in results]
     for rs in output:
         stored_results.append(rs)
-        print(rs)
+        if False:
+            print(rs)
 
     print("Asynchronus Execution_time = {}".format(end_time-star_time))
 
@@ -195,9 +202,19 @@ resdf = pd.DataFrame(resd)
 for tmp in stored_results:
     resdf = resdf.append(pd.DataFrame({"FEATURES":[tmp[0]], "ROC":[tmp[1]], "ACC":[tmp[2]]}))
 
+#Sort resdf dataframe by ROC values
+resdf.sort_values(by=['ROC'], ascending=False, inplace=True)
 resdf.reset_index(level='int', inplace=True)
 
+#Save resdf DF to CSV File
+resdf.to_csv('feature_combinations_results.csv')
+
 print("\nMaximum ROC value in data:\n")
-max_record = resdf.loc[resdf['ROC'].idxmax()]
-print(max_record)
-print(max_record["FEATURES"])
+max_record_roc = resdf.loc[resdf['ROC'].idxmax()]
+print(max_record_roc)
+print(max_record_roc["FEATURES"])
+
+print("\nMaximum Accuracy value in data:\n")
+max_record_acc = resdf.loc[resdf['ACC'].idxmax()]
+print(max_record_acc)
+print(max_record_acc["FEATURES"])
