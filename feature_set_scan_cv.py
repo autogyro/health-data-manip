@@ -103,16 +103,8 @@ print("Target features description:\n")
 print(full_data[targets_list].describe())
 
 
-#feature_sets definition
-#Compute before hand the number of possible combinations of features used for training
-feature_combinatons = combinations(iterable=feat_cols, r=10)
-feature_sets = []
-for el in feature_combinatons:
-    feature_sets.append(list(el))
-print("Number of feature combination sets = {}".format(len(feature_sets)))
-
-
-def testPerformance(full_data, features_list, targets_list, oversample=False):
+#Model fit function
+def testPerformance(model, full_data, features_list, targets_list, oversample=False):
 
     # Select model features
     features_df = full_data[features_list]
@@ -138,7 +130,6 @@ def testPerformance(full_data, features_list, targets_list, oversample=False):
 
     #XGBOOST Training Phase
 
-    model = xgb.XGBClassifier()
     model.fit(X_train, y_train)
 
     predictions_prob_test  = model.predict(X_test)
@@ -155,34 +146,40 @@ def testPerformance(full_data, features_list, targets_list, oversample=False):
 
     return (features_list, roc_auc, acc_pctg)
 
-#feat_sets defintion
-#Subselection of feature sets
+
+#Define model to evaluate
+model = xgb.XGBClassifier()
+
+
+
+#feature_sets definition
+#Compute before hand the number of possible combinations of features used for training
 if False:
-    number_of_test_sets = 10
-if True:
-    number_of_test_sets = 20
+    feature_combinatons = combinations(iterable=feat_cols, r=10)
+    feature_sets = []
+    for el in feature_combinatons:
+        feature_sets.append(list(el))
+    print("Number of feature combination sets = {}".format(len(feature_sets)))
+
+    # feat_sets defintion
+    # Subselection of feature sets
+    if False:
+        number_of_test_sets = 10
+    if True:
+        number_of_test_sets = 20
+    if False:
+        number_of_test_sets = len(feature_sets)
+
+    feat_sets = []
+    for m in range(number_of_test_sets):
+        feat_sets.append(feature_sets[m])
+
+
+#Evaluate model on multiple feature combinations
+#Asynchronus thread execution (much faster!)
 if False:
-    number_of_test_sets = len(feature_sets)
+    import multiprocessing as mp
 
-feat_sets = []
-for m in range(number_of_test_sets):
-    feat_sets.append(feature_sets[m])
-
-
-import multiprocessing as mp
-
-#Synchronus thread execution
-if False:
-    star_time = time.time()
-    pool = mp.Pool()
-    results = [pool.apply(testPerformance, args=(full_data, x, targets_list )) for x in feat_sets]
-    end_time = time.time()
-    for rs in results:
-        print(rs)
-    print("Synchronus Execution_time = {}".format(end_time-star_time))
-
-#Asynchronus thread execution (321 times faster!)
-if True:
     stored_results = []
     star_time = time.time()
     pool = mp.Pool()
@@ -196,25 +193,25 @@ if True:
 
     print("Asynchronus Execution_time = {}".format(end_time-star_time))
 
-resd = {'FEATURES':[], "ROC":[], "ACC":[]}
-resdf = pd.DataFrame(resd)
+    resd = {'FEATURES':[], "ROC":[], "ACC":[]}
+    resdf = pd.DataFrame(resd)
 
-for tmp in stored_results:
-    resdf = resdf.append(pd.DataFrame({"FEATURES":[tmp[0]], "ROC":[tmp[1]], "ACC":[tmp[2]]}))
+    for tmp in stored_results:
+        resdf = resdf.append(pd.DataFrame({"FEATURES":[tmp[0]], "ROC":[tmp[1]], "ACC":[tmp[2]]}))
 
-#Sort resdf dataframe by ROC values
-resdf.sort_values(by=['ROC'], ascending=False, inplace=True)
-resdf.reset_index(level='int', inplace=True)
+    #Sort resdf dataframe by ROC values
+    resdf.sort_values(by=['ROC'], ascending=False, inplace=True)
+    resdf.reset_index(level='int', inplace=True)
 
-#Save resdf DF to CSV File
-resdf.to_csv('feature_combinations_results.csv')
+    #Save resdf DF to CSV File
+    resdf.to_csv('feature_combinations_results.csv')
 
-print("\nMaximum ROC value in data:\n")
-max_record_roc = resdf.loc[resdf['ROC'].idxmax()]
-print(max_record_roc)
-print(max_record_roc["FEATURES"])
+    print("\nMaximum ROC value in data:\n")
+    max_record_roc = resdf.loc[resdf['ROC'].idxmax()]
+    print(max_record_roc)
+    print(max_record_roc["FEATURES"])
 
-print("\nMaximum Accuracy value in data:\n")
-max_record_acc = resdf.loc[resdf['ACC'].idxmax()]
-print(max_record_acc)
-print(max_record_acc["FEATURES"])
+    print("\nMaximum Accuracy value in data:\n")
+    max_record_acc = resdf.loc[resdf['ACC'].idxmax()]
+    print(max_record_acc)
+    print(max_record_acc["FEATURES"])
