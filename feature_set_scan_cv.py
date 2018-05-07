@@ -104,7 +104,7 @@ print(full_data[targets_list].describe())
 
 
 #Model fit function
-def testPerformance(model, full_data, features_list, targets_list, oversample=False):
+def testPerformance(model, full_data, features_list, targets_list, cross_val=True):
 
     # Select model features
     features_df = full_data[features_list]
@@ -114,20 +114,15 @@ def testPerformance(model, full_data, features_list, targets_list, oversample=Fa
     targets_df = full_data[targets_list]
     targets_df = pd.DataFrame(data=targets_df, columns=targets_list)
 
-    seed = 7
-    np.random.seed(seed)
+    #configure cross-validation if cross_val=True
+    if cross_val:
+        xgb_parameters = alg.get_xgb_params()
+        train_data = xgb.DMatrix(features_df.values, label=targets_df.values)
+        cv_results = xgb.cv(xgb_parameters, train_data, num_boost_round=alg.get_params()['n_estimators'], nfold=cv_folds,
+                          metrics='auc', early_stopping_rounds=early_stopping_rounds, show_progress=False)
+        alg.set_params(n_estimators=cv_results.shape[0])
 
-    #Train-test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        features_df, targets_df, test_size=0.33, random_state=seed)
-
-    #SMOTE Oversampling step
-    if oversample:
-
-        X_train, y_train = SMOTE(ratio='minority',kind='regular',k_neighbors=3).fit_sample(X_train, y_train)
-        X_train = pd.DataFrame(data=X_train, columns=features_df.columns)
-        y_train = pd.DataFrame(data=y_train, columns=targets_df.columns)
-
+    
     #XGBOOST Training Phase
 
     model.fit(X_train, y_train)
@@ -215,3 +210,4 @@ if False:
     max_record_acc = resdf.loc[resdf['ACC'].idxmax()]
     print(max_record_acc)
     print(max_record_acc["FEATURES"])
+
