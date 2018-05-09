@@ -145,7 +145,7 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
     print("Accuracy : %.4g" % metrics.accuracy_score(targets_df.values, predictions))
     print("AUC Score (Train): %f" % metrics.roc_auc_score(targets_df, predictions_prob))
 
-   
+
 
     #feat_imp = pd.Series(model.booster().get_fscore()).sort_values(ascending=False)
     #feat_imp.plot(kind='bar', title='Feature Importances')
@@ -160,6 +160,10 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
 
     accuracy = accuracy_score(targets_df.values, predictions)
     acc_pctg = accuracy * 100.0
+
+    ax = xgb.plot_importance(model, grid=False)
+    plt.yticks(fontsize=6)
+    plt.show()
 
     return (features_list, roc_auc, acc_pctg)
 
