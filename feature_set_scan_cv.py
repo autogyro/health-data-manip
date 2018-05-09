@@ -108,7 +108,7 @@ print(full_data[targets_list].describe())
 
 
 #Model fit function
-def testPerformance(model, full_data, features_list, targets_list, cross_val=True):
+def testPerformance(model, full_data, features_list, targets_list, cross_val=True,cv_folds=5, early_stopping_rounds=50):
 
     # Select model features
     features_df = full_data[features_list]
@@ -120,11 +120,11 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
 
     #configure cross-validation if cross_val=True
     if cross_val:
-        xgb_parameters = alg.get_xgb_params()
+        xgb_parameters = model.get_xgb_params()
         train_data = xgb.DMatrix(features_df.values, label=targets_df.values)
 
-        cv_results = xgb.cv(xgb_parameters, train_data, num_boost_round=alg.get_params()['n_estimators'], nfold=cv_folds,
-                          metrics='auc', early_stopping_rounds=early_stopping_rounds, show_progress=False)
+        cv_results = xgb.cv(xgb_parameters, train_data, num_boost_round=model.get_params()['n_estimators'], nfold=cv_folds,
+                          metrics='auc', early_stopping_rounds=early_stopping_rounds)
 
         model.set_params(n_estimators=cv_results.shape[0])
 
@@ -137,7 +137,8 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
 
     # Predict training set:
     predictions = model.predict(features_df)
-    predictions_prob= alg.predict_proba(features_df)[:, 1]
+    predictions_prob = model.predict_proba(features_df)[:, 1]
+
 
     # Print model report:
     print
@@ -147,13 +148,13 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
     print
     "AUC Score (Train): %f" % metrics.roc_auc_score(targets_df, predictions_prob)
 
-    feat_imp = pd.Series(alg.booster().get_fscore()).sort_values(ascending=False)
-    feat_imp.plot(kind='bar', title='Feature Importances')
-    plt.ylabel('Feature Importance Score')
-
+    #feat_imp = pd.Series(model.booster().get_fscore()).sort_values(ascending=False)
+    #feat_imp.plot(kind='bar', title='Feature Importances')
+    #plt.ylabel('Feature Importance Score')
 
     # Calculate ROC curve
-    fpr, tpr, dash = roc_curve(features_df, model.predict_proba(targets_df.values)[:, 1])
+    #fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test)[:, 1])
+    fpr, tpr, dash = roc_curve(targets_df, predictions_prob)
 
     # Calculate the AUC
     roc_auc = auc(fpr, tpr)
@@ -164,8 +165,21 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
     return (features_list, roc_auc, acc_pctg)
 
 
+#Testing cross validation
+
+
+
 #Define model to evaluate
-model = xgb.XGBClassifier()
+model_1 = xgb.XGBClassifier()
+
+opt_feats = ['LBXSBU', 'LBXSCK', 'LBXSCR', 'LBXSGL', 'LBXSKSI', 'BMI', 'HYPERTENSION_ONSET', 'HIGHCHOL_ONSET', 'HIGHCHOL', 'FAMILIAL_DIABETES']
+target_feat = ['DIAGNOSED_DIABETES']
+
+resultados = testPerformance(model_1, full_data, opt_feats, target_feat, cross_val=True)
+print(resultados)
+
+
+
 
 
 
