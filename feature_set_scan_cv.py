@@ -9,6 +9,10 @@ import xgboost as xgb
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve, auc
 
+from sklearn import cross_validation, metrics   #Additional scklearn functions
+#from sklearn.grid_search import GridSearchCV    #Perforing grid search
+from sklearn.model_selection import GridSearchCV
+
 from importlib.machinery import SourceFileLoader
 from itertools import combinations
 
@@ -118,25 +122,43 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
     if cross_val:
         xgb_parameters = alg.get_xgb_params()
         train_data = xgb.DMatrix(features_df.values, label=targets_df.values)
+
         cv_results = xgb.cv(xgb_parameters, train_data, num_boost_round=alg.get_params()['n_estimators'], nfold=cv_folds,
                           metrics='auc', early_stopping_rounds=early_stopping_rounds, show_progress=False)
-        alg.set_params(n_estimators=cv_results.shape[0])
 
-    
-    #XGBOOST Training Phase
+        model.set_params(n_estimators=cv_results.shape[0])
 
-    model.fit(X_train, y_train)
+    # XGBOOST Training Phase
 
-    predictions_prob_test  = model.predict(X_test)
-    predictions_test = [round(value) for value in predictions_prob_test]
+    # Fit the algorithm on the data
+    model.fit(features_df, targets_df, eval_metric='auc')
+
+    #accuracy_score(y_true, y_pred)
+
+    # Predict training set:
+    predictions = model.predict(features_df)
+    predictions_prob= alg.predict_proba(features_df)[:, 1]
+
+    # Print model report:
+    print
+    "\nModel Report"
+    print
+    "Accuracy : %.4g" % metrics.accuracy_score(targets_df.values, predictions)
+    print
+    "AUC Score (Train): %f" % metrics.roc_auc_score(targets_df, predictions_prob)
+
+    feat_imp = pd.Series(alg.booster().get_fscore()).sort_values(ascending=False)
+    feat_imp.plot(kind='bar', title='Feature Importances')
+    plt.ylabel('Feature Importance Score')
+
 
     # Calculate ROC curve
-    fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test)[:, 1])
+    fpr, tpr, dash = roc_curve(features_df, model.predict_proba(targets_df.values)[:, 1])
 
     # Calculate the AUC
     roc_auc = auc(fpr, tpr)
 
-    accuracy = accuracy_score(y_test, predictions_test)
+    accuracy = accuracy_score(targets_df.values, predictions)
     acc_pctg = accuracy * 100.0
 
     return (features_list, roc_auc, acc_pctg)
