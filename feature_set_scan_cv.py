@@ -340,6 +340,39 @@ if False:
     #{'subsample': 0.81, 'colsample_bytree': 0.71}
 
 
+#Tune regularization parameter alpha
+if False:
+
+
+    param_test5 = {'reg_alpha': [0.13, 0.14, 0.145, 0.15, 0.16]}
+
+
+    gsearch5 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=40, max_depth=4,
+                                                    min_child_weight=2, gamma=0, subsample=0.81, colsample_bytree=0.71,
+                                                    objective='binary:logistic', nthread=4, scale_pos_weight=1,
+                                                    seed=27),
+                            param_grid=param_test5, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
+
+    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+    target_feat = 'DIAGNOSED_DIABETES'
+
+    gsearch5.fit(full_data[pred_features], full_data[target_feat])
+
+    print("\nGrid scores:")
+    for rs in gsearch5.grid_scores_:
+        print(rs)
+
+    print("\nBest params:")
+    print(gsearch5.best_params_)
+
+    print("\nBest ROC score:")
+    print(gsearch5.best_score_)
+
+    #Best params: {'reg_alpha': 0.14}
+
+
+
+
 
 
 
