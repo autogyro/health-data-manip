@@ -145,14 +145,7 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
     print("Accuracy : %.4g" % metrics.accuracy_score(targets_df.values, predictions))
     print("AUC Score (Train): %f" % metrics.roc_auc_score(targets_df, predictions_prob))
 
-
-
-    #feat_imp = pd.Series(model.booster().get_fscore()).sort_values(ascending=False)
-    #feat_imp.plot(kind='bar', title='Feature Importances')
-    #plt.ylabel('Feature Importance Score')
-
     # Calculate ROC curve
-    #fpr, tpr, dash = roc_curve(y_test, model.predict_proba(X_test)[:, 1])
     fpr, tpr, dash = roc_curve(targets_df, predictions_prob)
 
     # Calculate the AUC
@@ -170,22 +163,104 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
 
 #Testing cross validation
 
+#=====================================================                     =============================================
+#----------------------------------------------------- GRIDSEARCH CV TESTS ---------------------------------------------
+######################################################                     #############################################
+
+#Default test (simplest case)
+if False:
+    model_1 = xgb.XGBClassifier()
+
+    opt_feats = ['LBXSBU', 'LBXSCK', 'LBXSCR', 'LBXSGL', 'LBXSKSI', 'BMI', 'HYPERTENSION_ONSET', 'HIGHCHOL_ONSET', 'HIGHCHOL', 'FAMILIAL_DIABETES']
+    target_feat = ['DIAGNOSED_DIABETES']
+
+    resultados = testPerformance(model_1, full_data, opt_feats, target_feat, cross_val=True)
+    print(resultados)
+
+#Optimization 1
+if False:
+    # Choose all predictors except target & IDcols
+    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+
+    target_feat = ['DIAGNOSED_DIABETES']
+
+    model_2 = xgb.XGBClassifier(
+        learning_rate=0.1,
+        n_estimators=1000,
+        max_depth=5,
+        min_child_weight=1,
+        gamma=0,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        objective='binary:logistic',
+        nthread=4,
+        scale_pos_weight=1,
+        seed=27)
+
+    resultados = testPerformance(model_2, full_data, pred_features, target_feat, cross_val=True)
+    print(resultados)
+
+#Optimization GridSearch CV 1
+if False:
+    param_test1 = {
+        'max_depth': range(3, 10, 1),
+        'min_child_weight': range(1, 6, 1),
+        'n_estimators': range(10,150,10)
+    }
+    gsearch1 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=1000, max_depth=5,
+                                                    min_child_weight=1, gamma=0, subsample=0.8, colsample_bytree=0.8,
+                                                    objective='binary:logistic', nthread=4, scale_pos_weight=1,
+                                                    seed=27),
+                            param_grid=param_test1, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
 
 
-#Define model to evaluate
-model_1 = xgb.XGBClassifier()
+    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+    target_feat = 'DIAGNOSED_DIABETES'
 
-opt_feats = ['LBXSBU', 'LBXSCK', 'LBXSCR', 'LBXSGL', 'LBXSKSI', 'BMI', 'HYPERTENSION_ONSET', 'HIGHCHOL_ONSET', 'HIGHCHOL', 'FAMILIAL_DIABETES']
-target_feat = ['DIAGNOSED_DIABETES']
+    gsearch1.fit(full_data[pred_features], full_data[target_feat])
 
-resultados = testPerformance(model_1, full_data, opt_feats, target_feat, cross_val=True)
-print(resultados)
+    print("\nGrid scores:")
+    for rs in gsearch1.grid_scores_:
+        print(rs)
+
+    print("\nBest params:")
+    print(gsearch1.best_params_)
+
+    print("\nBest ROC score:")
+    print(gsearch1.best_score_)
+
+    #Best params: {'n_estimators': 40, 'min_child_weight': 2, 'max_depth': 4}
+
+
+#Tune gamma
+if True:
+    param_test2 = {'gamma':[i/10.0 for i in range(0,5)]}
+
+    gsearch2 = GridSearchCV(estimator = xgb.XGBClassifier( learning_rate =0.1, n_estimators=40, max_depth=4,
+     min_child_weight=2, gamma=0, subsample=0.8, colsample_bytree=0.8,
+     objective= 'binary:logistic', nthread=4, scale_pos_weight=1,seed=27),
+     param_grid = param_test2, scoring='roc_auc',n_jobs=8,iid=False, cv=5)
+
+
+    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+    target_feat = 'DIAGNOSED_DIABETES'
+
+    gsearch2.fit(full_data[pred_features], full_data[target_feat])
+
+    print("\nGrid scores:")
+    for rs in gsearch2.grid_scores_:
+        print(rs)
+
+    print("\nBest params:")
+    print(gsearch2.best_params_)
+
+    print("\nBest ROC score:")
+    print(gsearch2.best_score_)
 
 
 
 
-
-
+# ============================================COMBINATIONS DIRECT OPTIMIZATION =========================================
 #feature_sets definition
 #Compute before hand the number of possible combinations of features used for training
 if False:
