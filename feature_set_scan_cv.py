@@ -257,8 +257,7 @@ if False:
     print("\nBest ROC score:")
     print(gsearch2.best_score_)
 
-#Recalibration
-
+#Recalibration first pass
 if False:
     # Choose all predictors except target & IDcols
     pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
@@ -280,6 +279,66 @@ if False:
 
     resultados = testPerformance(model_3, full_data, pred_features, target_feat, cross_val=True)
     print(resultados)
+
+#Tune subsample and colsample_bytree values first pass
+if False:
+    param_test3 = {
+        'subsample': [i / 10.0 for i in range(6, 10)],
+        'colsample_bytree': [i / 10.0 for i in range(6, 10)]
+    }
+    gsearch3 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=40, max_depth=4,
+                                                    min_child_weight=2, gamma=0, subsample=0.8, colsample_bytree=0.8,
+                                                    objective='binary:logistic', nthread=4, scale_pos_weight=1,
+                                                    seed=27),
+                            param_grid=param_test3, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
+
+    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+    target_feat = 'DIAGNOSED_DIABETES'
+
+    gsearch3.fit(full_data[pred_features], full_data[target_feat])
+
+    print("\nGrid scores:")
+    for rs in gsearch3.grid_scores_:
+        print(rs)
+
+    print("\nBest params:")
+    print(gsearch3.best_params_)
+
+    print("\nBest ROC score:")
+    print(gsearch3.best_score_)
+
+    #Best params:{'subsample': 0.9, 'colsample_bytree': 0.7}
+
+
+#Tune subsample and colsample_bytree values second pass
+if False:
+    param_test4 = {
+        'subsample': [i / 100.0 for i in range(80, 100)],
+        'colsample_bytree': [i / 100.0 for i in range(60, 100)]
+    }
+    gsearch4 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=40, max_depth=4,
+                                                    min_child_weight=2, gamma=0, subsample=0.8, colsample_bytree=0.8,
+                                                    objective='binary:logistic', nthread=4, scale_pos_weight=1,
+                                                    seed=27),
+                            param_grid=param_test4, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
+
+    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+    target_feat = 'DIAGNOSED_DIABETES'
+
+    gsearch4.fit(full_data[pred_features], full_data[target_feat])
+
+    print("\nGrid scores:")
+    for rs in gsearch4.grid_scores_:
+        print(rs)
+
+    print("\nBest params:")
+    print(gsearch4.best_params_)
+
+    print("\nBest ROC score:")
+    print(gsearch4.best_score_)
+
+    #{'subsample': 0.81, 'colsample_bytree': 0.71}
+
 
 
 
