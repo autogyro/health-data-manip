@@ -373,13 +373,13 @@ if False:
 
 
 #Recalibration second pass
-if True:
+if False:
     # Choose all predictors except target & IDcols
     pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
 
     target_feat = ['DIAGNOSED_DIABETES']
 
-    model_3 = xgb.XGBClassifier(
+    model_4 = xgb.XGBClassifier(
         learning_rate=0.1,
         n_estimators=40,
         max_depth=4,
@@ -393,9 +393,33 @@ if True:
         scale_pos_weight=1,
         seed=27)
 
-    resultados = testPerformance(model_3, full_data, pred_features, target_feat, cross_val=True)
+    resultados = testPerformance(model_4, full_data, pred_features, target_feat, cross_val=True)
     print(resultados)
 
+
+#Tuning learning rate (we might decide to stop tuning here)
+if True:
+    # Choose all predictors except target & IDcols
+    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+
+    target_feat = ['DIAGNOSED_DIABETES']
+
+    model_5 = xgb.XGBClassifier(
+        learning_rate=0.01,
+        n_estimators=400,
+        max_depth=4,
+        min_child_weight=2,
+        gamma=0,
+        subsample=0.81,
+        colsample_bytree=0.71,
+        reg_alpha=0.14,
+        objective='binary:logistic',
+        nthread=8,
+        scale_pos_weight=1,
+        seed=27)
+
+    resultados = testPerformance(model_5, full_data, pred_features, target_feat, cross_val=True)
+    print(resultados)
 
 
 
