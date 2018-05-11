@@ -398,7 +398,7 @@ if False:
 
 
 #Tuning learning rate (we might decide to stop tuning here)
-if True:
+if False:
     # Choose all predictors except target & IDcols
     pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
 
@@ -419,6 +419,54 @@ if True:
         seed=27)
 
     resultados = testPerformance(model_5, full_data, pred_features, target_feat, cross_val=True)
+    print(resultados)
+
+#Test on features selected by combinatorics
+if False:
+    # Choose all predictors except target & IDcols
+    opt_feats = ['LBXSBU', 'LBXSCK', 'LBXSCR', 'LBXSGL', 'LBXSKSI', 'BMI', 'HYPERTENSION_ONSET', 'HIGHCHOL_ONSET',
+             'HIGHCHOL', 'FAMILIAL_DIABETES']
+    target_feat = ['DIAGNOSED_DIABETES']
+
+    model_6 = xgb.XGBClassifier(
+        learning_rate=0.01,
+        n_estimators=400,
+        max_depth=4,
+        min_child_weight=2,
+        gamma=0,
+        subsample=0.81,
+        colsample_bytree=0.71,
+        reg_alpha=0.14,
+        objective='binary:logistic',
+        nthread=8,
+        scale_pos_weight=1,
+        seed=27)
+
+    resultados = testPerformance(model_6, full_data, opt_feats, target_feat, cross_val=True)
+    print(resultados)
+
+
+#Test on features selected by feature importance
+if True:
+    # Choose all predictors except target & IDcols
+    opt_feats = ['LBXSGL', 'BMI', 'LBXSCLSI', 'HYPERTENSION', 'HIGHCHOL', 'AGE', 'FAMILIAL_DIABETES', 'LBXSKSI', 'LBXSOSSI', 'LBXSCR']
+    target_feat = ['DIAGNOSED_DIABETES']
+
+    model_6 = xgb.XGBClassifier(
+        learning_rate=0.01,
+        n_estimators=400,
+        max_depth=4,
+        min_child_weight=2,
+        gamma=0,
+        subsample=0.81,
+        colsample_bytree=0.71,
+        reg_alpha=0.14,
+        objective='binary:logistic',
+        nthread=8,
+        scale_pos_weight=1,
+        seed=27)
+
+    resultados = testPerformance(model_6, full_data, opt_feats, target_feat, cross_val=True)
     print(resultados)
 
 
