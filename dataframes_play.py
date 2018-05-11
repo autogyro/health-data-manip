@@ -27,7 +27,7 @@ if False:
     df['Y1'] = df['X1'] + df['X2']
     print(df)
 
-def feat_Comb(df, features, weights, flabel):
+def weighted_Sum(df, features, weights, flabel):
     """
     Returns the weighted sum of selected feature in dataframe
     :param df: input dataframe
