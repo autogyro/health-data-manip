@@ -48,7 +48,7 @@ def weighted_Sum(df, features, weights, flabel):
 
 print("\nAggregated feature:\n")
 
-f = feat_Comb(df, list(df.columns), coef, 'YX')
+f = weighted_Sum(df, list(df.columns), coef, 'YX')
 print(f)
 
 
