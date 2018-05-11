@@ -34,7 +34,7 @@ def weighted_Sum(df, features, weights, flabel):
     :param features: selected features to be weighted
     :param weights: list of weight coefficients
     :param flabel: (str) label name of feature returned by function
-    :return:
+    :return: returns engineered feature frame[flabel] single pandas series (df column)
     """
 
     frame = df.copy(deep=True)
