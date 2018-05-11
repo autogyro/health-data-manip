@@ -11,14 +11,61 @@ import pandas as pd
 import sys
 
 
-d = {'FEATURES':[], "ROC":[], "ACC":[]}
-df = pd.DataFrame(d)
 
-tmp = (['A', 'B'], 80.0, 3.0)
+coef = [0.5, 0.5]
 
-df = df.append(pd.DataFrame({"FEATURES":[tmp[0]], "ROC":[tmp[1]], "ACC":[tmp[2]]}))
+d = {'X1':[2 ,4, 6],'X2':[10, 12, 8]}
+df = pd.DataFrame(d, index=['a', 'b', 'c'])
+
 
 print(df)
+
+if False:
+    for m, feat in enumerate(df.columns):
+        df[feat] = coef[m] * df[feat]
+    print(df)
+    df['Y1'] = df['X1'] + df['X2']
+    print(df)
+
+def feat_Comb(df, features, weights, flabel):
+    """
+    Returns the weighted sum of selected feature in dataframe
+    :param df: input dataframe
+    :param features: selected features to be weighted
+    :param weights: list of weight coefficients
+    :param flabel: (str) label name of feature returned by function
+    :return:
+    """
+
+    frame = df.copy(deep=True)
+
+    for m, feat in enumerate(features):
+        frame[feat] = weights[m] * frame[feat]
+
+    frame[flabel] = frame.sum(axis=1)
+
+    return frame[flabel]
+
+print("\nAggregated feature:\n")
+
+f = feat_Comb(df, list(df.columns), coef, 'YX')
+print(f)
+
+
+
+
+if False:
+    #Test for creating df for storing combinatorics results on feature selection
+    #see feature_scan_cv codes
+
+    d = {'FEATURES':[], "ROC":[], "ACC":[]}
+    df = pd.DataFrame(d)
+
+    tmp = (['A', 'B'], 80.0, 3.0)
+
+    df = df.append(pd.DataFrame({"FEATURES":[tmp[0]], "ROC":[tmp[1]], "ACC":[tmp[2]]}))
+
+    print(df)
 
 
 
