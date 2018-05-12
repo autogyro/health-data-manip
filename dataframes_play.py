@@ -12,9 +12,9 @@ import sys
 
 
 
-coef = [0.5, 0.5]
+coef = [1.0, 0.2, 0.4]
 
-d = {'X1':[2 ,4, 6],'X2':[10, 12, 8]}
+d = {'X1':[1 ,0, 0],'X2':[0, 1, 0], 'X3':[0, 0, 1]}
 df = pd.DataFrame(d, index=['a', 'b', 'c'])
 
 
@@ -27,7 +27,7 @@ if False:
     df['Y1'] = df['X1'] + df['X2']
     print(df)
 
-def weighted_Sum(df, features, weights, flabel):
+def weighted_Sum(df, features, weights, flabel,normalize=False):
     """
     Returns the weighted sum of selected feature in dataframe
     :param df: input dataframe
@@ -44,13 +44,19 @@ def weighted_Sum(df, features, weights, flabel):
 
     frame[flabel] = frame.sum(axis=1)
 
-    return frame[flabel]
+    if normalize:
+        s = frame[flabel] / np.sum(weights)
+        return s.to_frame()
+    else:
+        s = frame[flabel]
+        return s.to_frame()
 
 print("\nAggregated feature:\n")
 
-f = weighted_Sum(df, list(df.columns), coef, 'YX')
-print(f)
+frame1 = weighted_Sum(df, list(df.columns), coef, 'YX',normalize=True)
+print(frame1)
 
+print(frame1.columns)
 
 
 
@@ -183,9 +189,6 @@ if False:
     print("Balancing Ratio: {}".format(imbratio))
 
 
-
-
-
 def create_binarized_df(input_df, features, thresholds, full_binarization=True):
     """
     :param input_df: dataframe containing the features to be binarized
@@ -219,6 +222,13 @@ def create_binarized_df(input_df, features, thresholds, full_binarization=True):
         frame[feat] = pd.to_numeric(frame[feat], downcast='integer')
 
     return frame
+
+#Test binarized function on weighted sum engineered feature... see function above
+if False:
+    print("Binarized form:")
+    frame2 = create_binarized_df(frame1,['YX'],{'YX':0.5},full_binarization=True)
+    print(frame2)
+
 
 
 #######################################
