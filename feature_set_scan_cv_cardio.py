@@ -65,22 +65,46 @@ else:
 full_data = pd.read_csv(project_path + 'nhanes_2013_2014_full_data.csv',index_col=0)
 
 
-full_data.drop(['ETHNICITY_Other', 'GENDER_Male', 'GENDER_Female','DIAGNOSED_PREDIABETES',
-                'BREATH_SHORTNESS', 'CHEST_PAIN_30MIN', 'CHEST_DISCOMFORT', 'RISK_DIABETES',
-                'FAST_FOOD', 'NOTHOME_FOOD', 'INCOME_LEVEL','ETHNICITY_White', 'ETHNICITY_Black',
-                'ETHNICITY_Hispanic', 'ETHNICITY_Asian', 'SMOKING'], axis = 1, inplace=True)
+
+#@@@@@@@@@@@@@@
+############### Create cardiovascular disease feature ################
+#@@@@@@@@@@@@@@
+
+weights0 = [0.2, 0.8, 0.2, 0.8, 0.2]
+mean_weight = np.mean(weights0)
+print("Mean weight = {}".format(mean_weight))
+cardio_features = ['BREATH_SHORTNESS', 'CHEST_PAIN_30MIN', 'CHEST_DISCOMFORT', 'HYPERTENSION', 'HYPERTENSION_ONSET']
+flabel = 'CARDIO_DISORDER'
+
+sel_df = full_data[cardio_features]
+
+cardio_df = txt.weighted_Sum(sel_df, cardio_features, weights0, flabel,normalize=False)
+
+cardio_bin_df = txt.create_binarized_df(cardio_df,['CARDIO_DISORDER'],{'CARDIO_DISORDER':mean_weight}, full_binarization=True)
+
+print(cardio_bin_df)
+print("Number of cardiovascular disorder cases = {}".format(cardio_bin_df.sum()))
+
+full_data = pd.concat([full_data, cardio_bin_df],axis=1)
+
+print(full_data['CARDIO_DISORDER'])
+
+full_data.drop(['ETHNICITY_Other', 'GENDER_Male', 'GENDER_Female',
+                'BREATH_SHORTNESS', 'CHEST_PAIN_30MIN', 'CHEST_DISCOMFORT', 'HYPERTENSION', 'HYPERTENSION_ONSET',
+                'RISK_DIABETES','FAST_FOOD', 'NOTHOME_FOOD', 'INCOME_LEVEL','ETHNICITY_White',
+                'ETHNICITY_Black', 'ETHNICITY_Hispanic', 'ETHNICITY_Asian'], axis = 1, inplace=True)
 
 #Select the biofeatures to drop; the less you drop the more combinations will be calculated
 if False:
     full_data.drop(['LBXSTP', 'LBXSPH', 'LBXSC3SI', 'LBXSCA', 'LBXSLDSI', 'LBXSCK',
                     'LBXSCH', 'LBXSUA', 'LBXSASSI', 'LBXSIR'], axis = 1, inplace=True)
 
-if True:
+if False:
     full_data.drop(['LBXSTP', 'LBXSPH', 'LBXSC3SI', 'LBXSCA', 'LBXSLDSI',
                     'LBXSCH', 'LBXSASSI', 'LBXSIR'], axis = 1, inplace=True)
 
 
-targets_list = ['DIAGNOSED_DIABETES']
+targets_list = ['CARDIO_DISORDER']
 
 features_dframe = full_data.drop(targets_list, axis=1, inplace=False)
 
@@ -171,8 +195,8 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
 if False:
     model_1 = xgb.XGBClassifier()
 
-    opt_feats = ['LBXSBU', 'LBXSCK', 'LBXSCR', 'LBXSGL', 'LBXSKSI', 'BMI', 'HYPERTENSION_ONSET', 'HIGHCHOL_ONSET', 'HIGHCHOL', 'FAMILIAL_DIABETES']
-    target_feat = ['DIAGNOSED_DIABETES']
+    opt_feats = ['LBXSBU', 'LBXSCK', 'LBXSCR', 'LBXSGL', 'LBXSKSI', 'BMI', 'HIGHCHOL_ONSET', 'HIGHCHOL', 'FAMILIAL_DIABETES']
+    target_feat = ['CARDIO_DISORDER']
 
     resultados = testPerformance(model_1, full_data, opt_feats, target_feat, cross_val=True)
     print(resultados)
@@ -180,9 +204,9 @@ if False:
 #Optimization 1
 if False:
     # Choose all predictors except target & IDcols
-    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+    pred_features = [x for x in full_data.columns if x not in ['CARDIO_DISORDER', 'SEQN']]
 
-    target_feat = ['DIAGNOSED_DIABETES']
+    target_feat = ['CARDIO_DISORDER']
 
     model_2 = xgb.XGBClassifier(
         learning_rate=0.1,
@@ -214,8 +238,8 @@ if False:
                             param_grid=param_test1, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
 
 
-    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
-    target_feat = 'DIAGNOSED_DIABETES'
+    pred_features = [x for x in full_data.columns if x not in ['CARDIO_DISORDER', 'SEQN']]
+    target_feat = 'CARDIO_DISORDER'
 
     gsearch1.fit(full_data[pred_features], full_data[target_feat])
 
@@ -242,8 +266,8 @@ if False:
      param_grid = param_test2, scoring='roc_auc',n_jobs=8,iid=False, cv=5)
 
 
-    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
-    target_feat = 'DIAGNOSED_DIABETES'
+    pred_features = [x for x in full_data.columns if x not in ['CARDIO_DISORDER', 'SEQN']]
+    target_feat = 'CARDIO_DISORDER'
 
     gsearch2.fit(full_data[pred_features], full_data[target_feat])
 
@@ -260,9 +284,9 @@ if False:
 #Recalibration first pass
 if False:
     # Choose all predictors except target & IDcols
-    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+    pred_features = [x for x in full_data.columns if x not in ['CARDIO_DISORDER', 'SEQN']]
 
-    target_feat = ['DIAGNOSED_DIABETES']
+    target_feat = ['CARDIO_DISORDER']
 
     model_3 = xgb.XGBClassifier(
         learning_rate=0.1,
@@ -292,8 +316,8 @@ if False:
                                                     seed=27),
                             param_grid=param_test3, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
 
-    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
-    target_feat = 'DIAGNOSED_DIABETES'
+    pred_features = [x for x in full_data.columns if x not in ['CARDIO_DISORDER', 'SEQN']]
+    target_feat = 'CARDIO_DISORDER'
 
     gsearch3.fit(full_data[pred_features], full_data[target_feat])
 
@@ -322,8 +346,8 @@ if False:
                                                     seed=27),
                             param_grid=param_test4, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
 
-    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
-    target_feat = 'DIAGNOSED_DIABETES'
+    pred_features = [x for x in full_data.columns if x not in ['CARDIO_DISORDER', 'SEQN']]
+    target_feat = 'CARDIO_DISORDER'
 
     gsearch4.fit(full_data[pred_features], full_data[target_feat])
 
@@ -353,8 +377,8 @@ if False:
                                                     seed=27),
                             param_grid=param_test5, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
 
-    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
-    target_feat = 'DIAGNOSED_DIABETES'
+    pred_features = [x for x in full_data.columns if x not in ['CARDIO_DISORDER', 'SEQN']]
+    target_feat = 'CARDIO_DISORDER'
 
     gsearch5.fit(full_data[pred_features], full_data[target_feat])
 
@@ -375,9 +399,9 @@ if False:
 #Recalibration second pass
 if False:
     # Choose all predictors except target & IDcols
-    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+    pred_features = [x for x in full_data.columns if x not in ['CARDIO_DISORDER', 'SEQN']]
 
-    target_feat = ['DIAGNOSED_DIABETES']
+    target_feat = ['CARDIO_DISORDER']
 
     model_4 = xgb.XGBClassifier(
         learning_rate=0.1,
@@ -400,9 +424,9 @@ if False:
 #Tuning learning rate (we might decide to stop tuning here)
 if False:
     # Choose all predictors except target & IDcols
-    pred_features = [x for x in full_data.columns if x not in ['DIAGNOSED_DIABETES', 'SEQN']]
+    pred_features = [x for x in full_data.columns if x not in ['CARDIO_DISORDER', 'SEQN']]
 
-    target_feat = ['DIAGNOSED_DIABETES']
+    target_feat = ['CARDIO_DISORDER']
 
     model_5 = xgb.XGBClassifier(
         learning_rate=0.01,
@@ -424,9 +448,9 @@ if False:
 #Test on features selected by combinatorics
 if False:
     # Choose all predictors except target & IDcols
-    opt_feats = ['LBXSBU', 'LBXSCK', 'LBXSCR', 'LBXSGL', 'LBXSKSI', 'BMI', 'HYPERTENSION_ONSET', 'HIGHCHOL_ONSET',
+    opt_feats = ['LBXSBU', 'LBXSCK', 'LBXSCR', 'LBXSGL', 'LBXSKSI', 'BMI', 'HIGHCHOL_ONSET',
              'HIGHCHOL', 'FAMILIAL_DIABETES']
-    target_feat = ['DIAGNOSED_DIABETES']
+    target_feat = ['CARDIO_DISORDER']
 
     model_6 = xgb.XGBClassifier(
         learning_rate=0.01,
@@ -447,10 +471,10 @@ if False:
 
 
 #Test on features selected by feature importance
-if True:
+if False:
     # Choose all predictors except target & IDcols
-    opt_feats = ['LBXSGL', 'BMI', 'LBXSCLSI', 'HYPERTENSION', 'HIGHCHOL', 'AGE', 'FAMILIAL_DIABETES', 'LBXSKSI', 'LBXSOSSI', 'LBXSCR']
-    target_feat = ['DIAGNOSED_DIABETES']
+    opt_feats = ['LBXSGL', 'BMI', 'LBXSCLSI', 'HIGHCHOL', 'AGE', 'FAMILIAL_DIABETES', 'LBXSKSI', 'LBXSOSSI', 'LBXSCR']
+    target_feat = ['CARDIO_DISORDER']
 
     model_6 = xgb.XGBClassifier(
         learning_rate=0.01,
