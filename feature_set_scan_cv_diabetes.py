@@ -154,9 +154,9 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
     accuracy = accuracy_score(targets_df.values, predictions)
     acc_pctg = accuracy * 100.0
 
-    ax = xgb.plot_importance(model, grid=False)
-    plt.yticks(fontsize=6)
-    plt.show()
+    # ax = xgb.plot_importance(model, grid=False)
+    # plt.yticks(fontsize=6)
+    # plt.show()
 
     return (features_list, roc_auc, acc_pctg)
 
@@ -503,7 +503,7 @@ if False:
     stored_results = []
     star_time = time.time()
     pool = mp.Pool()
-    results = [pool.apply_async(testPerformance, args=(full_data, x, targets_list )) for x in feat_sets]
+    results = [pool.apply_async(testPerformance, args=(model_6, full_data, x, ['DIAGNOSED_DIABETES'], True, 5)) for x in feat_sets]
     end_time = time.time()
     output = [p.get() for p in results]
     for rs in output:
@@ -521,10 +521,10 @@ if False:
 
     #Sort resdf dataframe by ROC values
     resdf.sort_values(by=['ROC'], ascending=False, inplace=True)
-    resdf.reset_index(level='int', inplace=True)
+    #resdf.reset_index(level='int', inplace=True)
 
     #Save resdf DF to CSV File
-    resdf.to_csv('feature_combinations_results.csv')
+    resdf.to_csv('feature_combinations_results_diabetes.csv')
 
     print("\nMaximum ROC value in data:\n")
     max_record_roc = resdf.loc[resdf['ROC'].idxmax()]
