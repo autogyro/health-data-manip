@@ -8,17 +8,43 @@ Created on Tue Sep 19 10:02:43 2017
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import time
 import sys
 
+#Test sorting algorithms
+if True:
+    d = {'A': np.random.randn(20000000),'B': np.random.randn(20000000)}
+    df = pd.DataFrame(d)
+
+    if True:
+        start_time = time.time()
+        df.sort_values(by=['A'], ascending=False, inplace=True)
+        end_time = time.time()
+        print("Default (quicksort) elapsed time: {}".format(end_time-start_time))
+
+        #Default (quicksort) elapsed time: 0.524489164352417
+        #Default (quicksort) elapsed time: 8.430176019668579
+
+    if False:
+        start_time = time.time()
+        df.sort_values(by=['A'], ascending=False, inplace=True,kind='mergesort')
+        end_time = time.time()
+        print("Merge sort elapsed time: {}".format(end_time-start_time))
+
+        #Merge sort elapsed time: 0.46254897117614746
+        #Merge sort elapsed time: 7.251046895980835
 
 
-coef = [1.0, 0.2, 0.4]
-
-d = {'X1':[1 ,0, 0],'X2':[0, 1, 0], 'X3':[0, 0, 1]}
-df = pd.DataFrame(d, index=['a', 'b', 'c'])
 
 
-print(df)
+if False:
+    #coef = [1.0, 0.2, 0.4]
+    #coef = [0.8, 0.4, 0.4]
+    coef = [0.7, 0.2, 0.1]
+    print("Mean coef = {}".format(np.mean(coef)))
+    d = {'X1':[1 ,0, 0],'X2':[1, 1, 0], 'X3':[0, 1, 1]}
+    df = pd.DataFrame(d, index=['a', 'b', 'c'])
+    print(df)
 
 if False:
     for m, feat in enumerate(df.columns):
@@ -42,6 +68,9 @@ def weighted_Sum(df, features, weights, flabel,normalize=False):
     for m, feat in enumerate(features):
         frame[feat] = weights[m] * frame[feat]
 
+    print("Frame:\n")
+    print(frame)
+
     frame[flabel] = frame.sum(axis=1)
 
     if normalize:
@@ -51,12 +80,16 @@ def weighted_Sum(df, features, weights, flabel,normalize=False):
         s = frame[flabel]
         return s.to_frame()
 
-print("\nAggregated feature:\n")
 
-frame1 = weighted_Sum(df, list(df.columns), coef, 'YX',normalize=True)
-print(frame1)
+#**************************************
+if False:
 
-print(frame1.columns)
+    print("\nAggregated feature:\n")
+
+    frame1 = weighted_Sum(df, list(df.columns), coef, 'YX',normalize=True)
+    print(frame1)
+
+    print(frame1.columns)
 
 
 
@@ -223,7 +256,22 @@ def create_binarized_df(input_df, features, thresholds, full_binarization=True):
 
     return frame
 
+#-------------------------------------------------------------------------------
 #Test binarized function on weighted sum engineered feature... see function above
+
+
+if False:
+
+    coef = [0.2, 1.0, 0.2, 1.0, 0.3]
+    #coef = [0.1, 0.5, 0.1, 0.5, 0.15]
+
+    print("Mean coef = {}".format(np.mean(coef)))
+    dl = {'BREATH_SHORTNESS':[1,0,0], 'CHEST_PAIN_30MIN':[0,1,0], 'CHEST_DISCOMFORT':[1,0,1], 'HYPERTENSION':[0,0,1], 'HYPERTENSION_ONSET':[1,0,0]}
+    df = pd.DataFrame(dl)
+    print(df)
+
+
+
 if False:
     print("Binarized form:")
     frame2 = create_binarized_df(frame1,['YX'],{'YX':0.5},full_binarization=True)
