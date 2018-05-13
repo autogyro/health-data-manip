@@ -94,6 +94,8 @@ full_data.drop(['ETHNICITY_Other', 'GENDER_Male', 'GENDER_Female',
                 'RISK_DIABETES','FAST_FOOD', 'NOTHOME_FOOD', 'INCOME_LEVEL','ETHNICITY_White',
                 'ETHNICITY_Black', 'ETHNICITY_Hispanic', 'ETHNICITY_Asian'], axis = 1, inplace=True)
 
+
+#STEP RELEVANT FOR COMBINATORIC OPTIMIZATION ...SEE BELOW:
 #Select the biofeatures to drop; the less you drop the more combinations will be calculated
 if False:
     full_data.drop(['LBXSTP', 'LBXSPH', 'LBXSC3SI', 'LBXSCA', 'LBXSLDSI', 'LBXSCK',
@@ -102,6 +104,11 @@ if False:
 if False:
     full_data.drop(['LBXSTP', 'LBXSPH', 'LBXSC3SI', 'LBXSCA', 'LBXSLDSI',
                     'LBXSCH', 'LBXSASSI', 'LBXSIR'], axis = 1, inplace=True)
+
+#For cardiovascular disease risk calculation we drop features based on feature importance
+if True:
+    full_data.drop(['LBXSOSSI', 'LBXSC3SI', 'DIAGNOSED_PREDIABETES', 'LBXSNASI',
+                    'ALCOHOL_NUM', 'LBXSASSI', 'LBXSTP', 'LBXSTB', 'LBXSCA'], axis = 1, inplace=True)
 
 
 targets_list = ['CARDIO_DISORDER']
@@ -178,9 +185,9 @@ def testPerformance(model, full_data, features_list, targets_list, cross_val=Tru
     accuracy = accuracy_score(targets_df.values, predictions)
     acc_pctg = accuracy * 100.0
 
-    ax = xgb.plot_importance(model, grid=False)
-    plt.yticks(fontsize=6)
-    plt.show()
+    # ax = xgb.plot_importance(model, grid=False)
+    # plt.yticks(fontsize=6)
+    # plt.show()
 
     return (features_list, roc_auc, acc_pctg)
 
@@ -253,15 +260,22 @@ if False:
     print("\nBest ROC score:")
     print(gsearch1.best_score_)
 
-    #Best params: {'n_estimators': 40, 'min_child_weight': 2, 'max_depth': 4}
+    # Best
+    # params:
+    # {'min_child_weight': 3, 'max_depth': 3, 'n_estimators': 90}
+    #
+    # Best
+    # ROC
+    # score:
+    # 0.832375021941789
 
 
 #Tune gamma
 if False:
     param_test2 = {'gamma':[i/10.0 for i in range(0,5)]}
 
-    gsearch2 = GridSearchCV(estimator = xgb.XGBClassifier( learning_rate =0.1, n_estimators=40, max_depth=4,
-     min_child_weight=2, gamma=0, subsample=0.8, colsample_bytree=0.8,
+    gsearch2 = GridSearchCV(estimator = xgb.XGBClassifier( learning_rate =0.1, n_estimators=90, max_depth=3,
+     min_child_weight=3, gamma=0, subsample=0.8, colsample_bytree=0.8,
      objective= 'binary:logistic', nthread=4, scale_pos_weight=1,seed=27),
      param_grid = param_test2, scoring='roc_auc',n_jobs=8,iid=False, cv=5)
 
@@ -281,6 +295,13 @@ if False:
     print("\nBest ROC score:")
     print(gsearch2.best_score_)
 
+
+    # Best params:
+    # {'gamma': 0.3}
+    #
+    # Best ROC score:
+    # 0.8328079223746894
+
 #Recalibration first pass
 if False:
     # Choose all predictors except target & IDcols
@@ -290,10 +311,10 @@ if False:
 
     model_3 = xgb.XGBClassifier(
         learning_rate=0.1,
-        n_estimators=40,
-        max_depth=4,
-        min_child_weight=2,
-        gamma=0,
+        n_estimators=90,
+        max_depth=3,
+        min_child_weight=3,
+        gamma=0.3,
         subsample=0.8,
         colsample_bytree=0.8,
         objective='binary:logistic',
@@ -304,15 +325,19 @@ if False:
     resultados = testPerformance(model_3, full_data, pred_features, target_feat, cross_val=True)
     print(resultados)
 
+    # Model Report
+    # Accuracy : 0.8494
+    # AUC Score (Train): 0.890384
+
 #Tune subsample and colsample_bytree values first pass
 if False:
     param_test3 = {
         'subsample': [i / 10.0 for i in range(6, 10)],
         'colsample_bytree': [i / 10.0 for i in range(6, 10)]
     }
-    gsearch3 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=40, max_depth=4,
-                                                    min_child_weight=2, gamma=0, subsample=0.8, colsample_bytree=0.8,
-                                                    objective='binary:logistic', nthread=4, scale_pos_weight=1,
+    gsearch3 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=90, max_depth=3,
+                                                    min_child_weight=3, gamma=0.3, subsample=0.8, colsample_bytree=0.8,
+                                                    objective='binary:logistic', nthread=8, scale_pos_weight=1,
                                                     seed=27),
                             param_grid=param_test3, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
 
@@ -331,18 +356,25 @@ if False:
     print("\nBest ROC score:")
     print(gsearch3.best_score_)
 
-    #Best params:{'subsample': 0.9, 'colsample_bytree': 0.7}
+    # Best
+    # params:
+    # {'subsample': 0.7, 'colsample_bytree': 0.7}
+    #
+    # Best
+    # ROC
+    # score:
+    # 0.8330996528538714
 
 
 #Tune subsample and colsample_bytree values second pass
 if False:
     param_test4 = {
-        'subsample': [i / 100.0 for i in range(80, 100)],
+        'subsample': [i / 100.0 for i in range(60, 100)],
         'colsample_bytree': [i / 100.0 for i in range(60, 100)]
     }
-    gsearch4 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=40, max_depth=4,
-                                                    min_child_weight=2, gamma=0, subsample=0.8, colsample_bytree=0.8,
-                                                    objective='binary:logistic', nthread=4, scale_pos_weight=1,
+    gsearch4 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=90, max_depth=3,
+                                                    min_child_weight=3, gamma=0.3, subsample=0.7, colsample_bytree=0.7,
+                                                    objective='binary:logistic', nthread=8, scale_pos_weight=1,
                                                     seed=27),
                             param_grid=param_test4, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
 
@@ -361,7 +393,14 @@ if False:
     print("\nBest ROC score:")
     print(gsearch4.best_score_)
 
-    #{'subsample': 0.81, 'colsample_bytree': 0.71}
+    # Best
+    # params:
+    # {'colsample_bytree': 0.85, 'subsample': 0.74}
+    #
+    # Best
+    # ROC
+    # score:
+    # 0.8352258718123456
 
 
 #Tune regularization parameter alpha
@@ -371,9 +410,9 @@ if False:
     param_test5 = {'reg_alpha': [0.13, 0.14, 0.145, 0.15, 0.16]}
 
 
-    gsearch5 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=40, max_depth=4,
-                                                    min_child_weight=2, gamma=0, subsample=0.81, colsample_bytree=0.71,
-                                                    objective='binary:logistic', nthread=4, scale_pos_weight=1,
+    gsearch5 = GridSearchCV(estimator=xgb.XGBClassifier(learning_rate=0.1, n_estimators=90, max_depth=3,
+                                                    min_child_weight=3, gamma=0.3, subsample=0.74, colsample_bytree=0.85,
+                                                    objective='binary:logistic', nthread=8, scale_pos_weight=1,
                                                     seed=27),
                             param_grid=param_test5, scoring='roc_auc', n_jobs=8, iid=False, cv=5)
 
@@ -392,7 +431,7 @@ if False:
     print("\nBest ROC score:")
     print(gsearch5.best_score_)
 
-    #Best params: {'reg_alpha': 0.14}
+    #Best params:{'reg_alpha': 0.15}
 
 
 
@@ -405,13 +444,13 @@ if False:
 
     model_4 = xgb.XGBClassifier(
         learning_rate=0.1,
-        n_estimators=40,
-        max_depth=4,
-        min_child_weight=2,
-        gamma=0,
-        subsample=0.81,
-        colsample_bytree=0.71,
-        reg_alpha=0.14,
+        n_estimators=90,
+        max_depth=3,
+        min_child_weight=3,
+        gamma=0.3,
+        subsample=0.74,
+        colsample_bytree=0.84,
+        reg_alpha=0.15,
         objective='binary:logistic',
         nthread=8,
         scale_pos_weight=1,
@@ -419,6 +458,12 @@ if False:
 
     resultados = testPerformance(model_4, full_data, pred_features, target_feat, cross_val=True)
     print(resultados)
+
+    # Model
+    # Report
+    # Accuracy: 0.8478
+    # AUC
+    # Score(Train): 0.889458
 
 
 #Tuning learning rate (we might decide to stop tuning here)
@@ -430,13 +475,13 @@ if False:
 
     model_5 = xgb.XGBClassifier(
         learning_rate=0.01,
-        n_estimators=400,
-        max_depth=4,
-        min_child_weight=2,
-        gamma=0,
-        subsample=0.81,
-        colsample_bytree=0.71,
-        reg_alpha=0.14,
+        n_estimators=900,
+        max_depth=3,
+        min_child_weight=3,
+        gamma=0.3,
+        subsample=0.75,
+        colsample_bytree=0.84,
+        reg_alpha=0.15,
         objective='binary:logistic',
         nthread=8,
         scale_pos_weight=1,
@@ -473,7 +518,7 @@ if False:
 #Test on features selected by feature importance
 if False:
     # Choose all predictors except target & IDcols
-    opt_feats = ['LBXSGL', 'BMI', 'LBXSCLSI', 'HIGHCHOL', 'AGE', 'FAMILIAL_DIABETES', 'LBXSKSI', 'LBXSOSSI', 'LBXSCR']
+    opt_feats = ['AGE', 'BMI', 'LBXSUA', 'LBXSCR', 'LBXSCLSI', 'LBXSGTSI', 'LBXSLDSI', 'LBXSIR', 'LBXSGB', 'LBXSAL']
     target_feat = ['CARDIO_DISORDER']
 
     model_6 = xgb.XGBClassifier(
@@ -498,18 +543,40 @@ if False:
 # ============================================COMBINATIONS DIRECT OPTIMIZATION =========================================
 #feature_sets definition
 #Compute before hand the number of possible combinations of features used for training
+
+#Mini test on small subselection:
 if False:
-    feature_combinatons = combinations(iterable=feat_cols, r=10)
+    feat_cols = ['AGE', 'BMI', 'LBXSUA', 'LBXSAL', 'LBXSGB', 'LBXSCLSI', 'LBXSIR', 'LBXSGTSI']
+
+if True:
+
+    model_6 = xgb.XGBClassifier(
+        learning_rate=0.01,
+        n_estimators=400,
+        max_depth=4,
+        min_child_weight=2,
+        gamma=0,
+        subsample=0.81,
+        colsample_bytree=0.71,
+        reg_alpha=0.14,
+        objective='binary:logistic',
+        nthread=8,
+        scale_pos_weight=1,
+        seed=27)
+
+    num_elem_per_comb = 10
+    feature_combinatons = combinations(iterable=feat_cols, r=num_elem_per_comb)
     feature_sets = []
     for el in feature_combinatons:
         feature_sets.append(list(el))
     print("Number of feature combination sets = {}".format(len(feature_sets)))
 
+
     # feat_sets defintion
     # Subselection of feature sets
-    if False:
-        number_of_test_sets = 10
     if True:
+        number_of_test_sets = 5
+    if False:
         number_of_test_sets = 20
     if False:
         number_of_test_sets = len(feature_sets)
@@ -518,17 +585,24 @@ if False:
     for m in range(number_of_test_sets):
         feat_sets.append(feature_sets[m])
 
+    if False:
+        print(feat_sets)
+
+
+#
+#testPerformance(model, full_data, features_list, targets_list, cross_val=True,cv_folds=5, early_stopping_rounds=50)
 
 #Evaluate model on multiple feature combinations
 #Asynchronus thread execution (much faster!)
-if False:
+if True:
     import multiprocessing as mp
 
     stored_results = []
     star_time = time.time()
     pool = mp.Pool()
-    results = [pool.apply_async(testPerformance, args=(full_data, x, targets_list )) for x in feat_sets]
+    results = [pool.apply_async(testPerformance, args=(model_6, full_data, x, ['CARDIO_DISORDER'], True, 5)) for x in feat_sets]
     end_time = time.time()
+    print("Asynchronus Execution_time = {}".format(end_time - star_time))
     output = [p.get() for p in results]
     for rs in output:
         stored_results.append(rs)
@@ -543,12 +617,13 @@ if False:
     for tmp in stored_results:
         resdf = resdf.append(pd.DataFrame({"FEATURES":[tmp[0]], "ROC":[tmp[1]], "ACC":[tmp[2]]}))
 
+    #==================================
     #Sort resdf dataframe by ROC values
-    resdf.sort_values(by=['ROC'], ascending=False, inplace=True)
-    resdf.reset_index(level='int', inplace=True)
+    resdf.sort_values(by=['ROC'], ascending=False, inplace=True,kind='mergesort')
+    #resdf.reset_index(level='int', inplace=True)
 
     #Save resdf DF to CSV File
-    resdf.to_csv('feature_combinations_results.csv')
+    resdf.to_csv('feature_combinations_results_cardio.csv')
 
     print("\nMaximum ROC value in data:\n")
     max_record_roc = resdf.loc[resdf['ROC'].idxmax()]
