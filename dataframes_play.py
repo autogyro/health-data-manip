@@ -10,9 +10,76 @@ import numpy as np
 import pandas as pd
 import time
 import sys
+import pandasql as ps
+
+
+data = {"ID": ['001', '001', '002', '001', '002'], "A":[1,2,3,10,30], "B":[12,11,32,10,48]}
+df1 = pd.DataFrame(data)
+print(df1)
+print("\n\n")
+
+q0 = """ SELECT * FROM df1 ORDER BY ID ASC """
+q1 = """ SELECT COUNT(*) FROM df1 WHERE ID = '001' """
+q2 = """ SELECT COUNT(*) AS FOO FROM df1 WHERE ID = '001' """
+q3 = """ SELECT ID, FOO FROM (SELECT ID, df1.A + df1.B AS FOO FROM df1) """
+q4 = """SELECT ID,  SUM (FOO) FROM  (SELECT ID, df1.A + df1.B AS FOO FROM df1)  GROUP BY ID;"""
+
+print(ps.sqldf(q0, locals()))
+print("")
+print(ps.sqldf(q4, locals()))
+
+
+
+
+
+if False:
+
+    d1 = {"A":[1,2,3,10], "B":[12,11,32,10]}
+    d2 = {"A":[45,55,655,112], "B":[6,11,6,11]}
+
+    df1 = pd.DataFrame(d1)
+    df2 = pd.DataFrame(d2)
+
+    df = pd.concat([df1, df2],axis=0)
+    df.reset_index(inplace=True, drop=True)
+    print(df)
+
+    df['B'].replace(11,'Foo',inplace=True)
+    print("")
+    print(df)
+
+if False:
+    d3 = {"T1":["a","b","c"], "T2":["d","f","g"]}
+    df3 = pd.DataFrame(d3)
+    dfu = pd.DataFrame(df3['T1'].str.upper())
+    df3['T1'] = dfu['T1']
+
+
+
+if False:
+
+    M = np.random.random((2,10))
+    print(M)
+
+    MD = pd.DataFrame(M)
+    print(MD)
+
+
+    if False:
+
+        d = {"A":[1.1, 3.3, 3.3, 2.0], "B":[1,2,3,4]}
+        df = pd.DataFrame(d)
+
+        print(df["A"].max())
+
+        dflm = df[(df["A"] == 3.3)]
+
+        print(dflm["B"])
+
+
 
 #Test sorting algorithms
-if True:
+if False:
     d = {'A': np.random.randn(20000000),'B': np.random.randn(20000000)}
     df = pd.DataFrame(d)
 
