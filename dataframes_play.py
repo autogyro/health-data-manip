@@ -13,10 +13,20 @@ import sys
 import pandasql as ps
 
 
-data = {"ID": ['001', '001', '002', '001', '002'], "A":[1,2,3,10,30], "B":[12,11,32,10,48]}
+data = {"ID": ['001', '001', '002', '001', '002'], "A":[1,2,3,10,30], "B":[12,11,32,10,48], "name": ['mike','mike','frank', 'mike', 'frank']}
+data2 = {"ID": ['002', '001', '002', '001', '002'], "fruit":['grape', np.nan,'orange','lemon', np.nan],"item": [np.nan, 'car', 'fruit', 'stove', np.nan]}
+
 df1 = pd.DataFrame(data)
+df2 = pd.DataFrame(data2)
+
+print("Frames\n")
+
 print(df1)
 print("\n\n")
+print(df2)
+print("\n\n")
+
+
 
 q0 = """ SELECT * FROM df1 ORDER BY ID ASC """
 q1 = """ SELECT COUNT(*) FROM df1 WHERE ID = '001' """
@@ -24,10 +34,33 @@ q2 = """ SELECT COUNT(*) AS FOO FROM df1 WHERE ID = '001' """
 q3 = """ SELECT ID, FOO FROM (SELECT ID, df1.A + df1.B AS FOO FROM df1) """
 q4 = """SELECT ID,  SUM (FOO) FROM  (SELECT ID, df1.A + df1.B AS FOO FROM df1)  GROUP BY ID;"""
 
-print(ps.sqldf(q0, locals()))
-print("")
-print(ps.sqldf(q4, locals()))
+q4 = """SELECT ID,  SUM (FOO) FROM  (SELECT ID, df1.A + df1.B AS FOO FROM df1)  GROUP BY ID;"""
 
+q5 = """SELECT df1.ID,  df1.name, df2.item  FROM df1, df2 WHERE df1.ID = df2.ID;"""
+
+q6 = """SELECT df1.ID,  df1.name, df2.item  FROM df1 INNER JOIN df2 ON df1.ID = df2.ID;"""
+
+q7 = """SELECT df2.fruit FROM df2 UNION SELECT df2.item FROM df2 ;"""
+
+q8 = """SELECT df1.ID,  df1.name, FOO FROM df1, (SELECT df2.ID, (df2.fruit || df2.item) AS FOO FROM df2);"""
+
+
+
+
+
+print("Queries\n")
+
+"""
+#JOINS RESTRICT COMPARISON
+
+print("")
+print(ps.sqldf(q5, locals()))
+print("")
+print(ps.sqldf(q6, locals()))
+"""
+
+print("")
+print(ps.sqldf(q8, locals()))
 
 
 
